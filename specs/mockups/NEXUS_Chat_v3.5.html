@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS. — Chat v3.5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --ocean-800: #0F2C4A;
+  --ocean-700: #183F5E;
+  --ocean-600: #1E537A;
+  --ocean-500: #2A6A95;
+  --ocean-400: #3E86B5;
+  --ocean-300: #6BA8CD;
+  --ocean-200: #9CC6DF;
+  --ocean-100: #CFE1EE;
+  --ocean-50:  #EAF2F8;
+  --teal-700: #0B5D6B;
+  --teal-600: #0E7B8A;
+  --teal-500: #1293A6;
+  --teal-400: #2DB0C2;
+  --teal-300: #5AC6D5;
+  --teal-200: #8EDBE5;
+  --teal-100: #BFE9F0;
+  --teal-50:  #E1F5F8;
+  --fuchsia-700: #A0078A;
+  --fuchsia-600: #C108AB;
+  --fuchsia-500: #D814C0;
+  --fuchsia-400: #E83CD2;
+  --cream: #FAFAFA;
+  --cream-dark: #F2F2F2;
+  --ink-900: #0A0A0A;
+  --ink-800: #1a1a1a;
+  --ink-700: #333333;
+  --ink-500: #666666;
+  --ink-400: #999999;
+  --ink-200: #e0e0e0;
+  --ink-100: #f0f0f0;
+  --ink-50:  #fafafa;
+  --white:  #ffffff;
+  --sidebar-width: 260px;
+  --topbar-height: 64px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--cream);
+  color: var(--ink-900);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.mono {
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.app-shell { display: flex; min-height: 100vh; }
+
+/* Sidebar */
+.sidebar {
+  background: var(--ink-900);
+  color: var(--cream);
+  position: fixed;
+  top: 0; left: 0;
+  height: 100%;
+  width: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  overflow-y: auto;
+}
+.sidebar-brand {
+  padding: 28px 24px 22px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.brand-mark {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--cream);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.brand-mark .dot { color: var(--fuchsia-600); }
+.brand-tagline {
+  margin-top: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+  font-weight: 400;
+}
+.tier-badge {
+  margin-top: 16px;
+  padding: 7px 11px;
+  background: rgba(15, 44, 74, 0.4);
+  border: 1px solid rgba(42, 106, 149, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tier-badge .tier-dot { width: 5px; height: 5px; background: var(--teal-400); flex-shrink: 0; }
+.tier-badge .tier-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ocean-200);
+  font-weight: 500;
+}
+
+.sidebar-nav { flex: 1; overflow-y: auto; padding: 18px 10px; }
+.nav-section { margin-bottom: 24px; }
+.nav-section-label {
+  padding: 0 14px 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+  font-weight: 500;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  color: var(--ink-400);
+  font-size: 0.82rem;
+  font-weight: 400;
+  border-left: 2px solid transparent;
+  transition: all 200ms ease;
+  cursor: pointer;
+}
+.nav-item:hover { color: var(--cream); background: rgba(255,255,255,0.03); }
+.nav-item.active {
+  color: var(--cream);
+  background: rgba(15, 44, 74, 0.35);
+  border-left-color: var(--ocean-400);
+  font-weight: 500;
+}
+.nav-icon { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.7; }
+.nav-item.active .nav-icon { opacity: 1; }
+.nav-item .nav-count {
+  margin-left: auto;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--ink-500);
+  font-weight: 500;
+}
+.convo-list { margin-top: 6px; padding-left: 24px; }
+.convo-item {
+  padding: 7px 10px;
+  font-size: 0.78rem;
+  color: var(--ink-400);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-left: 1px solid rgba(255,255,255,0.05);
+  transition: all 150ms ease;
+}
+.convo-item:hover { color: var(--cream); }
+.convo-item.active {
+  color: var(--cream);
+  border-left-color: var(--ocean-400);
+  background: rgba(15, 44, 74, 0.2);
+}
+.convo-item .convo-date {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--ink-500);
+  margin-top: 2px;
+  letter-spacing: 0.08em;
+}
+
+.miles-panel {
+  margin: 0 10px 18px;
+  padding: 14px;
+  background: rgba(15, 44, 74, 0.25);
+  border: 1px solid rgba(42, 106, 149, 0.18);
+}
+.miles-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ocean-300);
+  margin-bottom: 6px;
+}
+.miles-count {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--cream);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.miles-count .miles-unit {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  color: var(--ink-400);
+  font-weight: 400;
+  margin-left: 4px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.miles-bar { margin-top: 10px; height: 2px; background: rgba(255,255,255,0.08); position: relative; }
+.miles-bar-fill { position: absolute; top: 0; left: 0; height: 100%; width: 63%; background: var(--ocean-400); }
+
+.sidebar-footer { padding: 16px 14px; border-top: 1px solid rgba(255,255,255,0.06); }
+.user-row { display: flex; align-items: center; gap: 10px; padding: 6px; cursor: pointer; }
+.user-avatar {
+  width: 30px; height: 30px;
+  background: var(--ocean-700);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cream);
+  flex-shrink: 0;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 0.78rem; font-weight: 500; color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-email { font-size: 0.68rem; color: var(--ink-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Main content */
+.main-content {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--cream);
+}
+
+/* Top bar */
+.topbar {
+  height: var(--topbar-height);
+  background: var(--white);
+  border-bottom: 1px solid var(--ink-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  position: sticky; top: 0; z-index: 40;
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ocean-600);
+  font-weight: 500;
+}
+.topbar-divider-v { width: 1px; height: 16px; background: var(--ink-200); }
+.topbar-title {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--ink-900);
+  letter-spacing: -0.01em;
+}
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.topbar-icon-btn {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-500);
+  cursor: pointer;
+  transition: color 200ms ease;
+  position: relative;
+}
+.topbar-icon-btn:hover { color: var(--ink-900); }
+.topbar-icon-btn .dot-notification {
+  position: absolute; top: 7px; right: 7px;
+  width: 6px; height: 6px;
+  background: var(--fuchsia-600);
+}
+
+/* Chat container */
+.chat-container {
+  flex: 1;
+  display: flex;
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 48px 140px;
+  gap: 56px;
+}
+
+/* Messages */
+.messages-area {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+
+.date-divider { display: flex; align-items: center; gap: 20px; }
+.date-divider::before,
+.date-divider::after { content: ''; flex: 1; height: 1px; background: var(--ink-100); }
+.date-divider span {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* NEXUS message */
+.nexus-message { display: flex; gap: 14px; }
+.nexus-avatar {
+  width: 28px; height: 28px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  overflow: visible;
+  border: none;
+}
+.nexus-avatar svg { width: 22px; height: 22px; }
+
+/* NEXUS fairy — moving dots along paths */
+@keyframes fairy-teal-1 {
+  /* figure-8 / lemniscate path */
+  0%   { transform: translate(-8px, -5px); opacity: 0.9; }
+  25%  { transform: translate(0px, 0px); opacity: 0.6; }
+  50%  { transform: translate(8px, 5px); opacity: 0.9; }
+  75%  { transform: translate(0px, 0px); opacity: 0.5; }
+  100% { transform: translate(-8px, -5px); opacity: 0.9; }
+}
+@keyframes fairy-teal-2 {
+  /* S-curve path, slower */
+  0%   { transform: translate(6px, -6px); opacity: 0.7; }
+  33%  { transform: translate(-4px, -2px); opacity: 1; }
+  66%  { transform: translate(2px, 6px); opacity: 0.6; }
+  100% { transform: translate(6px, -6px); opacity: 0.7; }
+}
+@keyframes fairy-fuchsia-1 {
+  /* diagonal drift path */
+  0%   { transform: translate(-6px, 4px); opacity: 1; }
+  50%  { transform: translate(6px, -4px); opacity: 0.5; }
+  100% { transform: translate(-6px, 4px); opacity: 1; }
+}
+@keyframes fairy-fuchsia-2 {
+  /* smaller orbital, tight */
+  0%   { transform: rotate(0deg) translateX(4px) rotate(0deg); opacity: 0.8; }
+  100% { transform: rotate(360deg) translateX(4px) rotate(-360deg); opacity: 0.8; }
+}
+@keyframes pulse-focal {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.5); opacity: 0.6; }
+}
+@keyframes drift-gentle {
+  0%, 100% { transform: translate(0, 0); }
+  25%      { transform: translate(0.5px, -0.5px); }
+  50%      { transform: translate(0, -1px); }
+  75%      { transform: translate(-0.5px, -0.5px); }
+}
+.nexus-fairy {
+  position: absolute;
+  inset: 0;
+  animation: drift-gentle 4s ease-in-out infinite;
+}
+.nexus-fairy .dot {
+  position: absolute;
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  will-change: transform, opacity;
+}
+.nexus-fairy .dot-t1 {
+  width: 2px; height: 2px;
+  background: #5AC6D5;
+  margin-left: -1px; margin-top: -1px;
+  box-shadow: 0 0 5px #2DB0C2, 0 0 10px rgba(45,176,194,0.6);
+  animation: fairy-teal-1 3.5s ease-in-out infinite;
+}
+.nexus-fairy .dot-t2 {
+  width: 1.5px; height: 1.5px;
+  background: #8EDBE5;
+  margin-left: -0.75px; margin-top: -0.75px;
+  box-shadow: 0 0 3px #5AC6D5;
+  animation: fairy-teal-2 4.8s ease-in-out infinite;
+}
+.nexus-fairy .dot-f1 {
+  width: 2.5px; height: 2.5px;
+  background: #E83CD2;
+  margin-left: -1.25px; margin-top: -1.25px;
+  box-shadow: 0 0 6px #C108AB, 0 0 12px rgba(193,8,171,0.5);
+  animation: fairy-fuchsia-1 2.8s ease-in-out infinite;
+}
+.nexus-fairy .dot-f2 {
+  width: 1.5px; height: 1.5px;
+  background: #D814C0;
+  margin-left: -0.75px; margin-top: -0.75px;
+  box-shadow: 0 0 3px #A0078A;
+  animation: fairy-fuchsia-2 2s linear infinite;
+}
+.nexus-fairy .focal {
+  position: absolute;
+  width: 4px; height: 4px;
+  top: 50%; left: 50%;
+  margin-left: -2px; margin-top: -2px;
+  background: #C108AB;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #C108AB, 0 0 16px rgba(193,8,171,0.7);
+  animation: pulse-focal 2.2s ease-in-out infinite;
+}
+
+.nexus-content { flex: 1; min-width: 0; max-width: 640px; }
+.nexus-meta { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.nexus-name {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ink-900);
+}
+.nexus-time {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+}
+
+.nexus-body { font-size: 0.95rem; line-height: 1.75; color: var(--ink-700); }
+.nexus-body .response-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ocean-600);
+  margin-bottom: 14px;
+  font-weight: 500;
+}
+.nexus-body h1 {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 1.75rem;
+  font-weight: 400;
+  color: var(--ink-900);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--ink-100);
+}
+.nexus-body h2 {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--ink-900);
+  margin-top: 32px;
+  margin-bottom: 14px;
+  letter-spacing: -0.005em;
+}
+.nexus-body p { margin-bottom: 16px; }
+.nexus-body p:last-child { margin-bottom: 0; }
+.nexus-body ul { list-style: none; margin: 16px 0 20px; padding: 0; }
+.nexus-body ul li {
+  position: relative;
+  padding-left: 18px;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: var(--ink-700);
+  line-height: 1.6;
+}
+.nexus-body ul li::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 12px;
+  width: 5px; height: 1px;
+  background: var(--ocean-400);
+}
+
+.data-panel { margin: 28px 0; padding: 24px; background: var(--white); border: 1px solid var(--ink-100); }
+.data-panel-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--ink-100);
+  border-left: 1px solid var(--ink-100);
+}
+.metric-cell {
+  padding: 16px 14px;
+  border-right: 1px solid var(--ink-100);
+  border-bottom: 1px solid var(--ink-100);
+}
+.metric-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.metric-value {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--ink-900);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.metric-value.teal { color: var(--teal-600); }
+.metric-value.fuchsia { color: var(--fuchsia-600); }
+.metric-value.low { color: var(--ocean-600); }
+
+.message-footer {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ink-100);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.msg-action {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  cursor: pointer;
+  transition: color 150ms ease;
+  font-weight: 500;
+}
+.msg-action:hover { color: var(--ink-700); }
+.msg-mile {
+  margin-left: auto;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal-600);
+  font-weight: 500;
+}
+
+/* User message */
+.user-message { display: flex; justify-content: flex-end; }
+.user-bubble {
+  max-width: 460px;
+  padding: 14px 18px;
+  background: var(--ocean-700);
+  color: var(--cream);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  text-align: left;
+}
+.user-message-meta {
+  text-align: right;
+  margin-top: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+}
+
+/* Context panel */
+.context-panel { width: 240px; flex-shrink: 0; padding-top: 4px; }
+.context-section { margin-bottom: 32px; }
+.context-section-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--ink-100);
+  font-weight: 500;
+}
+.context-item { padding: 8px 0; border-bottom: 1px solid var(--ink-50); }
+.context-item:last-child { border-bottom: none; }
+.context-item-label { font-size: 0.72rem; color: var(--ink-500); margin-bottom: 3px; }
+.context-item-value { font-size: 0.82rem; color: var(--ink-900); font-weight: 500; line-height: 1.4; }
+.context-item-value.mono-small {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--ocean-600);
+  letter-spacing: 0.05em;
+}
+
+.lens-card {
+  padding: 14px;
+  border: 1px solid var(--ocean-100);
+  background: var(--ocean-50);
+  margin-bottom: 10px;
+}
+.lens-card-name {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ocean-800);
+  margin-bottom: 4px;
+}
+.lens-card-desc { font-size: 0.72rem; color: var(--ocean-600); line-height: 1.5; margin-bottom: 10px; }
+.lens-card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid rgba(42, 106, 149, 0.15);
+}
+.lens-card-cost {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal-600);
+  font-weight: 500;
+}
+.gate-pass { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.gate-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--teal-500);
+  box-shadow: 0 0 6px var(--teal-400);
+}
+.gate-dot.teal { background: var(--teal-500); box-shadow: 0 0 6px var(--teal-400); }
+.gate-text {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--teal-700);
+}
+.lens-card-link { font-size: 0.7rem; color: var(--ocean-700); font-weight: 500; cursor: pointer; }
+
+.suggestion {
+  padding: 9px 11px;
+  border: 1px solid var(--ink-100);
+  margin-bottom: 6px;
+  font-size: 0.76rem;
+  color: var(--ink-700);
+  cursor: pointer;
+  transition: all 150ms ease;
+  line-height: 1.45;
+}
+.tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+  background: var(--ink-50);
+  border: 1px solid var(--ink-100);
+  padding: 4px 8px;
+  line-height: 1;
+}
+.tag.teal { color: var(--teal-700); background: var(--teal-50); border-color: var(--teal-100); }
+.tag.fuchsia { color: var(--fuchsia-700); background: #FDF2FB; border-color: #F5D5EE; }
+.suggestion:hover {
+  border-color: var(--ocean-300);
+  background: var(--ocean-50);
+  color: var(--ocean-700);
+}
+
+/* Composer */
+.composer-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: var(--sidebar-width);
+  right: 0;
+  padding: 20px 48px 32px;
+  background: linear-gradient(to top, var(--cream) 65%, rgba(250,250,250,0));
+  z-index: 30;
+  pointer-events: none;
+}
+.composer-wrapper > * { pointer-events: auto; }
+
+.composer {
+  max-width: 640px;
+  margin-left: 42px;
+  background: var(--white);
+  border: 1px solid var(--ink-200);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+.composer:focus-within {
+  border-color: var(--ocean-500);
+  box-shadow: 0 2px 20px rgba(15, 44, 74, 0.08);
+}
+.composer textarea {
+  width: 100%;
+  padding: 16px 18px 12px;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--ink-900);
+  background: transparent;
+  min-height: 46px;
+  max-height: 180px;
+}
+.composer textarea::placeholder { color: var(--ink-400); }
+.composer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px 10px;
+  border-top: 1px solid var(--ink-100);
+}
+.composer-tools { display: flex; gap: 4px; }
+.composer-tool {
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-400);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+.composer-tool:hover { color: var(--ink-700); background: var(--ink-50); }
+.composer-right { display: flex; align-items: center; gap: 14px; }
+.composer-estimate {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal-600);
+  font-weight: 500;
+}
+.send-btn {
+  padding: 8px 20px;
+  background: var(--ocean-700);
+  color: var(--cream);
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 200ms ease;
+  letter-spacing: 0.01em;
+}
+.send-btn:hover { background: var(--ocean-600); }
+
+.mockup-switcher {
+  position: fixed;
+  bottom: 20px; right: 20px;
+  background: var(--ink-900);
+  color: var(--cream);
+  padding: 12px 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.mockup-switcher .label { color: var(--ink-400); }
+.mockup-switcher .value { color: var(--cream); font-weight: 500; }
+
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark">NEXUS<span class="dot">.</span></div>
+      <div class="brand-tagline">Executive intelligence</div>
+      <div class="tier-badge">
+        <div class="tier-dot"></div>
+        <div class="tier-label">Pro Plan</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-label">Scenarios</div>
+
+        <div class="nav-item active">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 3a15 15 0 0 1 0 18M3 12h18"/>
+          </svg>
+          S1 — Strategy Readout
+          <span class="nav-count">active</span>
+        </div>
+
+        <div class="convo-list">
+          <div class="convo-item active">
+            Leadership alignment
+            <span class="convo-date">Today · 15:42</span>
+          </div>
+          <div class="convo-item">
+            AI workforce architecture
+            <span class="convo-date">Aug 20</span>
+          </div>
+          <div class="convo-item">
+            China expansion — brief
+            <span class="convo-date">Aug 15</span>
+          </div>
+        </div>
+
+        <div class="nav-item" style="margin-top: 14px;">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/>
+          </svg>
+          S2 — Leadership Coaching
+        </div>
+
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+          </svg>
+          S3 — Executive Brief
+        </div>
+
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="3" width="7" height="7"/>
+            <rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+          </svg>
+          S4 — Diagnostic Run
+        </div>
+
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+          </svg>
+          S5 — Research Assistant
+        </div>
+
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          S6 — Career Advisor
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-label">System</div>
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <path d="M14 2v6h6"/>
+          </svg>
+          Knowledge Base
+          <span class="nav-count">164</span>
+        </div>
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          QA Gate
+          <span class="nav-count">v3.0</span>
+        </div>
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1A2 2 0 1 1 4.4 17l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
+          </svg>
+          Settings
+        </div>
+      </div>
+
+      <div class="miles-panel">
+        <div class="miles-label">Miles Balance</div>
+        <div class="miles-count">7.5<span class="miles-unit">miles</span></div>
+        <div class="miles-bar">
+          <div class="miles-bar-fill" style="width: 63%"></div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-row">
+        <div class="user-avatar">KH</div>
+        <div class="user-info">
+          <div class="user-name">Kevin Hong</div>
+          <div class="user-email">kevin@lyc-intelligence.app</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <div class="main-content">
+
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="topbar-eyebrow">NEXUS Chat</span>
+        <span class="topbar-divider-v"></span>
+        <span class="topbar-title">Leadership alignment</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-icon-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.7 21a2 2 0 0 1-3.4 0"/>
+          </svg>
+          <div class="dot-notification"></div>
+        </div>
+        <div class="topbar-icon-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1A2 2 0 1 1 4.4 17l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
+          </svg>
+        </div>
+      </div>
+    </header>
+
+    <div class="chat-container">
+
+      <div class="messages-area">
+
+              <div class="date-divider"><span>Today · August 21, 2026</span></div>
+
+        <!-- User message 1 — opening question -->
+        <div class="user-message">
+          <div>
+            <div class="user-bubble">
+              We're at around 40 people and I can feel the leadership team starting to drift. What should I be looking at first?
+            </div>
+            <div class="user-message-meta">15:42 · you</div>
+          </div>
+        </div>
+
+        <!-- NEXUS message 1 — probing, not diagnosing -->
+        <div class="nexus-message">
+          <div class="nexus-avatar">
+            <div class="nexus-fairy">
+              <span class="dot dot-t1"></span>
+              <span class="dot dot-t2"></span>
+              <span class="dot dot-f1"></span>
+              <span class="dot dot-f2"></span>
+              <span class="focal"></span>
+            </div>
+          </div>
+          <div class="nexus-content">
+            <div class="nexus-meta">
+              <span class="nexus-name">NEXUS</span>
+              <span class="nexus-time">15:42</span>
+            </div>
+            <div class="nexus-body">
+              <p>
+                Drift at 40 people is normal — it's the first inflection point where founder-level oversight stops scaling. Before I say anything useful, I need to understand where the drift is showing up.
+              </p>
+              <p>
+                Three questions:
+              </p>
+              <ul>
+                <li>Is it showing up as <strong>speed</strong> (decisions take longer), <strong>alignment</strong> (people pull different directions), or <strong>quality</strong> (things slip through)?</li>
+                <li>Where do you feel it most — your direct reports, or one layer below?</li>
+                <li>How long have you been sensing this — weeks, or months?</li>
+              </ul>
+            </div>
+            <div class="message-footer">
+              <span class="msg-action">Copy</span>
+              <span class="msg-mile">Included</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- User message 2 — more context -->
+        <div class="user-message">
+          <div>
+            <div class="user-bubble">
+              Alignment mostly. My COO and CFO disagree on how to deploy capital for the next phase. And it's trickling down — middle managers get conflicting signals. Been about 2-3 months.
+            </div>
+            <div class="user-message-meta">15:45 · you</div>
+          </div>
+        </div>
+
+        <!-- NEXUS message 2 — deeper probe, still no framework -->
+        <div class="nexus-message">
+          <div class="nexus-avatar">
+            <div class="nexus-fairy">
+              <span class="dot dot-t1"></span>
+              <span class="dot dot-t2"></span>
+              <span class="dot dot-f1"></span>
+              <span class="dot dot-f2"></span>
+              <span class="focal"></span>
+            </div>
+          </div>
+          <div class="nexus-content">
+            <div class="nexus-meta">
+              <span class="nexus-name">NEXUS</span>
+              <span class="nexus-time">15:45</span>
+            </div>
+            <div class="nexus-body">
+              <p>
+                OK — so it's strategic alignment, starting at the top and cascading. 2-3 months means it's gone from friction to pattern, but it's not yet structural. That's the right window to fix it.
+              </p>
+              <p>
+                Two more to ground this properly:
+              </p>
+              <ul>
+                <li>When you all sit in a room and talk about it, do you agree on <strong>what</strong> the problem is but disagree on <strong>how</strong> to fix it? Or do you not even agree on what the problem is?</li>
+                <li>Have you lost anyone good in the last 6 months who you didn't expect to lose?</li>
+              </ul>
+            </div>
+            <div class="message-footer">
+              <span class="msg-action">Copy</span>
+              <span class="msg-mile">Included</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- User message 3 -->
+        <div class="user-message">
+          <div>
+            <div class="user-bubble">
+              We agree on the destination. Nobody agrees on the route. And yes — two directors left in Q2, both cited "lack of clarity on direction" in exit interviews.
+            </div>
+            <div class="user-message-meta">15:48 · you</div>
+          </div>
+        </div>
+
+        <!-- NEXUS message 3 — NOW the readout crystallizes. Framework appears. -->
+        <div class="nexus-message">
+          <div class="nexus-avatar">
+            <div class="nexus-fairy">
+              <span class="dot dot-t1"></span>
+              <span class="dot dot-t2"></span>
+              <span class="dot dot-f1"></span>
+              <span class="dot dot-f2"></span>
+              <span class="focal"></span>
+            </div>
+          </div>
+          <div class="nexus-content">
+            <div class="nexus-meta">
+              <span class="nexus-name">NEXUS</span>
+              <span class="nexus-time">15:49</span>
+            </div>
+            <div class="nexus-body">
+              <p>
+                I have enough. Here's what's happening — and what to do about it.
+              </p>
+
+              <div class="response-label">Readout · Strategic alignment</div>
+
+              <h1>Your leadership team is aligned on vision, misaligned on strategy — and it's starting to cost you people.</h1>
+
+              <p>
+                This is a specific pattern. Vision alignment is high — everyone knows where you're going. Strategy alignment is low — nobody agrees on how to get there. The gap between the two is the single biggest predictor of avoidable attrition at the 30-80 person stage.
+              </p>
+
+              <div class="data-panel">
+                <div class="data-panel-label">What the signals add up to</div>
+                <div class="metrics-grid">
+                  <div class="metric-cell">
+                    <div class="metric-label">Vision alignment</div>
+                    <div class="metric-value teal">High</div>
+                  </div>
+                  <div class="metric-cell">
+                    <div class="metric-label">Strategy alignment</div>
+                    <div class="metric-value low">Low</div>
+                  </div>
+                  <div class="metric-cell">
+                    <div class="metric-label">Attrition risk</div>
+                    <div class="metric-value fuchsia">Elevated</div>
+                  </div>
+                  <div class="metric-cell">
+                    <div class="metric-label">Stage</div>
+                    <div class="metric-value">40-person inflection</div>
+                  </div>
+                  <div class="metric-cell">
+                    <div class="metric-label">Pattern age</div>
+                    <div class="metric-value">2-3 months</div>
+                  </div>
+                  <div class="metric-cell">
+                    <div class="metric-label">Urgency</div>
+                    <div class="metric-value low">Medium-high</div>
+                  </div>
+                </div>
+              </div>
+
+              <h2>Why this is happening now</h2>
+
+              <p>
+                Up to 30 people, your direct oversight compensates for strategy drift. You sit in every key meeting, you catch misalignment early, you course-correct. At 40, you're no longer in every room. The misalignment that was always there — between COO and CFO on capital allocation, between teams on priorities — now has room to grow.
+              </p>
+
+              <p>
+                The director exits are the leading indicator. Good people don't leave bad companies — they leave situations where they can't see a coherent plan. Two in one quarter means the pattern has reached the next layer.
+              </p>
+
+              <h2>What to do about it</h2>
+
+              <p>
+                You don't fix this with more meetings. You fix it by forcing a single strategic framework that every function has to map to. Three moves:
+              </p>
+
+              <ul>
+                <li><strong>One-page strategy.</strong> Not a deck — a single page with 3-5 priorities ranked, each with a named owner and a clear kill criterion. If it doesn't fit on one page, you haven't decided yet.</li>
+                <li><strong>Capital allocation decision grid.</strong> The COO/CFO tension is the symptom. The cause is no shared framework for how capital gets deployed. Build one together — categories, thresholds, escalation rules. Then both of them operate inside it.</li>
+                <li><strong>90-day alignment checkpoint.</strong> Not another offsite. A 90-minute monthly review against the one-page strategy. No presentations — just: are we on track, what changed, what do we need to decide.</li>
+              </ul>
+
+              <p>
+                I can draft the one-page strategy framework, or walk through the capital allocation grid in more detail. Your call.
+              </p>
+            </div>
+            <div class="message-footer">
+              <span class="msg-action">Copy</span>
+              <span class="msg-action">Save to docs</span>
+              <span class="msg-action">Share</span>
+              <span class="msg-mile">2 miles</span>
+            </div>
+          </div>
+        </div>
+
+      <!-- Context rail -->
+      <div class="context-panel">
+
+        <div class="context-section">
+          <div class="context-section-title">Session</div>
+          <div class="context-item">
+            <div class="context-item-label">Miles used</div>
+            <div class="context-item-value mono-small">2.0 mi</div>
+          </div>
+          <div class="context-item">
+            <div class="context-item-label">Started</div>
+            <div class="context-item-value" style="font-size: 0.78rem; color: var(--ink-500); font-weight: 400;">Aug 21 · 15:42</div>
+          </div>
+        </div>
+
+        <div class="context-section">
+          <div class="context-section-title">Topics in play</div>
+          <div class="tag-row">
+            <span class="tag">Leadership alignment</span>
+            <span class="tag teal">Scaling stages</span>
+            <span class="tag">Attrition</span>
+            <span class="tag fuchsia">Strategy</span>
+            <span class="tag">Capital allocation</span>
+          </div>
+        </div>
+
+        <div class="context-section">
+          <div class="context-section-title">Try next</div>
+          <div class="suggestion">Draft one-page strategy</div>
+          <div class="suggestion">Build capital allocation grid</div>
+          <div class="suggestion">Share readout with team</div>
+        </div>
+
+        <div class="context-section">
+          <div class="context-section-title">Saved</div>
+          <div class="context-item">
+            <div class="context-item-value" style="color: var(--ocean-600); cursor: pointer; font-size: 0.78rem; font-weight: 500;">Alignment readout →</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Composer -->
+    <div class="composer-wrapper">
+      <div class="composer">
+        <textarea rows="2" placeholder="Ask NEXUS anything — strategy, research, diagnostics..."></textarea>
+        <div class="composer-bar">
+          <div class="composer-tools">
+            <div class="composer-tool" title="Attach document">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+              </svg>
+            </div>
+            <div class="composer-tool" title="Change scenario">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 3a15 15 0 0 1 0 18M3 12h18"/>
+              </svg>
+            </div>
+            <div class="composer-tool" title="Voice">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="9" y="2" width="6" height="12" rx="3"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/>
+              </svg>
+            </div>
+          </div>
+          <div class="composer-right">
+            <span class="composer-estimate">~0.5 mi</span>
+            <button class="send-btn">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="mockup-switcher">
+  <span class="label">Mockup</span>
+  <span class="value">V2 — Chat v3.5</span>
+</div>
+
+</body>
+</html>
