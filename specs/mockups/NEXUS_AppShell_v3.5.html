@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS. — App Shell v3.5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  /* Ocean — primary (authoritative, calm) */
+  --ocean-800: #0F2C4A;
+  --ocean-700: #183F5E;
+  --ocean-600: #1E537A;
+  --ocean-500: #2A6A95;
+  --ocean-400: #3E86B5;
+  --ocean-300: #6BA8CD;
+  --ocean-200: #9CC6DF;
+  --ocean-100: #CFE1EE;
+  --ocean-50:  #EAF2F8;
+
+  /* Teal — secondary accent (cyan-leaning, NOT green) */
+  --teal-700: #0B5D6B;
+  --teal-600: #0E7B8A;
+  --teal-500: #1293A6;
+  --teal-400: #2DB0C2;
+  --teal-300: #5AC6D5;
+  --teal-200: #8EDBE5;
+  --teal-100: #BFE9F0;
+  --teal-50:  #E1F5F8;
+
+  /* Fuchsia — punctuation only (dots, focal points) */
+  --fuchsia-700: #A0078A;
+  --fuchsia-600: #C108AB;
+  --fuchsia-500: #D814C0;
+  --fuchsia-400: #E83CD2;
+
+  /* Neutrals */
+  --cream: #FAFAFA;
+  --cream-dark: #EEEEEE;
+  --ink-900: #0A0A0A;
+  --ink-800: #1a1a1a;
+  --ink-700: #333333;
+  --ink-500: #666666;
+  --ink-400: #999999;
+  --ink-200: #e0e0e0;
+  --ink-100: #f0f0f0;
+  --ink-50:  #fafafa;
+  --white:  #ffffff;
+
+  /* App-specific */
+  --sidebar-width: 272px;
+  --topbar-height: 64px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--cream);
+  color: var(--ink-900);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.mono {
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.display {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+/* ============================================================
+   APP SHELL
+   ============================================================ */
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   SIDEBAR — ink-900 base, ocean accents, fuchsia focal
+   ============================================================ */
+.sidebar {
+  background: var(--ink-900);
+  color: var(--cream);
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-brand {
+  padding: 28px 28px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.brand-mark {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--cream);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.brand-mark .dot { color: var(--fuchsia-600); }
+.brand-tagline {
+  margin-top: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  font-weight: 400;
+}
+
+/* Tier badge */
+.tier-badge {
+  margin-top: 18px;
+  padding: 8px 12px;
+  background: rgba(15, 44, 74, 0.5);
+  border: 1px solid rgba(42, 106, 149, 0.3);
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tier-badge .tier-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--teal-400);
+  flex-shrink: 0;
+}
+.tier-badge .tier-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ocean-200);
+  font-weight: 500;
+}
+
+/* Sidebar nav */
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 12px;
+}
+.nav-section {
+  margin-bottom: 28px;
+}
+.nav-section-label {
+  padding: 0 16px 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+  font-weight: 500;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  color: var(--ink-400);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 400;
+  border-left: 2px solid transparent;
+  transition: all 200ms ease;
+  cursor: pointer;
+}
+.nav-item:hover {
+  color: var(--cream);
+  background: rgba(255,255,255,0.03);
+}
+.nav-item.active {
+  color: var(--cream);
+  background: rgba(15, 44, 74, 0.4);
+  border-left-color: var(--ocean-400);
+  font-weight: 500;
+}
+.nav-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+.nav-item.active .nav-icon,
+.nav-item:hover .nav-icon { opacity: 1; }
+
+.nav-item .nav-count {
+  margin-left: auto;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--ink-500);
+  font-weight: 500;
+}
+
+/* Miles indicator */
+.miles-panel {
+  margin: 0 12px 20px;
+  padding: 16px;
+  background: rgba(15, 44, 74, 0.3);
+  border: 1px solid rgba(42, 106, 149, 0.2);
+}
+.miles-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ocean-300);
+  margin-bottom: 8px;
+}
+.miles-count {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--cream);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.miles-count .miles-unit {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  color: var(--ink-400);
+  font-weight: 400;
+  margin-left: 4px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.miles-bar {
+  margin-top: 12px;
+  height: 2px;
+  background: rgba(255,255,255,0.08);
+  position: relative;
+}
+.miles-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 65%;
+  background: var(--ocean-400);
+}
+
+/* Sidebar footer */
+.sidebar-footer {
+  padding: 20px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  cursor: pointer;
+}
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  background: var(--ocean-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cream);
+  flex-shrink: 0;
+}
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+.user-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--cream);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.user-email {
+  font-size: 0.7rem;
+  color: var(--ink-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================================
+   MAIN CONTENT AREA
+   ============================================================ */
+.main-content {
+  grid-column: 2;
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top bar */
+.topbar {
+  height: var(--topbar-height);
+  background: var(--cream);
+  border-bottom: 1px solid var(--ink-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.page-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ocean-600);
+  font-weight: 500;
+}
+.page-title {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--ink-900);
+  letter-spacing: -0.01em;
+}
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.topbar-icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-500);
+  cursor: pointer;
+  transition: color 200ms ease;
+  position: relative;
+}
+.topbar-icon-btn:hover { color: var(--ink-900); }
+.topbar-icon-btn .dot-notification {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  background: var(--fuchsia-600);
+}
+.topbar-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--ink-100);
+}
+
+/* Content area */
+.content-area {
+  flex: 1;
+  padding: 48px 40px 80px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ============================================================
+   PAGE HEADER
+   ============================================================ */
+.page-header {
+  margin-bottom: 48px;
+}
+.page-header-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ocean-600);
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+.page-header-title {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 2.5rem;
+  font-weight: 400;
+  color: var(--ink-900);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.page-header-subtitle {
+  font-size: 1rem;
+  color: var(--ink-500);
+  max-width: 560px;
+  line-height: 1.6;
+}
+
+/* ============================================================
+   SECTION HEADING
+   ============================================================ */
+.section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ink-100);
+}
+.section-title {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--ink-900);
+  letter-spacing: -0.01em;
+}
+.section-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all 200ms ease;
+  letter-spacing: 0.01em;
+}
+.btn-primary {
+  background: var(--ocean-700);
+  color: var(--cream);
+}
+.btn-primary:hover {
+  background: var(--ocean-600);
+  transform: translateY(-1px);
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--ink-900);
+  border: 1px solid var(--ink-200);
+}
+.btn-secondary:hover {
+  border-color: var(--ink-400);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ocean-600);
+  padding: 8px 0;
+}
+.btn-ghost:hover {
+  color: var(--ocean-500);
+}
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 0.8rem;
+}
+.btn-xs {
+  padding: 5px 12px;
+  font-size: 0.72rem;
+}
+
+/* ============================================================
+   CARDS / PANELS — rule-lines, not card shadows (editorial)
+   ============================================================ */
+.panel {
+  background: var(--white);
+  border: 1px solid var(--ink-100);
+  padding: 28px;
+}
+.panel-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ink-100);
+}
+.panel-title {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--ink-900);
+}
+.panel-body {
+  font-size: 0.875rem;
+  color: var(--ink-500);
+  line-height: 1.6;
+}
+
+/* Grid layouts */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* ============================================================
+   STATUS BADGES
+   ============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 500;
+  border: 1px solid;
+}
+.badge-dot {
+  width: 5px;
+  height: 5px;
+  flex-shrink: 0;
+}
+.badge-ocean { color: var(--ocean-600); border-color: var(--ocean-200); background: var(--ocean-50); }
+.badge-ocean .badge-dot { background: var(--ocean-500); }
+.badge-teal { color: var(--teal-700); border-color: var(--teal-200); background: var(--teal-50); }
+.badge-teal .badge-dot { background: var(--teal-500); }
+.badge-ink { color: var(--ink-700); border-color: var(--ink-200); background: var(--ink-50); }
+.badge-ink .badge-dot { background: var(--ink-500); }
+.badge-fuchsia { color: var(--fuchsia-700); border-color: #f5ccee; background: #fdf2fb; }
+.badge-fuchsia .badge-dot { background: var(--fuchsia-600); }
+
+/* ============================================================
+   STAT CARDS (overview row)
+   ============================================================ */
+.stat-card {
+  padding: 24px 0;
+  border-top: 1px solid var(--ink-100);
+  border-bottom: 1px solid var(--ink-100);
+}
+.stat-card + .stat-card {
+  border-left: 1px solid var(--ink-100);
+  padding-left: 24px;
+  margin-left: 24px;
+}
+.stats-row {
+  display: flex;
+  align-items: stretch;
+  margin-bottom: 48px;
+  gap: 0;
+}
+.stat-card {
+  flex: 1;
+  padding: 24px;
+  border-top: 1px solid var(--ink-100);
+  border-bottom: 1px solid var(--ink-100);
+  border-right: 1px solid var(--ink-100);
+}
+.stat-card:first-child {
+  border-left: 1px solid var(--ink-100);
+}
+.stat-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  margin-bottom: 10px;
+}
+.stat-value {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--ink-900);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.stat-change {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--teal-600);
+  font-weight: 500;
+}
+.stat-change.negative { color: #c0392b; }
+
+/* ============================================================
+   TABLE — editorial, minimal
+   ============================================================ */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.data-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  font-weight: 500;
+  border-bottom: 1px solid var(--ink-100);
+  background: var(--ink-50);
+}
+.data-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--ink-100);
+  color: var(--ink-700);
+  vertical-align: middle;
+}
+.data-table tr:hover td {
+  background: var(--ocean-50);
+}
+.table-primary-cell {
+  font-weight: 500;
+  color: var(--ink-900);
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--ink-100);
+  margin-bottom: 32px;
+}
+.tab {
+  padding: 12px 24px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink-500);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 200ms ease;
+}
+.tab:hover { color: var(--ink-900); }
+.tab.active {
+  color: var(--ocean-700);
+  border-bottom-color: var(--ocean-500);
+}
+
+/* ============================================================
+   FORM ELEMENTS
+   ============================================================ */
+.form-group {
+  margin-bottom: 20px;
+}
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--ink-700);
+  margin-bottom: 6px;
+}
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  border: 1px solid var(--ink-200);
+  background: var(--white);
+  color: var(--ink-900);
+  transition: border-color 200ms ease;
+}
+.form-input:focus {
+  outline: none;
+  border-color: var(--ocean-500);
+}
+.form-input::placeholder {
+  color: var(--ink-400);
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+.progress {
+  height: 2px;
+  background: var(--ink-100);
+  position: relative;
+  overflow: hidden;
+}
+.progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--ocean-500);
+  transition: width 400ms ease;
+}
+.progress-fill.teal { background: var(--teal-500); }
+.progress-fill.fuchsia { background: var(--fuchsia-600); }
+
+/* ============================================================
+   COMPONENT SHOWCASE
+   ============================================================ */
+.component-demo {
+  margin-bottom: 56px;
+}
+.component-demo-header {
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ink-100);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.component-name {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--ink-900);
+}
+.component-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+}
+.component-showcase {
+  padding: 32px;
+  background: var(--white);
+  border: 1px solid var(--ink-100);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+/* ============================================================
+   SEARCH
+   ============================================================ */
+.search-box {
+  position: relative;
+  width: 280px;
+}
+.search-box input {
+  width: 100%;
+  padding: 8px 14px 8px 36px;
+  font-size: 0.8rem;
+  border: 1px solid var(--ink-100);
+  background: var(--white);
+  color: var(--ink-700);
+}
+.search-box input:focus {
+  outline: none;
+  border-color: var(--ocean-400);
+}
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-400);
+}
+
+/* ============================================================
+   MOCKUP NAVIGATION (demo switcher)
+   ============================================================ */
+.mockup-switcher {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--ink-900);
+  color: var(--cream);
+  padding: 12px 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.mockup-switcher .label { color: var(--ink-400); }
+.mockup-switcher .value { color: var(--cream); font-weight: 500; }
+
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ============================================================
+       SIDEBAR
+       ============================================================ -->
+  <aside class="sidebar">
+
+    <div class="sidebar-brand">
+      <div class="brand-mark">NEXUS<span class="dot">.</span></div>
+      <div class="brand-tagline">Executive intelligence</div>
+
+      <div class="tier-badge">
+        <div class="tier-dot"></div>
+        <div class="tier-label">Pro Plan</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+      <div class="nav-section">
+        <div class="nav-section-label">Workspace</div>
+
+        <div class="nav-item active">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 12L12 3l9 9v9a2 2 0 0 1-2 2h-4v-6h-6v6H5a2 2 0 0 1-2-2v-9z"/>
+          </svg>
+          Home
+        </div>
+
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 3a15 15 0 0 1 0 18M3 12h18"/>
+          </svg>
+          NEXUS Chat
+          <span class="nav-count">3</span>
+        </div>
+
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="3" width="7" height="7"/>
+            <rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+          </svg>
+          Lenses
+          <span class="nav-count">11</span>
+        </div>
+
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/>
+          </svg>
+          Milestones
+        </div>
+
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+          </svg>
+          Documents
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-label">Account</div>
+
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
+          </svg>
+          Profile
+        </div>
+
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="5" width="18" height="14" rx="2"/>
+            <path d="M3 10h18M8 5v14"/>
+          </svg>
+          Billing
+        </div>
+
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1A2 2 0 1 1 4.4 17l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
+          </svg>
+          Settings
+        </div>
+      </div>
+
+      <!-- Miles panel -->
+      <div class="miles-panel">
+        <div class="miles-label">Miles Balance</div>
+        <div class="miles-count">7.5<span class="miles-unit">miles</span></div>
+        <div class="miles-bar">
+          <div class="miles-bar-fill" style="width: 63%"></div>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- Sidebar footer -->
+    <div class="sidebar-footer">
+      <div class="user-row">
+        <div class="user-avatar">KH</div>
+        <div class="user-info">
+          <div class="user-name">Kevin Hong</div>
+          <div class="user-email">kevin@lyc-intelligence.app</div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ============================================================
+       MAIN CONTENT
+       ============================================================ -->
+  <div class="main-content">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="page-eyebrow">Overview</span>
+      </div>
+      <div class="topbar-right">
+        <div class="search-box">
+          <span class="search-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+          </span>
+          <input type="text" placeholder="Search lenses, documents...">
+        </div>
+        <div class="topbar-divider"></div>
+        <div class="topbar-icon-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.7 21a2 2 0 0 1-3.4 0"/>
+          </svg>
+          <div class="dot-notification"></div>
+        </div>
+        <div class="topbar-icon-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1A2 2 0 1 1 4.4 17l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
+          </svg>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <div class="content-area">
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div class="page-header-eyebrow">V1 App Shell — v3.5 Design System</div>
+        <h1 class="page-header-title">Dashboard overview</h1>
+        <p class="page-header-subtitle">A single source of truth for your executive intelligence. See where you stand and what's next across all diagnostic dimensions.</p>
+      </div>
+
+      <!-- Stats row -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Miles Remaining</div>
+          <div class="stat-value">7.5</div>
+          <div class="stat-change">Pro plan — 12 total</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Diagnostics Taken</div>
+          <div class="stat-value">4</div>
+          <div class="stat-change">+2 this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active Lenses</div>
+          <div class="stat-value">6</div>
+          <div class="stat-change">of 11 available</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Next Milestone</div>
+          <div class="stat-value">12d</div>
+          <div class="stat-change negative">Strategist review</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab active">Overview</div>
+        <div class="tab">Lenses</div>
+        <div class="tab">Milestones</div>
+        <div class="tab">Insights</div>
+      </div>
+
+      <!-- Component showcase: Panels -->
+      <div class="component-demo">
+        <div class="component-demo-header">
+          <div class="component-name">Recent diagnostics</div>
+          <div class="component-tag">Table · v3.5</div>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Lens</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Miles</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="table-primary-cell">PRISM — Leadership Alignment</td>
+              <td>Strategic</td>
+              <td><span class="badge badge-teal"><span class="badge-dot"></span>Complete</span></td>
+              <td>Aug 18, 2026</td>
+              <td>1 mi</td>
+              <td><button class="btn btn-ghost btn-xs">View →</button></td>
+            </tr>
+            <tr>
+              <td class="table-primary-cell">DEPTH — Executive Operating Style</td>
+              <td>Executive</td>
+              <td><span class="badge badge-ocean"><span class="badge-dot"></span>In Progress</span></td>
+              <td>Aug 20, 2026</td>
+              <td>2 mi</td>
+              <td><button class="btn btn-ghost btn-xs">Continue →</button></td>
+            </tr>
+            <tr>
+              <td class="table-primary-cell">AURA — Personal Brand Index</td>
+              <td>Market</td>
+              <td><span class="badge badge-teal"><span class="badge-dot"></span>Complete</span></td>
+              <td>Aug 15, 2026</td>
+              <td>1 mi</td>
+              <td><button class="btn btn-ghost btn-xs">View →</button></td>
+            </tr>
+            <tr>
+              <td class="table-primary-cell">CPI — Council Performance Insight</td>
+              <td>Governance</td>
+              <td><span class="badge badge-ink"><span class="badge-dot"></span>Not started</span></td>
+              <td>—</td>
+              <td>1 mi</td>
+              <td><button class="btn btn-ghost btn-xs">Start →</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Two-column layout -->
+      <div class="grid-2">
+
+        <!-- Panel: Up next -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Next milestone</div>
+            <span class="badge badge-fuchsia"><span class="badge-dot"></span>12 days</span>
+          </div>
+          <div class="panel-body">
+            <div style="margin-bottom: 16px;">
+              <div style="font-family: 'Crimson Pro', serif; font-size: 1.15rem; font-weight: 500; color: var(--ink-900); margin-bottom: 6px;">
+                Strategist Review
+              </div>
+              <div style="font-size: 0.8rem; color: var(--ink-500);">
+                60-minute debrief with a senior strategist to review your diagnostic results and define your 90-day plan.
+              </div>
+            </div>
+            <div style="margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--ink-500); margin-bottom: 6px;">
+                <span>Preparation progress</span>
+                <span>3 of 4 diagnostics</span>
+              </div>
+              <div class="progress">
+                <div class="progress-fill" style="width: 75%"></div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm">Book strategist call</button>
+          </div>
+        </div>
+
+        <!-- Panel: Tier progress -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Plan usage</div>
+            <span class="mono" style="font-size: 0.62rem; color: var(--ocean-600);">PRO</span>
+          </div>
+          <div class="panel-body">
+            <div style="margin-bottom: 20px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="font-size: 0.85rem; color: var(--ink-700);">Miles this cycle</span>
+                <span style="font-size: 0.85rem; font-weight: 500; color: var(--ink-900);">4.5 / 12</span>
+              </div>
+              <div class="progress">
+                <div class="progress-fill teal" style="width: 37%"></div>
+              </div>
+            </div>
+            <div style="margin-bottom: 20px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="font-size: 0.85rem; color: var(--ink-700);">Human coaching hours</span>
+                <span style="font-size: 0.85rem; font-weight: 500; color: var(--ink-900);">1 / 2</span>
+              </div>
+              <div class="progress">
+                <div class="progress-fill" style="width: 50%"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="font-size: 0.85rem; color: var(--ink-700);">Document exports</span>
+                <span style="font-size: 0.85rem; font-weight: 500; color: var(--ink-900);">0 / 5</span>
+              </div>
+              <div class="progress">
+                <div class="progress-fill" style="width: 0%"></div>
+              </div>
+            </div>
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--ink-100);">
+              <button class="btn btn-secondary btn-sm" style="width: 100%;">Upgrade to Executive</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Component showcase: Buttons -->
+      <div class="component-demo" style="margin-top: 56px;">
+        <div class="component-demo-header">
+          <div class="component-name">Shared components — buttons</div>
+          <div class="component-tag">UI Kit · v3.5</div>
+        </div>
+        <div class="component-showcase">
+          <button class="btn btn-primary">Primary button</button>
+          <button class="btn btn-secondary">Secondary button</button>
+          <button class="btn btn-ghost">Ghost link</button>
+          <button class="btn btn-primary btn-sm">Small primary</button>
+          <button class="btn btn-secondary btn-sm">Small secondary</button>
+        </div>
+      </div>
+
+      <!-- Component showcase: Badges -->
+      <div class="component-demo">
+        <div class="component-demo-header">
+          <div class="component-name">Shared components — badges</div>
+          <div class="component-tag">Status indicators · v3.5</div>
+        </div>
+        <div class="component-showcase">
+          <span class="badge badge-ocean"><span class="badge-dot"></span>Active</span>
+          <span class="badge badge-teal"><span class="badge-dot"></span>Complete</span>
+          <span class="badge badge-ink"><span class="badge-dot"></span>Pending</span>
+          <span class="badge badge-fuchsia"><span class="badge-dot"></span>Attention</span>
+        </div>
+      </div>
+
+      <!-- Component showcase: Form -->
+      <div class="component-demo">
+        <div class="component-demo-header">
+          <div class="component-name">Shared components — form fields</div>
+          <div class="component-tag">Inputs · v3.5</div>
+        </div>
+        <div class="component-showcase" style="flex-direction: column; align-items: stretch; gap: 16px; max-width: 400px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Default input</label>
+            <input type="text" class="form-input" placeholder="Enter text here">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">With value</label>
+            <input type="text" class="form-input" value="kevin@lyc-intelligence.app">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Mockup switcher -->
+<div class="mockup-switcher">
+  <span class="label">Mockup</span>
+  <span class="value">V1 — App Shell v3.5</span>
+</div>
+
+</body>
+</html>
