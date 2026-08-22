@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS. — Lenses v3.5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --ocean-800: #0F2C4A;
+  --ocean-700: #183F5E;
+  --ocean-600: #1E537A;
+  --ocean-500: #2A6A95;
+  --ocean-400: #3E86B5;
+  --ocean-300: #6BA8CD;
+  --ocean-200: #9CC6DF;
+  --ocean-100: #CFE1EE;
+  --ocean-50:  #EAF2F8;
+  --teal-700: #0B5D6B;
+  --teal-600: #0E7B8A;
+  --teal-500: #1293A6;
+  --teal-400: #2DB0C2;
+  --teal-300: #5AC6D5;
+  --teal-200: #8EDBE5;
+  --teal-100: #BFE9F0;
+  --teal-50:  #E1F5F8;
+  --fuchsia-700: #A0078A;
+  --fuchsia-600: #C108AB;
+  --fuchsia-500: #D814C0;
+  --fuchsia-400: #E83CD2;
+  --cream: #FAFAFA;
+  --cream-dark: #F2F2F2;
+  --ink-900: #0A0A0A;
+  --ink-800: #1a1a1a;
+  --ink-700: #333333;
+  --ink-500: #666666;
+  --ink-400: #999999;
+  --ink-200: #e0e0e0;
+  --ink-100: #f0f0f0;
+  --ink-50:  #fafafa;
+  --white:  #ffffff;
+  --sidebar-width: 220px;
+  --topbar-height: 56px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 14px;
+  color: var(--ink-800);
+  background: var(--cream);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === SIDEBAR === */
+.sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: var(--sidebar-width);
+  height: 100%;
+  background: var(--white);
+  border-right: 1px solid var(--ink-100);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.sidebar-brand {
+  height: var(--topbar-height);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--ink-100);
+}
+.sidebar-brand .wordmark {
+  font-family: 'Crimson Pro', serif;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+}
+.sidebar-brand .wordmark span { color: var(--fuchsia-600); }
+
+.sidebar-section { padding: 16px 0 4px; }
+.sidebar-section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  padding: 0 20px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 20px;
+  cursor: pointer;
+  color: var(--ink-500);
+  font-size: 12.5px;
+  font-weight: 400;
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+}
+.nav-item:hover { background: var(--ink-50); color: var(--ink-800); }
+.nav-item.active {
+  background: var(--ocean-50);
+  color: var(--ocean-700);
+  font-weight: 500;
+  border-left-color: var(--ocean-600);
+}
+.nav-item .nav-icon {
+  width: 14px; height: 14px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+.nav-item.active .nav-icon { opacity: 1; }
+
+.sidebar-divider {
+  height: 1px;
+  background: var(--ink-100);
+  margin: 6px 20px;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px 20px;
+  border-top: 1px solid var(--ink-100);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sidebar-footer .avatar-initials {
+  width: 28px; height: 28px;
+  background: var(--ocean-700);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.sidebar-footer .user-info { flex: 1; min-width: 0; }
+.sidebar-footer .user-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-800);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar-footer .user-plan {
+  font-size: 10px;
+  color: var(--ink-400);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* === TOP BAR === */
+.topbar {
+  position: fixed;
+  top: 0; left: var(--sidebar-width); right: 0;
+  height: var(--topbar-height);
+  background: var(--white);
+  border-bottom: 1px solid var(--ink-100);
+  display: flex;
+  align-items: center;
+  padding: 0 48px;
+  z-index: 90;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink-400);
+}
+.breadcrumb .crumb { color: var(--ink-400); }
+.breadcrumb .crumb-current { color: var(--ink-800); font-weight: 500; }
+.breadcrumb .sep { color: var(--ink-200); }
+
+.topbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.topbar-icon {
+  width: 32px; height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-400);
+  cursor: pointer;
+}
+.topbar-icon:hover { color: var(--ink-700); background: var(--ink-50); }
+
+/* === MAIN === */
+.main {
+  margin-left: var(--sidebar-width);
+  margin-top: var(--topbar-height);
+  padding: 0;
+  min-height: calc(100vh - var(--topbar-height));
+}
+
+/* === FUNNEL === */
+.funnel-bar {
+  background: var(--white);
+  border-bottom: 1px solid var(--ink-100);
+  padding: 16px 48px;
+}
+.funnel-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  max-width: 600px;
+}
+.funnel-step { display: flex; align-items: center; gap: 8px; }
+.funnel-step-num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.funnel-step.done .funnel-step-num { background: var(--teal-600); color: white; }
+.funnel-step.active .funnel-step-num {
+  background: var(--ocean-700);
+  color: white;
+  box-shadow: 0 0 0 3px var(--ocean-100);
+}
+.funnel-step.pending .funnel-step-num { background: var(--ink-100); color: var(--ink-400); }
+.funnel-step-label {
+  font-size: 11.5px;
+  color: var(--ink-400);
+}
+.funnel-step.done .funnel-step-label,
+.funnel-step.active .funnel-step-label {
+  color: var(--ink-700);
+  font-weight: 500;
+}
+.funnel-step-line {
+  width: 36px;
+  height: 1px;
+  background: var(--ink-100);
+  margin: 0 10px;
+}
+.funnel-step.done + .funnel-step-line { background: var(--teal-400); }
+
+/* === CONTENT WRAPPER === */
+.content-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+
+/* === HEADER === */
+.page-header { padding: 48px 0 32px; }
+
+.page-kicker {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal-600);
+  margin-bottom: 8px;
+}
+
+.page-title {
+  font-family: 'Crimson Pro', serif;
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+  margin-bottom: 8px;
+  max-width: 640px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--ink-500);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+.header-meta {
+  display: flex;
+  gap: 32px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--ink-100);
+}
+.meta-item { display: flex; flex-direction: column; gap: 2px; }
+.meta-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+}
+.meta-value {
+  font-size: 13px;
+  color: var(--ink-700);
+  font-weight: 500;
+}
+.meta-value .fuchsia-dot {
+  display: inline-block;
+  width: 5px; height: 5px;
+  background: var(--fuchsia-600);
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+/* === SECTION LABEL === */
+.section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::before {
+  content: '';
+  width: 16px; height: 1px;
+  background: var(--ink-200);
+}
+
+/* === READOUT === */
+.readout-section { padding: 0 0 40px; }
+
+.readout-card {
+  background: var(--white);
+  border: 1px solid var(--ink-100);
+  padding: 32px 36px;
+  position: relative;
+}
+.readout-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 2px; height: 100%;
+  background: var(--ocean-600);
+}
+
+.readout-headline {
+  font-family: 'Crimson Pro', serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink-900);
+  margin-bottom: 12px;
+  max-width: 640px;
+}
+
+.readout-summary {
+  font-size: 13.5px;
+  color: var(--ink-500);
+  line-height: 1.7;
+  max-width: 640px;
+  margin-bottom: 20px;
+}
+
+.signals-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--ink-100);
+  border-left: 1px solid var(--ink-100);
+}
+.signal-cell {
+  padding: 12px 16px;
+  border-right: 1px solid var(--ink-100);
+  border-bottom: 1px solid var(--ink-100);
+}
+.signal-cell-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  margin-bottom: 3px;
+}
+.signal-cell-value {
+  font-size: 18px;
+  font-weight: 600;
+  font-family: 'Crimson Pro', serif;
+  color: var(--ink-900);
+}
+.signal-cell-value.attn { color: var(--fuchsia-600); }
+.signal-cell-value.note { color: var(--teal-600); }
+.signal-cell-sub {
+  font-size: 10.5px;
+  color: var(--ink-400);
+  margin-top: 1px;
+}
+
+.readout-source {
+  font-size: 11.5px;
+  color: var(--ink-400);
+  font-style: italic;
+  margin-top: 16px;
+}
+
+/* === LENSES === */
+.lenses-section { padding: 0 0 40px; }
+
+.suite-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  margin-top: 8px;
+}
+.suite-header:first-child { margin-top: 0; }
+.suite-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ocean-600);
+}
+.suite-name.advisory { color: var(--teal-600); }
+.suite-line {
+  flex: 1;
+  height: 1px;
+  background: var(--ink-100);
+}
+.suite-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  color: var(--ink-400);
+}
+
+.lens-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--ink-100);
+  border: 1px solid var(--ink-100);
+  margin-bottom: 28px;
+}
+
+.lens {
+  background: var(--white);
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+}
+.lens:hover { background: var(--ink-50); }
+.lens.active {
+  background: var(--ocean-50);
+}
+.lens.active::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--fuchsia-600);
+}
+.lens.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.lens.locked:hover { background: var(--white); }
+
+.lens-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.lens-code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--ink-400);
+  text-transform: uppercase;
+}
+.lens-score {
+  font-family: 'Crimson Pro', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink-900);
+  line-height: 1;
+}
+.lens.locked .lens-score { color: var(--ink-300); }
+
+.lens-name {
+  font-family: 'Crimson Pro', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink-900);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.lens-score-bar {
+  height: 2px;
+  background: var(--ink-100);
+  position: relative;
+  margin-bottom: 10px;
+}
+.lens-score-bar-fill {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+}
+.fill-ok { background: var(--teal-500); }
+.fill-warn { background: var(--ocean-500); }
+.fill-crit { background: var(--fuchsia-600); }
+.fill-lock { background: var(--ink-200); }
+
+.lens-insight {
+  font-size: 11.5px;
+  color: var(--ink-500);
+  line-height: 1.5;
+  margin-top: auto;
+}
+.lens.locked .lens-insight {
+  color: var(--ink-400);
+  font-style: italic;
+}
+
+.lens-lock-icon { opacity: 0.3; }
+
+/* === DEEP DIVE === */
+.deep-section { padding: 0 0 40px; }
+
+.deep-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.deep-col h3 {
+  font-family: 'Crimson Pro', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink-900);
+  margin-bottom: 8px;
+}
+.deep-col p {
+  font-size: 13px;
+  color: var(--ink-500);
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.points {
+  list-style: none;
+  padding: 0;
+}
+.points li {
+  padding: 8px 0;
+  border-top: 1px solid var(--ink-100);
+  font-size: 12.5px;
+  color: var(--ink-700);
+  display: flex;
+  gap: 10px;
+  line-height: 1.5;
+}
+.points li:last-child { border-bottom: 1px solid var(--ink-100); }
+.points .num {
+  color: var(--fuchsia-600);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+/* === ACTIONS === */
+.actions-section { padding: 0 0 48px; }
+
+.timeline {
+  border-left: 1px solid var(--ink-100);
+  margin-left: 5px;
+}
+.timeline-item {
+  display: flex;
+  gap: 20px;
+  padding: 0 0 20px 20px;
+  position: relative;
+}
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -3.5px;
+  top: 3px;
+  width: 6px; height: 6px;
+  background: var(--white);
+  border: 1.5px solid var(--ocean-600);
+  border-radius: 50%;
+}
+.timeline-item.high::before {
+  border-color: var(--fuchsia-600);
+  background: var(--fuchsia-600);
+}
+
+.tl-meta {
+  flex-shrink: 0;
+  width: 65px;
+  padding-top: 1px;
+}
+.tl-horizon {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+}
+.tl-impact {
+  font-size: 9.5px;
+  color: var(--teal-600);
+  font-weight: 500;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.timeline-item.high .tl-impact { color: var(--fuchsia-600); }
+
+.tl-content h4 {
+  font-family: 'Crimson Pro', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-900);
+  margin-bottom: 3px;
+}
+.tl-content p {
+  font-size: 12.5px;
+  color: var(--ink-500);
+  line-height: 1.6;
+}
+
+/* === CTA === */
+.cta-bar {
+  background: var(--ocean-800);
+  padding: 24px 48px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.cta-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.cta-text { flex: 1; }
+.cta-text h3 {
+  font-family: 'Crimson Pro', serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 2px;
+}
+.cta-text p {
+  font-size: 12px;
+  color: var(--ocean-200);
+}
+.cta-btns { display: flex; gap: 8px; }
+.btn {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.01em;
+}
+.btn-primary { background: white; color: var(--ocean-800); }
+.btn-primary:hover { background: var(--cream-dark); }
+.btn-ghost {
+  background: transparent;
+  color: white;
+  border: 1px solid var(--ocean-600);
+}
+.btn-ghost:hover { border-color: var(--ocean-400); }
+
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="wordmark">NEXUS<span>.</span></div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Scenarios</div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h12M2 8h12M2 13h8" stroke-linecap="round"/></svg>
+      Strategy Readout
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5" stroke-linecap="round"/><path d="M8 5v3l2 2" stroke-linecap="round"/></svg>
+      Leadership Coaching
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v6H3z" stroke-linejoin="round"/><path d="M5 11h6M8 9v2" stroke-linecap="round"/></svg>
+      Executive Brief
+    </div>
+    <div class="nav-item active">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2"/><path d="M2 8s2-5 6-5 6 5 6 5-2 5-6 5-6-5-6-5z" stroke-linejoin="round"/></svg>
+      Diagnostic Run
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2v12M12 2v12M4 6h8M4 10h8" stroke-linecap="round"/></svg>
+      Research
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13l3-3 2 2 5-5" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 7V3H9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Career Advisor
+    </div>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Account</div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13l3-3 2 2 5-5" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 7V3H9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Milestones
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2"/><circle cx="8" cy="8" r="5" stroke-linecap="round"/><path d="M8 1v1M8 14v1M1 8h2M13 8h1" stroke-linecap="round"/></svg>
+      Settings
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="avatar-initials">KH</div>
+    <div class="user-info">
+      <div class="user-name">Kevin Hong</div>
+      <div class="user-plan">PROFESSIONAL</div>
+    </div>
+  </div>
+</aside>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="breadcrumb">
+    <span class="crumb">Diagnostic Run</span>
+    <span class="sep">/</span>
+    <span class="crumb">Leadership Drift</span>
+    <span class="sep">/</span>
+    <span class="crumb-current">Readout</span>
+  </div>
+  <div class="topbar-actions">
+    <div class="topbar-icon">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2a4 4 0 00-4 4v2.5L2.5 10h11L12 8.5V6a4 4 0 00-4-4z" stroke-linejoin="round"/><path d="M7 13a1 1 0 002 0" stroke-linecap="round"/></svg>
+    </div>
+    <div class="topbar-icon">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5h2v2h-2zM3 9h2v2H3zM11 11h2v2h-2zM3 3h2v2H3z"/><path d="M7 5h2M5 7v2M7 9h2M9 7v2" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- FUNNEL -->
+  <div class="funnel-bar">
+    <div class="funnel-steps" style="max-width:864px;margin:0 auto;">
+      <div class="funnel-step done">
+        <div class="funnel-step-num">1</div>
+        <div class="funnel-step-label">Intake</div>
+      </div>
+      <div class="funnel-step-line"></div>
+      <div class="funnel-step done">
+        <div class="funnel-step-num">2</div>
+        <div class="funnel-step-label">Discovery</div>
+      </div>
+      <div class="funnel-step-line"></div>
+      <div class="funnel-step done">
+        <div class="funnel-step-num">3</div>
+        <div class="funnel-step-label">Synthesis</div>
+      </div>
+      <div class="funnel-step-line"></div>
+      <div class="funnel-step active">
+        <div class="funnel-step-num">4</div>
+        <div class="funnel-step-label">Readout</div>
+      </div>
+      <div class="funnel-step-line"></div>
+      <div class="funnel-step pending">
+        <div class="funnel-step-num">5</div>
+        <div class="funnel-step-label">Action</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-wrap">
+
+    <!-- HEADER -->
+    <div class="page-header">
+      <div class="page-kicker">Diagnostic Readout — Leadership Drift</div>
+      <h1 class="page-title">Alignment is breaking at the director layer. The symptom is speed. The cause is architecture.</h1>
+      <p class="page-subtitle">11 lenses analyzed. Pattern router matched with 94% confidence. Quality thresholds passed.</p>
+      <div class="header-meta">
+        <div class="meta-item">
+          <span class="meta-label">Scenario</span>
+          <span class="meta-value">S4 — Diagnostic Run</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Confidence</span>
+          <span class="meta-value"><span class="fuchsia-dot"></span>94%</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Date</span>
+          <span class="meta-value">Aug 22, 2026</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- READOUT -->
+    <div class="readout-section">
+      <div class="section-label">Executive Readout</div>
+      <div class="readout-card">
+        <h2 class="readout-headline">Your leadership team agrees on where to go. They disagree on how to get there — and the gap is widening faster than you think.</h2>
+        <p class="readout-summary">Two director departures in Q2 were not isolated attrition. They were early signals of a structural misalignment between COO and CFO on operational cadence. The drift is now visible in three layers: decision velocity has dropped 38% in monthly business reviews, cross-functional initiatives are stuck in pilot, and your middle managers are quietly voting with their effort — not their resignation letters yet.</p>
+        
+        <div class="signals-grid">
+          <div class="signal-cell">
+            <div class="signal-cell-label">Decision Velocity</div>
+            <div class="signal-cell-value attn">38% slower</div>
+            <div class="signal-cell-sub">Q2 vs Q1 MBR cycle time</div>
+          </div>
+          <div class="signal-cell">
+            <div class="signal-cell-label">Alignment Gap</div>
+            <div class="signal-cell-value note">Layer 3 / 5</div>
+            <div class="signal-cell-sub">Director level most affected</div>
+          </div>
+          <div class="signal-cell">
+            <div class="signal-cell-label">At-Risk Talent</div>
+            <div class="signal-cell-value attn">4 directors</div>
+            <div class="signal-cell-sub">Disengagement patterns detected</div>
+          </div>
+          <div class="signal-cell">
+            <div class="signal-cell-label">Initiatives Stalled</div>
+            <div class="signal-cell-value">6 of 14</div>
+            <div class="signal-cell-sub">Stuck in pilot phase</div>
+          </div>
+          <div class="signal-cell">
+            <div class="signal-cell-label">Cultural Drift</div>
+            <div class="signal-cell-value note">+21%</div>
+            <div class="signal-cell-sub">Shadow behavior increase</div>
+          </div>
+          <div class="signal-cell">
+            <div class="signal-cell-label">Critical Window</div>
+            <div class="signal-cell-value attn">8 weeks</div>
+            <div class="signal-cell-sub">Before cascade accelerates</div>
+          </div>
+        </div>
+
+        <p class="readout-source">11 lenses analyzed across SHIFT and Advisory suites.</p>
+      </div>
+    </div>
+
+    <!-- LENSES -->
+    <div class="lenses-section">
+      <div class="section-label">Lenses</div>
+
+      <!-- SHIFT -->
+      <div class="suite-header">
+        <span class="suite-name">SHIFT Suite</span>
+        <div class="suite-line"></div>
+        <span class="suite-count">5 of 5 unlocked</span>
+      </div>
+      <div class="lens-grid">
+        <div class="lens">
+          <div class="lens-head">
+            <div class="lens-code">LEAP</div>
+            <div class="lens-score">52</div>
+          </div>
+          <div class="lens-name">Competitive Positioning</div>
+          <div class="lens-score-bar"><div class="lens-score-bar-fill fill-crit" style="width:52%"></div></div>
+          <div class="lens-insight">Clear on destination. Drift pulling you off trajectory.</div>
+        </div>
+
+        <div class="lens">
+          <div class="lens-head">
+            <div class="lens-code">QUEST</div>
+            <div class="lens-score">68</div>
+          </div>
+          <div class="lens-name">Strategic Readiness</div>
+          <div class="lens-score-bar"><div class="lens-score-bar-fill fill-warn" style="width:68%"></div></div>
+          <div class="lens-insight">Strategy is sound. The organization isn't fully wired.</div>
+        </div>
+
+        <div class="lens active">
+          <div class="lens-head">
+            <div class="lens-code">DRIVE</div>
+            <div class="lens-score">38</div>
+          </div>
+          <div class="lens-name">Execution Capability</div>
+          <div class="lens-score-bar"><div class="lens-score-bar-fill fill-crit" style="width:38%"></div></div>
+          <div class="lens-insight">Root cause. No single decision owner for cross-functional work.</div>
+        </div>
+
+        <div class="lens">
+          <div class="lens-head">
+            <div class="lens-code">COACH</div>
+            <div class="lens-score">45</div>
+          </div>
+          <div class="lens-name">Leadership Coaching</div>
+          <div class="lens-score-bar"><div class="lens-score-bar-fill fill-crit" style="width:45%"></div></div>
+          <div class="lens-insight">Directors need more active coaching.</div>
+        </div>
+
+        <div class="lens">
+          <div class="lens-head">
+            <div class="lens-code">IMPACT</div>
+            <div class="lens-score">48</div>
+          </div>
+          <div class="lens-name">Organizational Impact</div>
+          <div class="lens-score-bar"><div class="lens-score-bar-fill fill-crit" style="width:48%"></div></div>
+          <div class="lens-insight">Composite. Drift across three layers.</div>
+        </div>
+
+        <div class="lens" style="background:var(--cream); cursor:default;">
+          <!-- empty cell for 3-col grid balance -->
+        </div>
+      </div>
+
+      <!-- ADVISORY -->
+      <div class="suite-header">
+        <span class="suite-name advisory">Advisory Suite</span>
+        <div class="suite-line"></div>
+        <span class="suite-count">3 of 6 unlocked · upgrade for full access</span>
+      </div>
+      <div class="lens-grid">
+        <div class="lens">
+          <div class="lens-head">
+            <div class="lens-code">PRISM</div>
+            <div class="lens-score">74</div>
+          </div>
+          <div class="lens-name">Career & Brand</div>
+          <div class="lens-score-bar"><div class="lens-score-bar-fill fill-ok" style="width:74%"></div></div>
+          <div class="lens-insight">Strong individual brand equity.</div>
+        </div>
+
+        <div class="lens">
+          <div class="lens-head">
+            <div class="lens-code">BRIDGE</div>
+            <div class="lens-score">61</div>
+          </div>
+          <div class="lens-name">Cross-Cultural</div>
+          <div class="lens-score-bar"><div class="lens-score-bar-fill fill-warn" style="width:61%"></div></div>
+          <div class="lens-insight">China HQ alignment decent. Secondary factor.</div>
+        </div>
+
+        <div class="lens">
+          <div class="lens-head">
+            <div class="lens-code">FORGE</div>
+            <div class="lens-score">82</div>
+          </div>
+          <div class="lens-name">Sales Excellence</div>
+          <div class="lens-score-bar"><div class="lens-score-bar-fill fill-ok" style="width:82%"></div></div>
+          <div class="lens-insight">Revenue engine is strong. Not the constraint.</div>
+        </div>
+
+        <div class="lens locked">
+          <div class="lens-head">
+            <div class="lens-code">MOSAIC</div>
+            <svg class="lens-lock-icon" width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="10" height="7"/><path d="M5 7V5a3 3 0 016 0v2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="lens-name">CQ Development</div>
+          <div class="lens-score-bar"><div class="lens-score-bar-fill fill-lock" style="width:0%"></div></div>
+          <div class="lens-insight">Upgrade to Executive to unlock.</div>
+        </div>
+
+        <div class="lens locked">
+          <div class="lens-head">
+            <div class="lens-code">SPARK</div>
+            <svg class="lens-lock-icon" width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="10" height="7"/><path d="M5 7V5a3 3 0 016 0v2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="lens-name">AI Readiness</div>
+          <div class="lens-score-bar"><div class="lens-score-bar-fill fill-lock" style="width:0%"></div></div>
+          <div class="lens-insight">Upgrade to Executive to unlock.</div>
+        </div>
+
+        <div class="lens locked">
+          <div class="lens-head">
+            <div class="lens-code">IMPACT</div>
+            <svg class="lens-lock-icon" width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="10" height="7"/><path d="M5 7V5a3 3 0 016 0v2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="lens-name">Stakeholder Influence</div>
+          <div class="lens-score-bar"><div class="lens-score-bar-fill fill-lock" style="width:0%"></div></div>
+          <div class="lens-insight">Upgrade to Executive to unlock.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEEP DIVE -->
+    <div class="deep-section">
+      <div class="section-label">Root Cause</div>
+      <div class="deep-grid">
+        <div class="deep-col">
+          <h3>What's actually happening</h3>
+          <p>The leadership drift you're seeing isn't a people problem. It's a scaling problem that looks like a people problem. When your team was 25 people, decision-making was ambient — everyone knew what was happening because they were in the room. At 40, that room doesn't exist anymore.</p>
+          <p>The COO wants faster execution. The CFO wants more control. Both are right for their functions. The gap isn't between them — it's in the architecture that should connect their work.</p>
+        </div>
+        <div class="deep-col">
+          <h3>Why it matters now</h3>
+          <ul class="points">
+            <li><span class="num">01</span>8 weeks before director-level disengagement starts pushing high performers out.</li>
+            <li><span class="num">02</span>Six cross-functional initiatives are stuck — each leaking time, money, and credibility.</li>
+            <li><span class="num">03</span>Your board knows execution is the risk. They'll attribute any miss to leadership drift.</li>
+            <li><span class="num">04</span>The cultural cost compounds: every week without a fix makes the eventual fix harder.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTION PLAN -->
+    <div class="actions-section">
+      <div class="section-label">Action Plan</div>
+      <div class="timeline">
+        <div class="timeline-item high">
+          <div class="tl-meta">
+            <div class="tl-horizon">Wk 1-2</div>
+            <div class="tl-impact">Critical</div>
+          </div>
+          <div class="tl-content">
+            <h4>Clarify decision rights at the director layer</h4>
+            <p>Define who decides what for cross-functional initiatives. Not another RACI — a simple decision map with three categories: decide, influence, inform. Focus on the 6 stuck initiatives first.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item high">
+          <div class="tl-meta">
+            <div class="tl-horizon">Wk 2-3</div>
+            <div class="tl-impact">Critical</div>
+          </div>
+          <div class="tl-content">
+            <h4>Realign the COO/CFO operating rhythm</h4>
+            <p>Create a joint weekly 30-minute operational sync with a single agenda: what's blocking progress this week. One shared operational reality instead of two parallel views.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="tl-meta">
+            <div class="tl-horizon">Wk 3-4</div>
+            <div class="tl-impact">High</div>
+          </div>
+          <div class="tl-content">
+            <h4>Unblock the 6 stalled initiatives</h4>
+            <p>For each stuck initiative, assign a single accountable owner with a clear yes/no path to resolution. Kill the ones without a real sponsor. Better 8 moving than 14 in purgatory.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="tl-meta">
+            <div class="tl-horizon">Wk 4-6</div>
+            <div class="tl-impact">Medium</div>
+          </div>
+          <div class="tl-content">
+            <h4>Director-level calibration conversations</h4>
+            <p>Not performance reviews. Structured conversations about what's working, what's not, and what each director needs. Surface the concerns people aren't saying out loud.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="tl-meta">
+            <div class="tl-horizon">Wk 6-8</div>
+            <div class="tl-impact">Foundational</div>
+          </div>
+          <div class="tl-content">
+            <h4>Update the operating model for 40+ people</h4>
+            <p>The consensus-based model that got you to 25 won't get you to 50. Design a decision architecture that matches your current size — without losing the collaborative culture that got you here.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-bar">
+    <div class="cta-inner">
+      <div class="cta-text">
+        <h3>Ready to work through this?</h3>
+        <p>Open a coaching session or export this readout.</p>
+      </div>
+      <div class="cta-btns">
+        <button class="btn btn-primary">Start Coaching</button>
+        <button class="btn btn-ghost">Export</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+</body>
+</html>
