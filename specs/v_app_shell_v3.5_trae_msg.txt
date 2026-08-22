@@ -1,8 +1,9 @@
-V-APP — NEXUS App Shell v3.5 Full Rebuild (with NEXUS Engine Integration)
+V-APP — NEXUS App Shell v3.5 Full Rebuild (with NEXUS Engine v1.5 Integration)
 
 **Phase:** V-App (post-V7.0 marketing rebuild)
 **Type:** FUNCTIONAL app shell rebuild — visual redesign + nexus-engine wiring + Supabase per-user data
-**Priority:** High — unifies app visual language with v3.5 marketing system and wires in the NEXUS brain
+**Priority:** High — unifies app visual language with v3.5 marketing system and wires in the full NEXUS brain
+**Engine version:** v1.5 — Persona Constitution + 3-lane framework + 6-layer prompt stack
 **Spec file:** specs/v_app_shell_v3.5_spec.md (full spec, READ FIRST — especially Section 9: Backend Integration)
 **Source mockups (VISUAL ground truth — open in browser and match pixel-close):**
 - specs/mockups/NEXUS_AppShell_v3.5.html (sidebar + topbar + layout)
@@ -10,27 +11,35 @@ V-APP — NEXUS App Shell v3.5 Full Rebuild (with NEXUS Engine Integration)
 - specs/mockups/NEXUS_Lenses_v3.5.html (lenses library, 11 lenses, 3-col grid)
 - specs/mockups/NEXUS_Milestones_v3.5.html (milestones timeline + profile + settings)
 - specs/mockups/NEXUS_DocumentsBooking_v3.5.html (documents list + booking flow)
-**NEXUS Engine (BRAIN — read first):** nexus-engine/ directory
-- nexus_llm_engine.py — DeepSeek LLM client + 5-layer prompt stack
-- nexus_engine.py — pattern retriever + scenario router
-- nexus_lens_memory_engine.py — lens scoring + memory system
-- pattern_db/patterns_v1.0.json — full pattern knowledge base
-- system_prompts/ — 6 system prompt files (core, quality, pattern spec, scenarios, turn engine, general mode)
-- conversation_scripts/ — 6 reference demo conversation scripts
+
+**NEXUS Engine v1.5 (BRAIN — read these first before coding anything):**
+- `nexus-engine/00_persona_master_v1.1.md` — Layer 0 Constitution (7 dimensions × 3 lanes) ← START HERE
+- `nexus-engine/system_prompt_architecture_v2.1.md` — full 6-layer + 3 vertical architecture diagram
+- `nexus-engine/nexus_llm_system_prompt_v2.0.txt` — reference full system prompt (for understanding the assembled output)
+- `nexus-engine/nexus_llm_engine.py` — Python LLM client (DeepSeek) + runtime prompt assembly
+- `nexus-engine/nexus_engine.py` — pattern retriever + scenario router
+- `nexus-engine/nexus_lens_memory_engine.py` — lens scoring + memory system
+- `nexus-engine/system_prompts/` — all 9 prompt files (L0-L5 + lens ID + user intel + recommendation)
+- `nexus-engine/pattern_db/` — 164-pattern consolidated library v3.1 + patterns_v1.0.json
 
 ---
 
 ## 🔴 MOST IMPORTANT RULE — READ THIS FIRST
 
-**This is NOT a static mock build. This is NOT a simple UI skin on existing Supabase tables.**
+**This is NOT a static mock build. This is NOT a simple UI skin on existing Supabase tables. This is NOT a basic chat wrapper around an LLM API.**
 
 This is a FUNCTIONAL rebuild with TWO backend layers you must wire together:
 
-**Layer 1 — NEXUS Engine (the brain):**
+**Layer 1 — NEXUS Engine v1.5 (the brain):**
 - Python engine in nexus-engine/ directory
-- Handles all chat intelligence: 5-layer prompt stack, pattern retrieval, scenario routing, lens scoring, memory
+- 6-layer horizontal prompt stack: L0 Persona Constitution → L1 Core Identity → L2 Quality System → L3 Pattern Context → L4 Scenario Control → L5 Turn Engine
+- 3 vertical intelligence layers: User Intelligence → Lens Intelligence → Recommendation Engine
+- 3-lane universal framework: Leadership Advisory / Career Architecture / Search Operations
+- Lane detection from user context — China is deepest evidence base, NOT default frame
+- 5 persona modes × 3 lane variants = 15 behavioral configurations
+- 164-pattern knowledge base + lens identification system + recommendation engine
 - Uses DeepSeek API (DEEPSEEK_API_KEY env var)
-- Pattern knowledge base (JSON) and system prompts live here — NOT in Supabase
+- All intelligence (prompts, patterns, persona canon) lives in the engine — NOT in Supabase
 - Communicates via API endpoints you will build (Next.js route handlers that call the Python engine)
 
 **Layer 2 — Supabase (per-user state):**
@@ -39,20 +48,24 @@ This is a FUNCTIONAL rebuild with TWO backend layers you must wire together:
 - Same Supabase instance as DEX products — strict RLS separation between products
 
 **Your job:** Build the v3.5 UI and wire it so that:
-1. Chat messages go through the NEXUS Engine (Python), not a simple Supabase/OpenAI passthrough
+1. Chat messages go through the full NEXUS Engine (6-layer stack + 3 vertical layers + lane detection), not a simple LLM passthrough
 2. Lens scores come from the NEXUS Lens Memory Engine, not hardcoded values
-3. User-specific state (conversations, profile, settings, docs, bookings) still lives in Supabase
-4. Pattern knowledge and prompt logic NEVER enters Supabase tables — it stays in the Python engine
+3. Lane detection is automatic — infer from first message, never ask "which lane"
+4. User-specific state (conversations, profile, settings, docs, bookings) lives in Supabase
+5. Persona canon, pattern knowledge, and prompt logic NEVER enters Supabase tables — stays in the engine
 
 **Mock data is allowed ONLY as a temporary scaffold during development. It must be removed before the PR.**
 **PR with hardcoded mock data = rejected.**
 **PR that bypasses the NEXUS Engine and wires chat directly to LLM = rejected.**
+**PR that flattens the 6-layer prompt stack into a single system prompt = rejected.**
 
-**Before writing any component, explore:**
+**Before writing any component, explore and understand:**
 - The existing Next.js app structure, auth flow, and Supabase schema
-- nexus-engine/ — read nexus_llm_engine.py, nexus_engine.py, nexus_lens_memory_engine.py
-- The system prompts in nexus-engine/system_prompts/ — understand the 5-layer stack
-- patterns_v1.0.json — understand the pattern data structure
+- nexus-engine/00_persona_master_v1.1.md — Layer 0, the constitution
+- nexus-engine/system_prompt_architecture_v2.1.md — how all layers fit together
+- nexus-engine/nexus_llm_engine.py — how the runtime assembles the prompt stack
+- nexus-engine/system_prompts/ — all 9 prompt files
+- nexus-engine/pattern_db/ — the pattern knowledge base
 
 Then build on top of both foundations.
 
@@ -60,18 +73,18 @@ Then build on top of both foundations.
 
 ## WHAT TO BUILD
 
-Full redesign of the NEXUS app shell to v3.5 design system, with nexus-engine integration.
+Full redesign of the NEXUS app shell to v3.5 design system, with nexus-engine v1.5 integration.
 
 **5 view groups to rebuild (all functional):**
 1. V1: App Shell — sidebar nav + topbar + page layout
-2. V2: Chat — conversation list (Supabase) + message thread + composer (both via NEXUS Engine)
-3. V3: Lenses Library — 11 lenses with scores from NEXUS Lens Memory Engine + tier gating from Supabase
+2. V2: Chat — conversation list (Supabase) + message thread + composer (via full NEXUS Engine pipeline)
+3. V3: Lenses Library — 11 lenses with scores from Lens Intelligence Engine + tier gating from Supabase
 4. V4: Milestones / Profile / Settings — real milestone data + real user profile + real persistent settings
 5. V5: Documents + Booking — real document list + real calendar availability + real booking creation
 
-**1 shared component library** used across all views (buttons, badges, toggles, selects, score bars, modals, empty states, loading skeletons, etc.)
+**1 shared component library** used across all views
 
-**New: NEXUS Engine API layer** — Next.js route handlers that bridge the frontend to the Python engine
+**New: NEXUS Engine API layer** — Next.js route handlers that bridge frontend to the Python engine
 
 ---
 
@@ -81,20 +94,44 @@ Full redesign of the NEXUS app shell to v3.5 design system, with nexus-engine in
 Frontend (Next.js App Router, v3.5 UI)
     │
     ├── Chat messages ──► /api/nexus/chat (stream) ──► NEXUS Engine (Python) ──► DeepSeek API
-    │                                                ├─ 5-layer prompt stack
-    │                                                ├─ Pattern retrieval
-    │                                                ├─ Scenario routing
-    │                                                └─ Lens memory update
+    │                                                │
+    │                                                ├─ L0 Persona Constitution (7 dims × 3 lanes)
+    │                                                ├─ L1 Core Identity (lane-activated)
+    │                                                ├─ L2 Quality System (12-gate)
+    │                                                ├─ L3 Pattern Context (164 patterns, retrieved)
+    │                                                ├─ L4 Scenario Control / Lane Detection
+    │                                                ├─ L5 Turn Engine
+    │                                                │
+    │                                                ├─ U0 User Intelligence (memory/profile/milestones)
+    │                                                ├─ L0 Lens Intelligence (pattern→lens signal scoring)
+    │                                                └─ R1 Recommendation Engine (trust-aligned)
     │
-    ├── Lens scores ─────► /api/nexus/lenses ───────► NEXUS Lens Memory Engine
+    ├── Lens scores ─────► /api/nexus/lenses ───────► Lens Intelligence Engine
+    ├── Recommendations ─► /api/nexus/recommend ────► Recommendation Engine
     │
-    ├── Conversations ───► Supabase (conversations table, user-scoped)
-    ├── Profile/Settings ─► Supabase (users table, settings table)
-    ├── Documents ───────► Supabase (documents table)
-    └── Booking ─────────► Supabase (bookings table) + calendar provider
+    ├── Conversations ───► Supabase (user-scoped RLS)
+    ├── Profile/Settings ─► Supabase
+    ├── Documents ───────► Supabase
+    └── Booking ─────────► Supabase
 ```
 
 The NEXUS Engine is the intelligence layer. Supabase is the user state layer. Both must work together.
+
+---
+
+## 3-LANE FRAMEWORK (KEY v1.5 CONCEPT)
+
+NEXUS serves three lanes. Core worldview is universal. Lane depth activates based on user context.
+
+- **Lane 1 — Leadership Advisory:** Board-level, organizational, cross-border leadership
+- **Lane 2 — Career Architecture:** Executive career transitions, positioning, advancement
+- **Lane 3 — Search Operations:** Talent evaluation, selection science, search execution
+
+**Lane detection rule (critical):** Infer lane from the user's first message. If ambiguous, start universal and let the conversation reveal the lane. **Never ask "which lane are you in?"**
+
+China is the deepest evidence base, not the default frame. Lane-specific depth activates by detection.
+
+The engine handles this automatically — do NOT implement lane selection UI.
 
 ---
 
@@ -119,46 +156,51 @@ The NEXUS Engine is the intelligence layer. Supabase is the user state layer. Bo
 
 ### Chat (most complex — read carefully)
 
-**Do NOT wire chat directly to an LLM API. Chat must go through the NEXUS Engine.**
+**Do NOT wire chat directly to an LLM API. Chat must go through the full NEXUS Engine pipeline.**
 
 Build API routes that call the NEXUS Python engine:
 - `POST /api/nexus/chat` — send a message, stream back NEXUS response
-- The engine assembles the full 5-layer prompt stack (core identity → quality system → retrieved patterns → scenario controller → turn engine)
-- Pattern retrieval happens automatically based on user input + conversation context
-- Scenario routing classifies the conversation type
-- After each turn, the lens memory engine updates lens scores
+- The engine assembles the FULL 6-layer prompt stack at runtime (L0 Constitution → L1 Core → L2 Quality → L3 Patterns → L4 Scenario/Lane → L5 Turn Engine)
+- 3 vertical layers feed into the stack: User Intelligence → Lens Intelligence → Recommendation Engine
+- Lane detection happens on first message — automatic, no UI selector
+- Pattern retrieval from 164-pattern library based on user input + context
+- After each turn, lens scores update via Lens Intelligence Engine
+- Quality gates are enforced by L2
 
 **Supabase side:**
 - Conversation list from Supabase conversations table (user-scoped via RLS)
 - Messages saved to Supabase messages table for persistence
-- First message in a conversation triggers scenario classification by the engine
+- User intelligence data (profile memory, milestones, artifacts) feeds U0 vertical layer
 
-**What to preserve from the engine:**
-- The 5-layer prompt architecture — do NOT flatten or simplify
-- Pattern retrieval from pattern_db/patterns_v1.0.json
-- Scenario routing logic
-- Lens memory / scoring updates after each turn
-- Quality gate checks
+**What to preserve from the engine — do NOT simplify:**
+- The full 6-layer horizontal + 3 vertical architecture
+- Layer 0 Persona Constitution (always active, above everything)
+- Lane detection and lane-activated depth
+- Pattern retrieval from 164-pattern library
+- Lens intelligence / scoring after each turn
+- Recommendation engine integration
+- Quality gate system
 
 ### Lenses
 
-- Lens scores computed by NEXUS Lens Memory Engine (nexus_lens_memory_engine.py)
-- 11 lenses across 2 suites — definitions from engine, scores from engine based on conversation history
+- Lens scores computed by Lens Intelligence Engine (L0 vertical layer)
+- 11 lenses across 2 suites — definitions and scores from engine
 - Tier gating from Supabase subscription tier
 - Insight text generated by engine, not hardcoded
 - Active/locked state from real tier + real data availability
+- Lens identification system maps patterns → lens signals → scores
 
 ### Milestones
 
-- Use existing milestones/goals data model in Supabase
+- Milestones data model in Supabase
+- Also feeds the User Intelligence (U0) vertical layer of the engine
 - Status, progress, target dates = real data
-- Click through to existing milestone detail if applicable
 
 ### Profile & Settings
 
-- Profile from users table (name, email, company, role, tier, etc.)
+- Profile from users table
 - Settings = real preferences that persist on change
-- Find existing settings schema and use it
+- User profile also feeds U0 layer for persona calibration
 
 ### Documents
 
@@ -176,28 +218,36 @@ Build API routes that call the NEXUS Python engine:
 
 ## NEXUS ENGINE INTEGRATION NOTES
 
-The Python engine is in `nexus-engine/`. Key integration points:
+The Python engine code is in `nexus-engine/`. Key files and concepts:
 
-**nexus_llm_engine.py — NexusLLMEngine class:**
-- Takes DEEPSEEK_API_KEY env var
-- `chat(user_message, conversation_history, scenario_id, persona)` — full turn
-- 5-layer prompt assembly at runtime (not a single static system prompt)
-- Pattern retrieval is part of the pipeline
+**Prompt architecture v2.1:**
+- Layer 0: Persona Master Constitution (new in v1.5 — worldview, lanes, canon, blind spots, boundaries, gravitas)
+- Layer 1: Core Identity (lane-activated, 5 persona modes)
+- Layer 2: Quality System (12-gate quality framework)
+- Layer 3: Pattern Context (retrieved from 164-pattern library)
+- Layer 4: Scenario Control / Lane Detection
+- Layer 5: Turn Engine (per-turn response orchestration)
 
-**nexus_engine.py — PatternRetriever + ScenarioRouter:**
-- Keyword-based pattern retrieval from patterns_v1.0.json
-- Scenario classification
+**Vertical intelligence layers:**
+- U0: User Intelligence — profile, memory, milestones, artifacts
+- L0: Lens Intelligence — pattern-to-lens mapping, signal scoring, 11-lens model
+- R1: Recommendation Engine — trust-aligned recommendations, not pushy
 
-**nexus_lens_memory_engine.py — LensMemoryEngine:**
-- Tracks 11 lens scores per user
-- Updates scores based on conversation content
-- Generates lens insights
+**Key Python files:**
+- `nexus_llm_engine.py` — NexusLLMEngine, DeepSeek client, runtime prompt assembly
+- `nexus_engine.py` — PatternRetriever, ScenarioRouter
+- `nexus_lens_memory_engine.py` — LensMemoryEngine, 11-lens scoring
 
-**How to call from Next.js:**
+**Deployment approach:**
 - Options: (a) Python subprocess per request, (b) Vercel Function running Python, (c) separate microservice
 - Choose the approach that works best with Vercel deployment
-- Streaming is required — chat responses must stream token-by-token, not return full response at once
-- DEEPSEEK_API_KEY comes from environment variables (server-side only, never expose to client)
+- Streaming is required — chat responses must stream token-by-token
+- DEEPSEEK_API_KEY from environment variables (server-side only, never expose to client)
+
+**Pattern library:**
+- 164 patterns consolidated v3.1 (nexus_pattern_library_consolidated_v3.1.md)
+- Also available as JSON for programmatic use (patterns_v1.0.json — expand/upgrade as needed)
+- Patterns are the intellectual canon — they stay in the engine, never in Supabase
 
 ---
 
@@ -218,7 +268,7 @@ The Python engine is in `nexus-engine/`. Key integration points:
 - SPARK — AI Readiness (locked on Pro)
 - IMPACT — Stakeholder Influence (locked on Pro)
 
-Tier gating wired from real subscription tier. Lens scores wired from real engine output.
+Tier gating wired from real subscription tier. Lens scores wired from real Lens Intelligence Engine output.
 
 ---
 
@@ -239,17 +289,25 @@ Tier gating wired from real subscription tier. Lens scores wired from real engin
 
 ## ACCEPTANCE CRITERIA
 
-**Functional — NEXUS Engine (hard requirements):**
-- [ ] Chat goes through NEXUS Engine (5-layer prompt stack + pattern retrieval + scenario routing), NOT direct LLM call
+**Functional — NEXUS Engine v1.5 (hard requirements — no shortcuts):**
+- [ ] Chat goes through FULL NEXUS Engine pipeline (6-layer horizontal stack + 3 vertical layers), NOT direct LLM call
+- [ ] Layer 0 Persona Constitution is active and loaded at runtime (not flattened into core prompt)
+- [ ] Lane detection is automatic — inferred from user's first message, no lane selector UI
+- [ ] 3-lane framework works: Leadership Advisory / Career Architecture / Search Operations
+- [ ] China is evidence base, not default frame — lane activation is context-dependent
 - [ ] Chat streams token-by-token from engine through API route
-- [ ] Lens scores come from NEXUS Lens Memory Engine, not hardcoded
-- [ ] Pattern knowledge base (patterns_v1.0.json) is used by the engine, not copied to Supabase
-- [ ] System prompts (6 files) are loaded by the engine at runtime, not inlined in frontend code
+- [ ] Lens scores come from Lens Intelligence Engine, not hardcoded
+- [ ] 164-pattern library is used by engine for retrieval, not copied to Supabase
+- [ ] All 9 system prompt files loaded by engine at runtime, not inlined in frontend code
+- [ ] Quality gates (L2) are enforced on every response
+- [ ] Recommendation engine (R1) integrated and accessible
 - [ ] DEEPSEEK_API_KEY is server-side only (never exposed to client bundle)
+- [ ] No pattern knowledge, persona canon, or prompt logic stored in Supabase
 
 **Functional — Supabase / per-user state:**
 - [ ] No hardcoded mock data anywhere in production code at PR time
 - [ ] Conversations and messages persist to Supabase (user-scoped via RLS)
+- [ ] User intelligence data (profile/memory/milestones) feeds U0 vertical layer
 - [ ] Tier gating works based on user's actual subscription tier
 - [ ] Milestones data comes from real data source
 - [ ] Profile data comes from users table
@@ -276,13 +334,13 @@ Tier gating wired from real subscription tier. Lens scores wired from real engin
 
 ## WORKFLOW
 
-1. **Explore first** — map both codebases: existing Next.js app (auth, data, routes) AND nexus-engine/ (LLM engine, patterns, lens memory)
+1. **Explore first** — map everything: existing Next.js app AND nexus-engine/ (read persona master v1.1, architecture v2.1, and the Python engine code)
 2. Design tokens + shared UI components (buttons, badges, toggles, score bar, etc.)
 3. App shell layout (sidebar + topbar + page structure), wired to auth/user context
-4. **NEXUS Engine API layer** — build the /api/nexus/ routes that call the Python engine
-5. Lenses library (most visible card pattern), wired to lens memory engine
-6. Chat interface (most complex interaction), wired through engine API with streaming
-7. Milestones / Profile / Settings (secondary nav + 3 views), wired to Supabase
+4. **NEXUS Engine API layer** — build the /api/nexus/ routes (chat, lenses, recommend) that call the Python engine
+5. Lenses library (most visible card pattern), wired to Lens Intelligence Engine
+6. Chat interface (most complex interaction), wired through full engine pipeline with streaming
+7. Milestones / Profile / Settings (secondary nav + 3 views), wired to Supabase + U0 layer
 8. Documents + Booking (list pattern + calendar/slot patterns), wired to Supabase
 
 Commit and push after each major section is complete. Create a single PR for the full V-App rebuild. Tag me when ready for review.
