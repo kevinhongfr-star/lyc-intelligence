@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS. — Documents + Booking v3.5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --ocean-800: #0F2C4A;
+  --ocean-700: #183F5E;
+  --ocean-600: #1E537A;
+  --ocean-500: #2A6A95;
+  --ocean-400: #3E86B5;
+  --ocean-300: #6BA8CD;
+  --ocean-200: #9CC6DF;
+  --ocean-100: #CFE1EE;
+  --ocean-50:  #EAF2F8;
+  --teal-700: #0B5D6B;
+  --teal-600: #0E7B8A;
+  --teal-500: #1293A6;
+  --teal-400: #2DB0C2;
+  --teal-300: #5AC6D5;
+  --teal-200: #8EDBE5;
+  --teal-100: #BFE9F0;
+  --teal-50:  #E1F5F8;
+  --fuchsia-700: #A0078A;
+  --fuchsia-600: #C108AB;
+  --fuchsia-500: #D814C0;
+  --fuchsia-400: #E83CD2;
+  --cream: #FAFAFA;
+  --cream-dark: #F2F2F2;
+  --ink-900: #0A0A0A;
+  --ink-800: #1a1a1a;
+  --ink-700: #333333;
+  --ink-500: #666666;
+  --ink-400: #999999;
+  --ink-200: #e0e0e0;
+  --ink-100: #f0f0f0;
+  --ink-50:  #fafafa;
+  --white:  #ffffff;
+  --sidebar-width: 220px;
+  --topbar-height: 56px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 14px;
+  color: var(--ink-800);
+  background: var(--cream);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === SIDEBAR === */
+.sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: var(--sidebar-width);
+  height: 100%;
+  background: var(--white);
+  border-right: 1px solid var(--ink-100);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.sidebar-brand {
+  height: var(--topbar-height);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--ink-100);
+}
+.sidebar-brand .wordmark {
+  font-family: 'Crimson Pro', serif;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+}
+.sidebar-brand .wordmark span { color: var(--fuchsia-600); }
+
+.sidebar-section { padding: 16px 0 4px; }
+.sidebar-section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  padding: 0 20px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 20px;
+  cursor: pointer;
+  color: var(--ink-500);
+  font-size: 12.5px;
+  font-weight: 400;
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+}
+.nav-item:hover { background: var(--ink-50); color: var(--ink-800); }
+.nav-item.active {
+  background: var(--ocean-50);
+  color: var(--ocean-700);
+  font-weight: 500;
+  border-left-color: var(--ocean-600);
+}
+.nav-item .nav-icon {
+  width: 14px; height: 14px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+.nav-item.active .nav-icon { opacity: 1; }
+
+.sidebar-divider {
+  height: 1px;
+  background: var(--ink-100);
+  margin: 6px 20px;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px 20px;
+  border-top: 1px solid var(--ink-100);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sidebar-footer .avatar-initials {
+  width: 28px; height: 28px;
+  background: var(--ocean-700);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.sidebar-footer .user-info { flex: 1; min-width: 0; }
+.sidebar-footer .user-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-800);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar-footer .user-plan {
+  font-size: 10px;
+  color: var(--ink-400);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* === TOP BAR === */
+.topbar {
+  position: fixed;
+  top: 0; left: var(--sidebar-width); right: 0;
+  height: var(--topbar-height);
+  background: var(--white);
+  border-bottom: 1px solid var(--ink-100);
+  display: flex;
+  align-items: center;
+  padding: 0 48px;
+  z-index: 90;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink-400);
+}
+.breadcrumb .crumb { color: var(--ink-400); }
+.breadcrumb .crumb-current { color: var(--ink-800); font-weight: 500; }
+.breadcrumb .sep { color: var(--ink-200); }
+
+.topbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.topbar-icon {
+  width: 32px; height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-400);
+  cursor: pointer;
+}
+.topbar-icon:hover { color: var(--ink-700); background: var(--ink-50); }
+
+/* === MAIN === */
+.main {
+  margin-left: var(--sidebar-width);
+  margin-top: var(--topbar-height);
+  padding: 0;
+  min-height: calc(100vh - var(--topbar-height));
+}
+
+/* === CONTENT WRAPPER === */
+.content-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+
+/* === VIEW DIVIDER === */
+.view-divider {
+  height: 1px;
+  background: var(--ink-200);
+  margin: 64px 0;
+  position: relative;
+}
+.view-divider-label {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--cream);
+  padding: 0 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+}
+
+/* === PAGE HEADER === */
+.page-header { padding: 40px 0 24px; }
+
+.page-kicker {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal-600);
+  margin-bottom: 8px;
+}
+
+.page-title {
+  font-family: 'Crimson Pro', serif;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+  margin-bottom: 6px;
+}
+
+.page-subtitle {
+  font-size: 13.5px;
+  color: var(--ink-500);
+  max-width: 560px;
+  line-height: 1.6;
+}
+
+/* === SECTION LABEL === */
+.section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::before {
+  content: '';
+  width: 16px; height: 1px;
+  background: var(--ink-200);
+}
+
+/* === DOCUMENTS === */
+.docs-section { padding: 0 0 40px; }
+
+.docs-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.search-box {
+  position: relative;
+  width: 280px;
+}
+.search-box input {
+  width: 100%;
+  padding: 8px 12px 8px 34px;
+  border: 1px solid var(--ink-100);
+  background: var(--white);
+  font-size: 12.5px;
+  font-family: 'Inter', sans-serif;
+  color: var(--ink-700);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.search-box input:focus { border-color: var(--ocean-400); }
+.search-box svg {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-400);
+}
+
+.filter-group {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--ink-100);
+  background: var(--white);
+}
+.filter-btn {
+  padding: 7px 14px;
+  background: transparent;
+  font-size: 11.5px;
+  color: var(--ink-500);
+  cursor: pointer;
+  border: none;
+  border-right: 1px solid var(--ink-100);
+  font-family: 'Inter', sans-serif;
+  transition: all 0.15s;
+}
+.filter-btn:last-child { border-right: none; }
+.filter-btn.active {
+  background: var(--ocean-700);
+  color: white;
+  font-weight: 500;
+}
+.filter-btn:not(.active):hover { color: var(--ink-700); background: var(--ink-50); }
+
+.doc-list {
+  background: var(--white);
+  border: 1px solid var(--ink-100);
+}
+.doc-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--ink-100);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.doc-item:last-child { border-bottom: none; }
+.doc-item:hover { background: var(--ink-50); }
+
+.doc-icon {
+  width: 36px; height: 36px;
+  flex-shrink: 0;
+  background: var(--ocean-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ocean-600);
+}
+.doc-icon.teal { background: var(--teal-50); color: var(--teal-600); }
+.doc-icon.fuchsia { background: #FCE7F8; color: var(--fuchsia-600); }
+
+.doc-main { flex: 1; min-width: 0; }
+.doc-title {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-800);
+  margin-bottom: 3px;
+}
+.doc-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11.5px;
+  color: var(--ink-400);
+}
+.doc-meta .dot {
+  width: 3px; height: 3px;
+  background: var(--ink-200);
+  border-radius: 50%;
+}
+
+.doc-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+.doc-status {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 8px;
+  letter-spacing: 0.04em;
+  font-family: 'IBM Plex Mono', monospace;
+  text-transform: uppercase;
+}
+.doc-status.final { background: var(--teal-50); color: var(--teal-700); }
+.doc-status.draft { background: var(--ink-100); color: var(--ink-500); }
+.doc-status.archived { background: var(--cream-dark); color: var(--ink-400); }
+
+.doc-date {
+  font-size: 12px;
+  color: var(--ink-400);
+  font-family: 'IBM Plex Mono', monospace;
+  min-width: 72px;
+  text-align: right;
+}
+
+.doc-chevron {
+  color: var(--ink-300);
+  flex-shrink: 0;
+}
+
+/* === BOOKING === */
+.booking-section { padding: 0 0 48px; }
+
+/* Session type selector — top */
+.session-selector {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--ink-100);
+  background: var(--white);
+  margin-bottom: 24px;
+}
+.session-option {
+  flex: 1;
+  padding: 16px 20px;
+  cursor: pointer;
+  border-right: 1px solid var(--ink-100);
+  transition: all 0.15s;
+  position: relative;
+}
+.session-option:last-child { border-right: none; }
+.session-option:hover { background: var(--ink-50); }
+.session-option.selected {
+  background: var(--ocean-50);
+}
+.session-option.selected::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--ocean-600);
+}
+.session-option-name {
+  font-family: 'Crimson Pro', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-900);
+  margin-bottom: 3px;
+}
+.session-option-desc {
+  font-size: 11.5px;
+  color: var(--ink-500);
+  line-height: 1.4;
+}
+.session-option-duration {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-400);
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.session-option.selected .session-option-name { color: var(--ocean-700); }
+
+/* Calendar + times — 2-col balanced */
+.booking-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--ink-100);
+  border: 1px solid var(--ink-100);
+  margin-bottom: 0;
+}
+.booking-col {
+  background: var(--white);
+  padding: 24px;
+}
+
+.booking-col-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.booking-col-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+}
+.booking-col-sub {
+  font-size: 11.5px;
+  color: var(--teal-600);
+  font-weight: 500;
+}
+
+/* Calendar */
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.cal-month {
+  font-family: 'Crimson Pro', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink-900);
+}
+.cal-nav { display: flex; gap: 2px; }
+.cal-nav-btn {
+  width: 24px; height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-400);
+  cursor: pointer;
+  border: 1px solid var(--ink-100);
+  background: var(--white);
+}
+.cal-nav-btn:hover { color: var(--ink-700); border-color: var(--ink-200); }
+
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 4px;
+}
+.cal-weekday {
+  text-align: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  padding: 6px 0;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--ink-500);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.cal-day:hover { background: var(--ink-50); color: var(--ink-700); }
+.cal-day.muted { color: var(--ink-200); cursor: default; }
+.cal-day.muted:hover { background: none; }
+.cal-day.today {
+  border: 1px solid var(--ocean-400);
+  color: var(--ocean-700);
+  font-weight: 500;
+}
+.cal-day.selected {
+  background: var(--ocean-700);
+  color: white;
+  font-weight: 500;
+}
+.cal-day.unavailable {
+  color: var(--ink-200);
+  cursor: not-allowed;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.cal-day.unavailable:hover { background: none; color: var(--ink-200); }
+
+/* Time slots */
+.slots-date {
+  font-family: 'Crimson Pro', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink-900);
+  margin-bottom: 4px;
+}
+.slots-date-sub {
+  font-size: 11.5px;
+  color: var(--ink-400);
+  margin-bottom: 16px;
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.slot {
+  padding: 10px 12px;
+  border: 1px solid var(--ink-100);
+  background: var(--white);
+  font-size: 12.5px;
+  color: var(--ink-700);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+.slot:hover { border-color: var(--ocean-300); color: var(--ocean-700); }
+.slot.selected {
+  background: var(--ocean-700);
+  border-color: var(--ocean-700);
+  color: white;
+  font-weight: 500;
+}
+.slot.booked {
+  background: var(--ink-50);
+  color: var(--ink-300);
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+.slot.booked:hover { border-color: var(--ink-100); color: var(--ink-300); }
+
+/* Confirm bar */
+.booking-confirm {
+  margin-top: 20px;
+  padding: 20px 24px;
+  background: var(--ocean-800);
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.booking-summary { flex: 1; }
+.booking-summary h4 {
+  font-family: 'Crimson Pro', serif;
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.booking-summary p {
+  font-size: 12.5px;
+  color: var(--ocean-200);
+}
+.btn-book {
+  padding: 9px 22px;
+  background: white;
+  color: var(--ocean-800);
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+}
+.btn-book:hover { background: var(--cream-dark); }
+
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="wordmark">NEXUS<span>.</span></div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Scenarios</div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h12M2 8h12M2 13h8" stroke-linecap="round"/></svg>
+      Strategy Readout
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5" stroke-linecap="round"/><path d="M8 5v3l2 2" stroke-linecap="round"/></svg>
+      Leadership Coaching
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v6H3z" stroke-linejoin="round"/><path d="M5 11h6M8 9v2" stroke-linecap="round"/></svg>
+      Executive Brief
+    </div>
+    <div class="nav-item active">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2"/><path d="M2 8s2-5 6-5 6 5 6 5-2 5-6 5-6-5-6-5z" stroke-linejoin="round"/></svg>
+      Diagnostic Run
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2v12M12 2v12M4 6h8M4 10h8" stroke-linecap="round"/></svg>
+      Research
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13l3-3 2 2 5-5" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 7V3H9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Career Advisor
+    </div>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Account</div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13l3-3 2 2 5-5" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 7V3H9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Milestones
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2"/><circle cx="8" cy="8" r="5" stroke-linecap="round"/><path d="M8 1v1M8 14v1M1 8h2M13 8h1" stroke-linecap="round"/></svg>
+      Settings
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="avatar-initials">KH</div>
+    <div class="user-info">
+      <div class="user-name">Kevin Hong</div>
+      <div class="user-plan">PROFESSIONAL</div>
+    </div>
+  </div>
+</aside>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="breadcrumb">
+    <span class="crumb">Library</span>
+    <span class="sep">/</span>
+    <span class="crumb-current">Documents</span>
+  </div>
+  <div class="topbar-actions">
+    <div class="topbar-icon">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2a4 4 0 00-4 4v2.5L2.5 10h11L12 8.5V6a4 4 0 00-4-4z" stroke-linejoin="round"/><path d="M7 13a1 1 0 002 0" stroke-linecap="round"/></svg>
+    </div>
+    <div class="topbar-icon">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5h2v2h-2zM3 9h2v2H3zM11 11h2v2h-2zM3 3h2v2H3z"/><path d="M7 5h2M5 7v2M7 9h2M9 7v2" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+  <div class="content-wrap">
+
+    <!-- ===== DOCUMENTS VIEW ===== -->
+    <div class="page-header">
+      <div class="page-kicker">Library</div>
+      <h1 class="page-title">Documents</h1>
+      <p class="page-subtitle">All readouts, briefs, and exports from your NEXUS sessions.</p>
+    </div>
+
+    <div class="docs-section">
+      <div class="docs-toolbar">
+        <div class="filter-group">
+          <button class="filter-btn active">All</button>
+          <button class="filter-btn">Readouts</button>
+          <button class="filter-btn">Briefs</button>
+          <button class="filter-btn">Exports</button>
+        </div>
+        <div class="search-box">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5" stroke-linecap="round"/><path d="M11 11l3 3" stroke-linecap="round"/></svg>
+          <input type="text" placeholder="Search documents...">
+        </div>
+      </div>
+
+      <div class="doc-list">
+        <div class="doc-item">
+          <div class="doc-icon">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2h6l3 3v9H4z" stroke-linejoin="round"/><path d="M10 2v3h3" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="doc-main">
+            <div class="doc-title">Leadership Drift — Diagnostic Readout</div>
+            <div class="doc-meta">
+              <span>Diagnostic Run</span>
+              <span class="dot"></span>
+              <span>11 lenses · 94% confidence</span>
+            </div>
+          </div>
+          <div class="doc-right">
+            <span class="doc-status final">Final</span>
+            <span class="doc-date">Aug 22</span>
+            <svg class="doc-chevron" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+
+        <div class="doc-item">
+          <div class="doc-icon teal">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l3 3 7-7" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke-linecap="round"/></svg>
+          </div>
+          <div class="doc-main">
+            <div class="doc-title">Q2 Executive Brief — Operating Cadence</div>
+            <div class="doc-meta">
+              <span>Executive Brief</span>
+              <span class="dot"></span>
+              <span>Board-level summary · 6 pages</span>
+            </div>
+          </div>
+          <div class="doc-right">
+            <span class="doc-status final">Final</span>
+            <span class="doc-date">Aug 15</span>
+            <svg class="doc-chevron" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+
+        <div class="doc-item">
+          <div class="doc-icon">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2h6l3 3v9H4z" stroke-linejoin="round"/><path d="M10 2v3h3" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="doc-main">
+            <div class="doc-title">Competitive Positioning — Market Scan</div>
+            <div class="doc-meta">
+              <span>Research</span>
+              <span class="dot"></span>
+              <span>LEAP lens · 8 companies analyzed</span>
+            </div>
+          </div>
+          <div class="doc-right">
+            <span class="doc-status draft">Draft</span>
+            <span class="doc-date">Aug 12</span>
+            <svg class="doc-chevron" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+
+        <div class="doc-item">
+          <div class="doc-icon fuchsia">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5" stroke-linecap="round"/><path d="M8 5v4l2 2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="doc-main">
+            <div class="doc-title">Coaching Session #3 — Decision Architecture</div>
+            <div class="doc-meta">
+              <span>Coaching</span>
+              <span class="dot"></span>
+              <span>60-min · action plan attached</span>
+            </div>
+          </div>
+          <div class="doc-right">
+            <span class="doc-status final">Final</span>
+            <span class="doc-date">Aug 10</span>
+            <svg class="doc-chevron" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+
+        <div class="doc-item">
+          <div class="doc-icon">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2h6l3 3v9H4z" stroke-linejoin="round"/><path d="M10 2v3h3" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="doc-main">
+            <div class="doc-title">Career Narrative — Executive Positioning</div>
+            <div class="doc-meta">
+              <span>Career Advisor</span>
+              <span class="dot"></span>
+              <span>PRISM lens · personal brand framework</span>
+            </div>
+          </div>
+          <div class="doc-right">
+            <span class="doc-status final">Final</span>
+            <span class="doc-date">Jul 28</span>
+            <svg class="doc-chevron" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+
+        <div class="doc-item">
+          <div class="doc-icon teal">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v8H3z" stroke-linejoin="round"/><path d="M5 13h6M8 11v2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="doc-main">
+            <div class="doc-title">Onboarding Summary — Your Executive Baseline</div>
+            <div class="doc-meta">
+              <span>Onboarding</span>
+              <span class="dot"></span>
+              <span>Initial diagnostic · 13 scenarios mapped</span>
+            </div>
+          </div>
+          <div class="doc-right">
+            <span class="doc-status archived">Archived</span>
+            <span class="doc-date">Jul 15</span>
+            <svg class="doc-chevron" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="view-divider">
+      <span class="view-divider-label">Booking</span>
+    </div>
+
+    <!-- ===== BOOKING VIEW ===== -->
+    <div class="page-header">
+      <div class="page-kicker">Schedule</div>
+      <h1 class="page-title">Book a session</h1>
+      <p class="page-subtitle">Choose a time that works. NEXUS prepares the agenda before you join.</p>
+    </div>
+
+    <div class="booking-section">
+
+      <!-- Session type — 3 equal columns -->
+      <div class="section-label">Session type</div>
+      <div class="session-selector">
+        <div class="session-option selected">
+          <div class="session-option-name">Executive Coaching</div>
+          <div class="session-option-desc">Deep-dive on your current focus area</div>
+          <div class="session-option-duration">60 minutes</div>
+        </div>
+        <div class="session-option">
+          <div class="session-option-name">Diagnostic Review</div>
+          <div class="session-option-desc">Walk through a readout together</div>
+          <div class="session-option-duration">45 minutes</div>
+        </div>
+        <div class="session-option">
+          <div class="session-option-name">Quick Check-in</div>
+          <div class="session-option-desc">Short sync on a specific question</div>
+          <div class="session-option-duration">20 minutes</div>
+        </div>
+      </div>
+
+      <!-- Calendar + Time slots — balanced 2-col -->
+      <div class="section-label">Select date & time</div>
+      <div class="booking-grid">
+        <!-- Calendar -->
+        <div class="booking-col">
+          <div class="cal-header">
+            <div class="cal-month">September 2026</div>
+            <div class="cal-nav">
+              <div class="cal-nav-btn">
+                <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="cal-nav-btn">
+                <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="cal-weekdays">
+            <div class="cal-weekday">S</div>
+            <div class="cal-weekday">M</div>
+            <div class="cal-weekday">T</div>
+            <div class="cal-weekday">W</div>
+            <div class="cal-weekday">T</div>
+            <div class="cal-weekday">F</div>
+            <div class="cal-weekday">S</div>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-day muted">31</div>
+            <div class="cal-day">1</div>
+            <div class="cal-day">2</div>
+            <div class="cal-day">3</div>
+            <div class="cal-day">4</div>
+            <div class="cal-day">5</div>
+            <div class="cal-day">6</div>
+
+            <div class="cal-day">7</div>
+            <div class="cal-day">8</div>
+            <div class="cal-day today">9</div>
+            <div class="cal-day selected">10</div>
+            <div class="cal-day">11</div>
+            <div class="cal-day">12</div>
+            <div class="cal-day">13</div>
+
+            <div class="cal-day">14</div>
+            <div class="cal-day unavailable">15</div>
+            <div class="cal-day unavailable">16</div>
+            <div class="cal-day">17</div>
+            <div class="cal-day">18</div>
+            <div class="cal-day">19</div>
+            <div class="cal-day">20</div>
+
+            <div class="cal-day">21</div>
+            <div class="cal-day">22</div>
+            <div class="cal-day">23</div>
+            <div class="cal-day">24</div>
+            <div class="cal-day unavailable">25</div>
+            <div class="cal-day">26</div>
+            <div class="cal-day">27</div>
+
+            <div class="cal-day">28</div>
+            <div class="cal-day">29</div>
+            <div class="cal-day">30</div>
+            <div class="cal-day muted">1</div>
+            <div class="cal-day muted">2</div>
+            <div class="cal-day muted">3</div>
+            <div class="cal-day muted">4</div>
+          </div>
+        </div>
+
+        <!-- Time slots -->
+        <div class="booking-col">
+          <div class="slots-date">Wednesday, September 10</div>
+          <div class="slots-date-sub">6 available slots · Shanghai time</div>
+          <div class="slots-grid">
+            <div class="slot booked">09:00 AM</div>
+            <div class="slot selected">10:00 AM</div>
+            <div class="slot">11:30 AM</div>
+            <div class="slot booked">01:00 PM</div>
+            <div class="slot">02:30 PM</div>
+            <div class="slot">03:45 PM</div>
+            <div class="slot booked">04:30 PM</div>
+            <div class="slot">05:00 PM</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirm — full width -->
+      <div class="booking-confirm">
+        <div class="booking-summary">
+          <h4>Executive Coaching — 60 minutes</h4>
+          <p>Wednesday, September 10 · 10:00 AM · Shanghai</p>
+        </div>
+        <button class="btn-book">Confirm booking</button>
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
+
+</body>
+</html>
