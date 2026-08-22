@@ -76,6 +76,7 @@ export function SettingsPageV3(): React.ReactElement {
   const [notifMilestone, setNotifMilestone] = useState(true);
   const [notifCoaching, setNotifCoaching] = useState(true);
   const [notifNudge, setNotifNudge] = useState(false);
+  const [savedSetting, setSavedSetting] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -134,12 +135,21 @@ export function SettingsPageV3(): React.ReactElement {
     }
   };
 
-  const handleToggleConsultantHide = async (next: boolean) => {
-    setHideFromConsultants(next);
+  // Generic instant-save for all settings toggles (corrective batch #1393).
+  // Persists to the profiles column immediately on change + shows a subtle
+  // transient confirmation. Column names match the 20260821 migration.
+  const handleToggleSetting = async (
+    column: string,
+    setter: (v: boolean) => void,
+    next: boolean,
+  ) => {
+    setter(next);
     try {
-      await updateProfile({ hide_profile_from_consultants: next } as any);
+      await updateProfile({ [column]: next } as any);
+      setSavedSetting(true);
+      window.setTimeout(() => setSavedSetting(false), 1600);
     } catch (_e) {
-      // no-op if column missing; UI state already updated
+      // Optimistic — column may not exist pre-migration; UI already updated.
     }
   };
 
@@ -271,7 +281,7 @@ export function SettingsPageV3(): React.ReactElement {
                   >
                     <Toggle
                       checked={hideFromConsultants}
-                      onChange={handleToggleConsultantHide}
+                      onChange={(next) => handleToggleSetting('hide_profile_from_consultants', setHideFromConsultants, next)}
                     />
                   </FormRow>
                 </div>
@@ -287,7 +297,7 @@ export function SettingsPageV3(): React.ReactElement {
                   >
                     <Toggle
                       checked={allowAnonymousBenchmarks}
-                      onChange={(next) => setAllowAnonymousBenchmarks(next)}
+                      onChange={(next) => handleToggleSetting('allow_anonymous_benchmarks', setAllowAnonymousBenchmarks, next)}
                     />
                   </FormRow>
                 </div>
@@ -386,7 +396,7 @@ export function SettingsPageV3(): React.ReactElement {
                   >
                     <Toggle
                       checked={notifProduct}
-                      onChange={(next) => setNotifProduct(next)}
+                      onChange={(next) => handleToggleSetting('notif_product_updates', setNotifProduct, next)}
                     />
                   </FormRow>
                 </div>
@@ -402,7 +412,7 @@ export function SettingsPageV3(): React.ReactElement {
                   >
                     <Toggle
                       checked={notifMilestone}
-                      onChange={(next) => setNotifMilestone(next)}
+                      onChange={(next) => handleToggleSetting('notif_milestone_reminders', setNotifMilestone, next)}
                     />
                   </FormRow>
                 </div>
@@ -418,7 +428,7 @@ export function SettingsPageV3(): React.ReactElement {
                   >
                     <Toggle
                       checked={notifCoaching}
-                      onChange={(next) => setNotifCoaching(next)}
+                      onChange={(next) => handleToggleSetting('notif_coaching_followups', setNotifCoaching, next)}
                     />
                   </FormRow>
                 </div>
@@ -434,7 +444,7 @@ export function SettingsPageV3(): React.ReactElement {
                   >
                     <Toggle
                       checked={notifNudge}
-                      onChange={(next) => setNotifNudge(next)}
+                      onChange={(next) => handleToggleSetting('notif_nudges', setNotifNudge, next)}
                     />
                   </FormRow>
                 </div>
@@ -500,6 +510,27 @@ export function SettingsPageV3(): React.ReactElement {
               </Button>
             </div>
           </div>
+        </div>
+      )}
+      {savedSetting && (
+        <div
+          aria-live="polite"
+          style={{
+            position: 'fixed',
+            bottom: 24,
+            right: 24,
+            zIndex: 50,
+            background: V3.ink900,
+            color: V3.cream,
+            padding: '8px 14px',
+            fontFamily: V3.monoFont,
+            fontSize: '0.68rem',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            lineHeight: 1,
+          }}
+        >
+          Saved
         </div>
       )}
     </>

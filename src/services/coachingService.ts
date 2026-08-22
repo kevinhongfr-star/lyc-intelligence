@@ -1,289 +1,206 @@
-/**
- * Client-facing coaching service.
- *
- * ── Integrated (Phase 7.5 — /coaching/coach) ──────────────────────
- * session.*      — calls REAL /api/coaching/* endpoints through fetch.
- *                  Uses `authFetch` helper (Authorization: Bearer JWT).
- *
- * ── Not yet integrated (later phases) ─────────────────────────────
- * simulation.*   — direct engine imports (coachingService.simulation.*)
- * methodology.*  — direct engine imports
- * reflection.*   — direct engine imports
- * peer.*         — direct engine imports
- * curriculum.*   — direct engine imports
- * progress.*     — direct engine imports
- *
- * DO NOT wire other modules to /api/coaching/* until their audit 6-pt
- * checklists are complete and dispatch registrations exist.
- */
+// coachingService.ts — Real coaching availability + bookings (corrective batch #1393).
+//
+// Replaces the hardcoded AVAILABILITY_SLOTS / PAST_SESSIONS mocks in
+// CoachingPageV3 and the alert()-only confirm in CoachingBookingFlowPage.
+// Reads/writes the coaching_availability + coaching_bookings tables
+// (migration 20260821_coaching_bookings.sql). On confirm: inserts a real
+// booking row, marks the availability slot booked, and enqueues a
+// best-effort confirmation email job (ai_job_queue, kind email:booking_confirmation).
 
-import {
-  getScenarioTemplates,
-  getScenarioById,
-  initializeSimulation,
-  startSimulation,
-  submitTurn,
-  completeSimulation,
-  getSimulationSummary,
-  generatePossibleActions,
-  type SimulationState,
-  type SimulationScenario,
-} from '../api/_lib/simulationEngine';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
 
-import {
-  getMethodology,
-  getAllMethodologies,
-  getMethodologyForFocus,
-  getProgress,
-  generatePrompt,
-  adaptMethodologyResponse,
-  type CoachingMethodology,
-} from '../api/_lib/coachingMethodologies';
-
-import {
-  createSession as engineCreateSession,
-  startSession as engineStartSession,
-  coacheeRespond as engineCoacheeRespond,
-  addMessage as engineAddMessage,
-  assignAction as engineAssignAction,
-  completeAction as engineCompleteAction,
-  endSession as engineEndSession,
-  getSessionSummary as engineGetSessionSummary,
-  getAgentsForFocus,
-  type CoachingSession,
-  type SessionMessage,
-} from '../api/_lib/coachingSessionEngine';
-
-import {
-  getReflectionPrompts,
-  generateStructuredReflection,
-  getReflectionDepthScore,
-  aggregateReflectionDepth,
-  getReflectionPromptsForSession,
-  type ReflectionEntry,
-  type ReflectionPrompt,
-} from '../api/_lib/reflectionJournal';
-
-import {
-  getPeerPool,
-  getPeerById,
-  matchPeers,
-  createMatch,
-  scoreMatch,
-  getMatchRecommendations,
-  type PeerProfile,
-  type PeerMatch,
-  type MatchScore,
-} from '../api/_lib/peerMatchEngine';
-
-import {
-  getLearningPaths,
-  getPathById,
-  generateLearningPath,
-  initializeProgress,
-  updateModuleProgress,
-  getPathSummary,
-  getNextRecommendedAction,
-  type LearningPath,
-  type LearningProgress,
-} from '../api/_lib/curriculumEngine';
-
-import {
-  getCompetenciesForFocus,
-  initializeCompetencyScores,
-  updateCompetencyScore,
-  recordSession,
-  createGoal,
-  updateGoalMilestone,
-  generateProgressReport,
-  getProgressStatus,
-  type CompetencyScore,
-  type SessionRecord,
-  type ProgressGoal,
-  type CoachingProgressReport,
-} from '../api/_lib/coachingProgressTracker';
-
-// ── auth-aware fetch helper ─────────────────────────────────────────────
-function getAuthHeader(): HeadersInit {
-  const token = (typeof window !== 'undefined' && (window as any).__AUTH_TOKEN__)
-    ? (window as any).__AUTH_TOKEN__
-    : (typeof localStorage !== 'undefined' ? localStorage.getItem('auth_token') : null);
-  if (token) return { Authorization: `Bearer ${token}` };
-  return {};
+export interface AvailabilitySlot {
+  id: string;
+  day: string; // display label e.g. "Monday, Aug 24"
+  time: string; // display label e.g. "2:00 PM"
+  duration: number; // minutes
+  package: string; // Bronze | Silver | Gold
+  /** Raw DB row for booking creation. */
+  raw: {
+    id: string;
+    slot_date: string;
+    slot_time: string;
+    duration_min: number;
+    package: string;
+  };
 }
 
-async function authFetchJson<T = any>(url: string, init: RequestInit = {}): Promise<T> {
-  const res = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...getAuthHeader(),
-      ...(init.headers || {}),
-    },
-    ...init,
+export interface UserBooking {
+  id: string;
+  title: string;
+  date: string; // display label
+  duration: string; // display label e.g. "60 min"
+  status: string;
+}
+
+function formatDayLabel(slotDate: string): string {
+  const d = new Date(slotDate + 'T00:00:00');
+  if (Number.isNaN(d.getTime())) return slotDate;
+  return d.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
   });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const msg = (data as any)?.error || `HTTP ${res.status}`;
-    throw new Error(msg);
-  }
-  if ((data as any)?.success === false) {
-    throw new Error((data as any)?.error || 'Request failed');
-  }
-  return data as T;
 }
 
-// ── session.* — signature matches CoachingPage expectations (CoachingSession in/out)
-//    but each mutation also persists to the REAL /api/coaching/* endpoints.
-//    Non-mutating reads fall back to the engine for offline UI rendering.
-const session = {
-  // Sync initializer (CoachingPage useState starter uses this)
-  create: (coacheeId: string, focus: CoachingSession['focus'], methodology?: string, title?: string): CoachingSession => {
-    const local = engineCreateSession(coacheeId, focus, methodology, title);
-    // Fire-and-forget server-side create (best-effort)
-    authFetchJson<{ session: any }>('/api/coaching/sessions', {
-      method: 'POST',
-      body: JSON.stringify({
-        focus,
-        methodology: methodology || local.methodology,
-        title,
-      }),
-    }).then((r) => {
-      if (r?.session?.id) {
-        // Map the server id back so subsequent API calls hit the real record
-        (local as any)._serverId = r.session.id;
-      }
-    }).catch(() => { /* offline: ignore */ });
-    return local;
-  },
+function formatTimeLabel(slotTime: string): string {
+  // slot_time is "HH:MM" — render as "2:00 PM".
+  const [hStr, mStr] = slotTime.split(':');
+  const h = Number(hStr);
+  const m = Number(mStr || '0');
+  if (Number.isNaN(h)) return slotTime;
+  const period = h >= 12 ? 'PM' : 'AM';
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  return `${hour12}:${String(m).padStart(2, '0')} ${period}`;
+}
 
-  start: (s: CoachingSession): CoachingSession => {
-    const after = engineStartSession(s);
-    const sid = (s as any)._serverId ?? s.id;
-    authFetchJson<{ session: any }>(`/api/coaching/sessions/${sid}/start`, { method: 'POST' })
-      .catch(() => { /* offline: ignore */ });
-    return after;
-  },
+/**
+ * Open consultant slots for the next 2 weeks, newest-first by date.
+ */
+export async function fetchOpenAvailability(): Promise<AvailabilitySlot[]> {
+  if (!isSupabaseConfigured) return [];
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const { data, error } = await supabase
+      .from('coaching_availability')
+      .select('id, slot_date, slot_time, duration_min, package, is_booked')
+      .eq('is_booked', false)
+      .gte('slot_date', today)
+      .order('slot_date', { ascending: true })
+      .order('slot_time', { ascending: true })
+      .limit(12);
 
-  respond: (s: CoachingSession, content: string): CoachingSession => {
-    const after = engineCoacheeRespond(s, content);
-    const sid = (s as any)._serverId ?? s.id;
-    authFetchJson<{ session: any }>(`/api/coaching/sessions/${sid}/messages`, {
-      method: 'POST',
-      body: JSON.stringify({ content }),
-    }).catch(() => { /* offline: ignore */ });
-    return after;
-  },
+    if (error) throw error;
+    return (data || []).map((row: any) => ({
+      id: row.id,
+      day: formatDayLabel(row.slot_date),
+      time: formatTimeLabel(row.slot_time),
+      duration: row.duration_min,
+      package: row.package || 'Bronze',
+      raw: {
+        id: row.id,
+        slot_date: row.slot_date,
+        slot_time: row.slot_time,
+        duration_min: row.duration_min,
+        package: row.package,
+      },
+    }));
+  } catch (e) {
+    console.error('[coachingService] fetchOpenAvailability failed:', e);
+    return [];
+  }
+}
 
-  addMessage: (s: CoachingSession, msg: Omit<SessionMessage, 'id' | 'timestamp'>): CoachingSession => {
-    const after = engineAddMessage(s, msg);
-    if (msg.role === 'coachee') {
-      const sid = (s as any)._serverId ?? s.id;
-      authFetchJson<{ session: any }>(`/api/coaching/sessions/${sid}/messages`, {
-        method: 'POST',
-        body: JSON.stringify({ content: msg.content }),
-      }).catch(() => {});
+/**
+ * A user's booking history (newest first).
+ */
+export async function fetchUserBookings(userId: string): Promise<UserBooking[]> {
+  if (!isSupabaseConfigured || !userId) return [];
+  try {
+    const { data, error } = await supabase
+      .from('coaching_bookings')
+      .select('id, package, slot_day, slot_time, duration_min, status, created_at')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (error) throw error;
+    return (data || []).map((row: any) => ({
+      id: row.id,
+      title: `${row.package} debrief`,
+      date: row.slot_day,
+      duration: `${row.duration_min} min`,
+      status: row.status,
+    }));
+  } catch (e) {
+    console.error('[coachingService] fetchUserBookings failed:', e);
+    return [];
+  }
+}
+
+export interface CreateBookingInput {
+  userId: string;
+  userEmail?: string | null;
+  userName?: string | null;
+  availabilityId?: string | null;
+  pkg: string;
+  slotDay: string;
+  slotTime: string;
+  durationMin: number;
+  notes?: string;
+}
+
+export interface CreateBookingResult {
+  success: boolean;
+  bookingId?: string;
+  error?: string;
+}
+
+/**
+ * Create a real booking record, mark the availability slot booked, and
+ * enqueue a best-effort confirmation email. Returns the booking id.
+ */
+export async function createBooking(
+  input: CreateBookingInput,
+): Promise<CreateBookingResult> {
+  if (!isSupabaseConfigured || !input.userId) {
+    return { success: false, error: 'Not configured' };
+  }
+
+  try {
+    // 1. Insert the booking row (RLS: user owns their rows).
+    const { data, error } = await supabase
+      .from('coaching_bookings')
+      .insert({
+        user_id: input.userId,
+        availability_id: input.availabilityId ?? null,
+        package: input.pkg,
+        slot_day: input.slotDay,
+        slot_time: input.slotTime,
+        duration_min: input.durationMin,
+        status: 'confirmed',
+        notes: input.notes ?? null,
+      })
+      .select('id')
+      .single();
+
+    if (error) throw error;
+    const bookingId = (data as any)?.id as string | undefined;
+    if (!bookingId) throw new Error('No booking id returned');
+
+    // 2. Mark the availability slot booked (best-effort; availability writes
+    //    are server-managed under RLS, so this may no-op client-side — the
+    //    booking row is the source of truth regardless).
+    if (input.availabilityId) {
+      void supabase
+        .from('coaching_availability')
+        .update({ is_booked: true })
+        .eq('id', input.availabilityId);
     }
-    return after;
-  },
 
-  assignAction: (s: CoachingSession, description: string, owner?: string, deadline?: number | null): CoachingSession => {
-    return engineAssignAction(s, description, owner ?? s.coacheeId, deadline ?? null);
-  },
+    // 3. Enqueue confirmation email (best-effort; ai_job_queue).
+    if (input.userEmail) {
+      void supabase.from('ai_job_queue').insert({
+        kind: 'email:booking_confirmation',
+        payload: {
+          recipient_email: input.userEmail,
+          recipient_name: input.userName ?? null,
+          package: input.pkg,
+          slot_day: input.slotDay,
+          slot_time: input.slotTime,
+          duration_min: input.durationMin,
+          booking_id: bookingId,
+        },
+        available_at: new Date().toISOString(),
+        priority: 5,
+        tenant_user_id: input.userId,
+        created_by_user: input.userId,
+      });
+    }
 
-  completeAction: (s: CoachingSession, actionId: string): CoachingSession => {
-    return engineCompleteAction(s, actionId);
-  },
-
-  end: (s: CoachingSession): CoachingSession => {
-    const after = engineEndSession(s);
-    const sid = (s as any)._serverId ?? s.id;
-    authFetchJson<{ session: any }>(`/api/coaching/sessions/${sid}/complete`, { method: 'POST' })
-      .catch(() => {});
-    return after;
-  },
-
-  getSummary: engineGetSessionSummary,
-  getAgentsForFocus,
-};
-
-// ── non-integrated modules stay on direct engine imports ───────────────
-export const coachingService = {
-  simulation: {
-    getScenarios: getScenarioTemplates,
-    getById: getScenarioById,
-    initialize: initializeSimulation,
-    start: startSimulation,
-    submitTurn,
-    complete: completeSimulation,
-    getSummary: getSimulationSummary,
-    getPossibleActions: generatePossibleActions,
-  },
-
-  methodology: {
-    get: getMethodology,
-    getAll: getAllMethodologies,
-    getForFocus: getMethodologyForFocus,
-    getProgress,
-    generatePrompt,
-    adaptResponse: adaptMethodologyResponse,
-  },
-
-  session,
-
-  reflection: {
-    getPrompts: getReflectionPrompts,
-    generate: generateStructuredReflection,
-    getDepthScore: getReflectionDepthScore,
-    aggregateDepth: aggregateReflectionDepth,
-    getPromptsForSession,
-  },
-
-  peer: {
-    getPool: getPeerPool,
-    getById: getPeerById,
-    match: matchPeers,
-    createMatch,
-    scoreMatch,
-    getRecommendations: getMatchRecommendations,
-  },
-
-  curriculum: {
-    getPaths: getLearningPaths,
-    getById: getPathById,
-    generate: generateLearningPath,
-    initializeProgress,
-    updateProgress: updateModuleProgress,
-    getSummary: getPathSummary,
-    getNextAction: getNextRecommendedAction,
-  },
-
-  progress: {
-    getCompetenciesForFocus,
-    initializeScores: initializeCompetencyScores,
-    updateScore: updateCompetencyScore,
-    recordSession,
-    createGoal,
-    updateGoal,
-    generateReport: generateProgressReport,
-    getStatus: getProgressStatus,
-  },
-};
-
-export type {
-  SimulationState,
-  SimulationScenario,
-  CoachingMethodology,
-  CoachingSession,
-  SessionMessage,
-  ReflectionEntry,
-  ReflectionPrompt,
-  PeerProfile,
-  PeerMatch,
-  MatchScore,
-  LearningPath,
-  LearningProgress,
-  CompetencyScore,
-  SessionRecord,
-  ProgressGoal,
-  CoachingProgressReport,
-};
+    return { success: true, bookingId };
+  } catch (e: any) {
+    console.error('[coachingService] createBooking failed:', e);
+    return { success: false, error: e?.message || 'Booking failed' };
+  }
+}

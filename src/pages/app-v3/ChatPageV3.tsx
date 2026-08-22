@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
-import { sendChatMessage } from '@/services/coze';
+import { sendNexusMessage } from '@/services/nexusChat';
 import { V3 } from '@/styles/v3-tokens';
 import {
   PageHeader,
@@ -27,6 +27,12 @@ interface NexusConversation {
   updated_at: string;
   lens_id?: string | null;
   milestone_id?: string | null;
+  // Engine-internal state (corrective batch #1393). Persisted from the
+  // /api/nexus-chat `_engine` response. `lane` is NEVER rendered in the UI
+  // (v2.2 § Three Lanes — "Never ask 'which lane are you in?'").
+  lane?: string | null;
+  lens_signals?: Record<string, number> | null;
+  trust_stage?: string | null;
 }
 
 interface NexusMessage {
@@ -398,10 +404,19 @@ export function ChatPageV3(): React.ReactElement {
       await bumpConversationUpdated(activeConversationId);
     }
 
-    const historyForApi: Array<{ role: string; content: string }> = [
-      ...messages.map((m) => ({ role: m.role, content: m.content })),
-      { role: 'user', content: text },
-    ];
+    // History excludes the current turn (the engine appends it itself).
+    const historyForApi: Array<{ role: string; content: string }> = messages.map(
+      (m) => ({ role: m.role, content: m.content }),
+    );
+
+    // ── Engine context flags (v2.2 ONBOARDING / SESSION RESUME) ──────────
+    const priorUserMsgs = messages.filter((m) => m.role === 'user').length;
+    const isFirstMessageInThread = priorUserMsgs === 0;
+    const totalConvos = conversations.length; // proxy for session count
+    const isOnboarding = isFirstMessageInThread && totalConvos <= 1;
+    const isReturnSession = isFirstMessageInThread && totalConvos > 1;
+    const currentLane =
+      conversations.find((c) => c.id === activeConversationId)?.lane ?? null;
 
     const assistantPlaceholder: NexusMessage = {
       conversation_id: activeConversationId,
@@ -414,7 +429,48 @@ export function ChatPageV3(): React.ReactElement {
     setStreamingMsgIndex(placeholderIndex);
 
     try {
-      const fullResponse = await sendChatMessage(text, userId, historyForApi);
+      const nexusResult = await sendNexusMessage(text, {
+        conversationId: activeConversationId,
+        userId,
+        history: historyForApi,
+        currentLane,
+        sessionCount: totalConvos,
+        lensCount: 0, // lenses completed — trust stage falls back to session count
+        isOnboarding,
+        isReturnSession,
+        userProfile: {
+          name: profile?.name,
+          tier: profile?.tier,
+          icp: profile?.icp,
+        },
+      });
+      const fullResponse = nexusResult.response;
+
+      // ── Persist engine-internal state to the conversation ──────────────
+      // lane / lens_signals / trust_stage are engine state, NOT shown in the
+      // UI. Lens signals power the memory panel; lane is purely internal.
+      if (isSupabaseConfigured) {
+        void supabase
+          .from('nexus_conversations')
+          .update({
+            lane: nexusResult._engine.lane,
+            lens_signals: nexusResult._engine.lensSignals,
+            trust_stage: nexusResult._engine.trustStage,
+          })
+          .eq('id', activeConversationId);
+      }
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === activeConversationId
+            ? {
+                ...c,
+                lane: nexusResult._engine.lane,
+                lens_signals: nexusResult._engine.lensSignals,
+                trust_stage: nexusResult._engine.trustStage,
+              }
+            : c,
+        ),
+      );
 
       if (streamIntervalRef.current != null) {
         window.clearInterval(streamIntervalRef.current);
