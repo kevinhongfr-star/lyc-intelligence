@@ -1,0 +1,192 @@
+V-APP — NEXUS App Shell v3.5 Full Rebuild
+
+**Phase:** V-App (post-V7.0 marketing rebuild)
+**Type:** FUNCTIONAL app shell rebuild — visual redesign + real backend wiring
+**Priority:** High — unifies app visual language with v3.5 marketing system
+**Spec file:** v_app_shell_v3.5_spec.md (full spec, READ FIRST — especially Section 9: Backend Integration)
+**Source mockups (VISUAL ground truth — open in browser and match pixel-close):**
+- NEXUS_AppShell_v3.5.html (sidebar + topbar + layout)
+- NEXUS_Chat_v3.5.html (chat interface)
+- NEXUS_Lenses_v3.5.html (lenses library, 11 lenses, 3-col grid)
+- NEXUS_Milestones_v3.5.html (milestones timeline + profile + settings)
+- NEXUS_DocumentsBooking_v3.5.html (documents list + booking flow)
+
+---
+
+## 🔴 MOST IMPORTANT RULE — READ THIS FIRST
+
+**This is NOT a static mock build. This is a FUNCTIONAL rebuild.**
+
+Every view must wire to real backend data. You are NOT building pretty HTML pages with sample text. You are rebuilding the UI of an already-working app, reusing all existing backend logic, data models, API routes, and business logic.
+
+- The app already works. Chat works. Lenses work. Milestones work. Documents work. Booking works.
+- Your job: rebuild the UI shell to match the v3.5 mockups, while keeping all existing functionality intact.
+- Mock data is allowed ONLY as a temporary scaffold during development. It must be removed before the PR.
+- PR with hardcoded mock data = rejected.
+
+**Before writing any component, explore the codebase.** Understand:
+- How auth works
+- Where conversations/messages are stored and fetched
+- How lenses/diagnostics work and where scores come from
+- How milestones are modeled
+- Where user profile and settings live
+- How documents are generated and listed
+- How booking/scheduling works
+- What API routes exist
+
+Then rebuild the UI on top of that existing foundation.
+
+---
+
+## WHAT TO BUILD
+
+Full redesign of the NEXUS app shell to v3.5 design system, with full backend integration.
+
+**5 view groups to rebuild (all functional):**
+1. V1: App Shell — sidebar nav + topbar + page layout
+2. V2: Chat — real conversation list + real message thread + real streaming composer
+3. V3: Lenses Library — 11 lenses with real scores + real tier gating from subscription
+4. V4: Milestones / Profile / Settings — real milestone data + real user profile + real persistent settings
+5. V5: Documents + Booking — real document list + real calendar availability + real booking creation
+
+**1 shared component library** used across all views (buttons, badges, toggles, selects, score bars, modals, empty states, loading skeletons, etc.)
+
+---
+
+## NON-NEGOTIABLE DESIGN RULES
+
+1. **v3.5 design system ONLY** — ocean/teal/fuchsia palette, Crimson Pro display + Inter body + IBM Plex Mono meta
+2. **ZERO border-radius** everywhere — no rounded corners, not even on buttons or cards
+3. **No box shadows** — use 1px borders instead
+4. **No gradients** — solid colors only
+5. **Editorial minimalism** — rule lines, not cards; white space / iceberg principle
+6. **App content column: 960px max-width, centered** — NOT 1160px like marketing
+7. **Sidebar: 272px fixed width, ink-900 dark background**
+8. **Topbar: 64px fixed height, white, bottom border 1px ink-100**
+9. **Lens card pattern (APPROVED by Kevin):** code (top-left, mono, ocean-600) + score (top-right, Crimson Pro, big), lens name (Crimson Pro 16px/600), score bar (2px height), 1-line insight
+10. **Active lens:** ocean-50 bg + 2px fuchsia top border
+11. **Locked lens:** 0.45 opacity + dashed border + lock icon + "Upgrade to Executive to unlock"
+12. **Second-person voice only** — "you", never "I/me/my"
+
+---
+
+## BACKEND INTEGRATION — PER VIEW
+
+**Chat:**
+- Wire to existing Supabase conversations + messages tables
+- Use existing streaming chat endpoint (find it — could be /api/chat, edge function, or worker)
+- Conversation list = real user conversations, sorted by recent
+- Message thread = real messages for active conversation
+- Composer = real streaming, not fake typing
+- Preserve ALL existing agent orchestration, memory, context system, tools — only change the UI
+
+**Lenses:**
+- Use existing diagnostic/assessment system
+- Scores = real computed scores from user's diagnostic data
+- Tier gating = read from user's actual subscription tier
+- Unlocked/locked computed from real tier, not hardcoded
+- Insight text comes from real lens readout generation
+- 11 lens definitions (code, name, suite, description) can be config — but everything dynamic must be real
+
+**Milestones:**
+- Use existing milestones/goals data model
+- Status, progress, target dates = real data
+- Click through to existing milestone detail if applicable
+
+**Profile & Settings:**
+- Profile from users table (name, email, company, role, tier, etc.)
+- Settings = real preferences that persist on change
+- Find existing settings schema and use it
+
+**Documents:**
+- Document list from real documents/reports table
+- Status reflects real generation state
+- Click = navigate to real document readout page
+
+**Booking:**
+- Session types mapped to real session products
+- Calendar + time slots = real availability
+- Confirm bar = creates real booking record
+
+---
+
+## LENS ROSTER (11 TOTAL — MUST MATCH EXACTLY)
+
+**SHIFT Suite (5 lenses, all unlocked on Professional+):**
+- LEAP — Competitive Positioning
+- QUEST — Strategic Readiness
+- DRIVE — Execution Capability
+- COACH — Leadership Coaching
+- IMPACT — Organizational Impact (composite)
+
+**Advisory Suite (6 lenses — first 3 on Professional, full on Executive+):**
+- PRISM — Career & Brand (unlocked)
+- BRIDGE — Cross-Cultural (unlocked)
+- FORGE — Sales Excellence (unlocked)
+- MOSAIC — CQ Development (locked on Pro)
+- SPARK — AI Readiness (locked on Pro)
+- IMPACT — Stakeholder Influence (locked on Pro)
+
+Tier gating must be wired to the user's actual subscription tier.
+
+---
+
+## IMPLEMENTATION
+
+- Next.js App Router, TypeScript, Tailwind CSS
+- Extend Tailwind config with v3.5 custom tokens (match CSS vars in mockups)
+- Shared components in src/components/app/ui/ and src/components/app/shell/
+- Pages in src/app/nexus/ (chat, lenses, milestones, profile, settings, documents, booking)
+- **Reuse existing backend endpoints, data models, auth, middleware** — this is a UI rebuild, not a backend rebuild
+- Server Components for data fetching, Client Components for interactivity
+- Loading skeletons + error states + empty states for every data-fetching view
+- Desktop-first (1280px+). Mobile responsive is NOT in scope for this pass.
+- Semantic HTML, keyboard accessible, WCAG AA contrast
+
+---
+
+## ACCEPTANCE CRITERIA
+
+**Functional (must pass):**
+- [ ] No hardcoded mock data anywhere in production code at PR time
+- [ ] Chat streams real messages through real endpoint
+- [ ] Lenses show real scores from real diagnostic data
+- [ ] Tier gating works based on user's actual subscription tier
+- [ ] Milestones data comes from real data source
+- [ ] Profile data comes from users table
+- [ ] Settings persist on change (write to DB)
+- [ ] Documents list from real documents table
+- [ ] Booking uses real availability and creates real records
+- [ ] Loading states show during data fetch
+- [ ] Error states handle failed fetches gracefully
+- [ ] Empty states show when user has no data yet
+
+**Visual (must pass):**
+- [ ] Sidebar: dark bg, NEXUS. wordmark with fuchsia dot, nav items with active state (ocean-50 bg + left border)
+- [ ] Topbar: white, breadcrumbs left, icons right, 64px height
+- [ ] Chat: 3-panel layout, user messages ocean-600 right-aligned, NEXUS messages white left-aligned with avatar
+- [ ] Lenses: 2 suite sections, 3-col grid, lens card matches approved pattern exactly
+- [ ] Milestones: secondary nav tabs, vertical timeline with dots, left meta + right content, status badges
+- [ ] Profile: left avatar card + right detail rows
+- [ ] Settings: grouped form with toggle switches and select dropdowns
+- [ ] Documents: filter tabs left + search right, list rows with icon/title/meta left, status/date/chevron right
+- [ ] Booking: 3 session type cards on top, two-panel shared-border calendar + time slots, full-width dark confirm bar with fuchsia CTA
+- [ ] Zero border-radius everywhere (grep to verify)
+- [ ] No box shadows (grep to verify)
+- [ ] All v3.5 tokens in Tailwind config
+
+---
+
+## WORKFLOW
+
+1. **Explore first** — map the existing codebase: auth, data models, API routes, existing components
+2. Design tokens + shared UI components (buttons, badges, toggles, score bar, etc.)
+3. App shell layout (sidebar + topbar + page structure), wired to auth/user context
+4. Lenses library (most visible, most complex card pattern), wired to diagnostic data
+5. Milestones / Profile / Settings (secondary nav + 3 views), wired to user data
+6. Documents + Booking (list pattern + calendar/slot patterns), wired to docs/booking backend
+7. Chat interface (most complex interaction), wired to real streaming endpoint
+
+Commit and push after each major section is complete. Create a single PR for the full V-App rebuild. Tag me when ready for review.
+
+**Ground truth = the HTML mockups for visuals + existing codebase for data. Read both. Match both. Don't improvise.**
