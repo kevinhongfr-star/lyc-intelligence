@@ -68,6 +68,8 @@ const ConsultantPortalLayout = lazy(() => import('@/components/layouts/Consultan
 const ClientPortalLayout = lazy(() => import('@/components/layouts/ConsultantPortalLayout').then(m => ({ default: m.ClientPortalLayout })));
 const AdminLayout = lazy(() => import('@/components/layouts/AdminLayout').then(m => ({ default: m.AdminLayout })));
 const CandidatePortalLayout = lazy(() => import('@/components/layouts/CandidatePortalLayout').then(m => ({ default: m.CandidatePortalLayout })));
+// ── Phase 17 — V-App v3.5 layout + placeholder pages ────────────────
+const AppShellV3Layout = lazy(() => import('@/components/layouts/AppShellV3Layout').then(m => ({ default: m.AppShellV3Layout })));
 
 // ── Landing + Auth ──
 const Landing = lazy(() => import('@/pages/Landing').then(m => ({ default: m.Landing })));
@@ -199,6 +201,16 @@ function LegacyAssessmentTakeRedirect() {
   const { code } = useParams<{ code: string }>();
   return <Navigate to={`/nexus/lenses/${(code || '').toLowerCase()}/take`} replace />;
 }
+
+// ── Phase 17 / V-App v3.5 surface pages — /app/v3/* ────────────────
+const NexusChatPageV3 = lazy(() => import('@/pages/app-v3/ChatPageV3').then(m => ({ default: m.ChatPageV3 })));
+const LensesLibraryV3Page = lazy(() => import('@/pages/app-v3/LensesPageV3').then(m => ({ default: m.LensesPageV3 })));
+const LensDetailV3Page = lazy(() => import('@/pages/app-v3/LensDetailPageV3').then(m => ({ default: m.LensDetailPageV3 })));
+const MilestonesV3Page = lazy(() => import('@/pages/app-v3/MilestonesPageV3').then(m => ({ default: m.MilestonesPageV3 })));
+const DocumentsV3Page = lazy(() => import('@/pages/app-v3/DocumentsPageV3').then(m => ({ default: m.DocumentsPageV3 })));
+const ProfileV3Page = lazy(() => import('@/pages/app-v3/ProfilePageV3').then(m => ({ default: m.ProfilePageV3 })));
+const SettingsV3Page = lazy(() => import('@/pages/app-v3/SettingsPageV3').then(m => ({ default: m.SettingsPageV3 })));
+const CoachingV3Page = lazy(() => import('@/pages/app-v3/CoachingPageV3').then(m => ({ default: m.CoachingPageV3 })));
 
 // ── Authenticated user pages — shared across leader / (in future) candidate ──
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
@@ -536,6 +548,27 @@ export default function App() {
             <Route path="dex/journey" element={<DexJourneyPage />} />
             <Route path="dex/store" element={<CreditStorePage />} />
             <Route path="dex/credits" element={<Navigate to="dex/store" replace />} />
+          </Route>
+
+          {/* ═══════════════════════════════════════════════════════════
+              PHASE 17 · V-APP SHELL v3.5 — /app/v3/* (B2C executives)
+              Auth-required via AppShellV3Layout. New v3.5 design system.
+              Existing /app/nexus/* routes stay intact until all V-App
+              surfaces pass audit (V-App 7/7).
+              ═══════════════════════════════════════════════════════════ */}
+          <Route path="/app/v3" element={<AppShellV3Layout />}>
+            <Route index element={<Navigate to="chat" replace />} />
+            <Route path="chat" element={<NexusChatPageV3 />} />
+            <Route path="lenses" element={<LensesLibraryV3Page />} />
+            <Route path="lenses/:code" element={<LensDetailV3Page />} />
+            <Route path="lenses/:code/take" element={<LensTakeFlowPage />} />
+            <Route path="lenses/:code/readout/:resultId" element={<LensReadoutPage />} />
+            <Route path="milestones" element={<MilestonesV3Page />} />
+            <Route path="documents" element={<DocumentsV3Page />} />
+            <Route path="profile" element={<ProfileV3Page />} />
+            <Route path="settings" element={<SettingsV3Page />} />
+            <Route path="coaching" element={<CoachingV3Page />} />
+            <Route path="coaching/book" element={<CoachingBookingFlowPage />} />
           </Route>
 
           {/* ═══════════════════════════════════════════════════════════

@@ -2286,7 +2286,8 @@ body {
   .v3-cta-primary, .v3-nav-cta, .v3-nav-links a,
   .v3-lens-icon, .v3-focal-dot, .v3-quote-mark,
   .v3-tier-col, .v3-lens-cell, .v3-what-item,
-  .v3-eyebrow, .v3-headline, .v3-fixed-nav {
+  .v3-eyebrow, .v3-headline, .v3-fixed-nav,
+  .v3-skeleton-shimmer {
     transition: none !important;
     animation: none !important;
   }
@@ -2294,6 +2295,47 @@ body {
     opacity: 1 !important;
     transform: none !important;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   V-App — v3.5 skeleton shimmer (no radial glows, gradient-only)
+   ═══════════════════════════════════════════════════════════════════════ */
+@keyframes v3-app-shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: calc(100% + 400px) 0; }
+}
+.v3-skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #F0F0F0 0%,
+    #F5F5F5 40%,
+    #ECECEC 60%,
+    #F0F0F0 100%
+  );
+  background-size: 800px 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .v3-skeleton-shimmer {
+    animation: v3-app-shimmer 1.4s linear infinite;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   V-App — responsive helpers
+   Breakpoints: <768 mobile, ≥1024 desktop
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .v3-app-hide-mobile { display: none !important; }
+  .v3-app-lens-grid,
+  .v3-app-pillar-grid { grid-template-columns: 1fr !important; }
+  .v3-app-hero-score { grid-template-columns: 1fr !important; }
+}
+@media (min-width: 769px) and (max-width: 1023px) {
+  .v3-app-hide-tablet { display: none !important; }
+  .v3-app-lens-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+@media (min-width: 1024px) {
+  .v3-app-hide-desktop { display: none !important; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
