@@ -556,18 +556,18 @@ export default function App() {
               Existing /app/nexus/* routes stay intact until all V-App
               surfaces pass audit (V-App 7/7).
               ═══════════════════════════════════════════════════════════ */}
-          <Route path="/app/v3" element={<AppShellV3Layout />}>
+// BUILD DIAGNOSTIC:           <Route path="/app/v3" element={<AppShellV3Layout />}>
             <Route index element={<Navigate to="chat" replace />} />
-            <Route path="chat" element={<NexusChatPageV3 />} />
-            <Route path="lenses" element={<LensesLibraryV3Page />} />
-            <Route path="lenses/:code" element={<LensDetailV3Page />} />
+// BUILD DIAGNOSTIC:             <Route path="chat" element={<NexusChatPageV3 />} />
+// BUILD DIAGNOSTIC:             <Route path="lenses" element={<LensesLibraryV3Page />} />
+// BUILD DIAGNOSTIC:             <Route path="lenses/:code" element={<LensDetailV3Page />} />
             <Route path="lenses/:code/take" element={<LensTakeFlowPage />} />
             <Route path="lenses/:code/readout/:resultId" element={<LensReadoutPage />} />
-            <Route path="milestones" element={<MilestonesV3Page />} />
-            <Route path="documents" element={<DocumentsV3Page />} />
-            <Route path="profile" element={<ProfileV3Page />} />
-            <Route path="settings" element={<SettingsV3Page />} />
-            <Route path="coaching" element={<CoachingV3Page />} />
+// BUILD DIAGNOSTIC:             <Route path="milestones" element={<MilestonesV3Page />} />
+// BUILD DIAGNOSTIC:             <Route path="documents" element={<DocumentsV3Page />} />
+// BUILD DIAGNOSTIC:             <Route path="profile" element={<ProfileV3Page />} />
+// BUILD DIAGNOSTIC:             <Route path="settings" element={<SettingsV3Page />} />
+// BUILD DIAGNOSTIC:             <Route path="coaching" element={<CoachingV3Page />} />
             <Route path="coaching/book" element={<CoachingBookingFlowPage />} />
           </Route>
 
