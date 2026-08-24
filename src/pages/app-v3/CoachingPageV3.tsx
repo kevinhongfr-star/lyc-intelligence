@@ -72,7 +72,7 @@ const PACKAGES: PackageDef[] = [
   },
 ];
 
-// Corrective batch v2.4 #1393 — real Supabase-backed slots/history.
+// Corrective batch v2.7 #1393 — real Supabase-backed slots/history.
 // The service falls back to the migration-matched inline set when rows are
 // pre-migration, so we don't render a blank page on local dev.
 

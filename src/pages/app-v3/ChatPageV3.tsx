@@ -27,8 +27,8 @@ interface NexusConversation {
   updated_at: string;
   lens_id?: string | null;
   milestone_id?: string | null;
-  // Engine-internal state (corrective batch, v2.4 spec).
-  // Persisted from _engine response. NEVER render lane in UI (v2.4 § Three Lanes).
+  // Engine-internal state (corrective batch, v2.7 spec).
+  // Persisted from _engine response. NEVER render lane in UI (v2.7 § Three Lanes).
   lane?: string | null;
   lens_signals?: Record<string, number> | null;
   trust_stage?: string | null;
@@ -409,7 +409,7 @@ export function ChatPageV3(): React.ReactElement {
       (m) => ({ role: m.role, content: m.content }),
     );
 
-    // Onboarding & opening-vector flags (v2.4 § OPENING SCRIPTS v1.2).
+    // Onboarding & opening-vector flags (v2.7 § OPENING SCRIPTS v1.2).
     // Vector D fires only when conversation has ZERO prior messages AND the
     // user has clicked an "empty" NEXUS-start (below) — handled separately by
     // calling nexusStartsTheChat=true with empty text.

@@ -1,4 +1,4 @@
-// nexusChat.ts — Corrective batch #1393, v2.4 spec.
+// nexusChat.ts — Corrective batch v3, v2.7 system prompt.
 // Client for /api/nexus-chat. Replaces legacy sendChatMessage (coze.ts → old
 // /api/chat). Returns { response, _engine } state; caller persists _engine
 // to nexus_conversations. _engine.lane is ENGINE-INTERNAL — never render.

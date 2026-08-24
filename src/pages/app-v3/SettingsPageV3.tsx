@@ -135,7 +135,7 @@ export function SettingsPageV3(): React.ReactElement {
     }
   };
 
-  // Corrective batch v2.4 #1393: instant save handler for ALL settings toggles.
+  // Corrective batch v2.7 #1393: instant save handler for ALL settings toggles.
   // Columns match 20260821_profile_settings migration. All 6 toggles (privacy +
   // notifications) persist to profiles immediately.
   const handleToggleSetting = async (
