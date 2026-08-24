@@ -300,7 +300,7 @@ export function AppShellV3Layout(): React.ReactElement {
           borderBottom: `1px solid ${onDark ? V3.dividerDark : V3.dividerSurface}`,
         }}
       >
-        <Wordmark size="sidebar" onDark={onDark} />
+        <Wordmark size="sidebar" onDark={onDark} tagline />
       </div>
 
       {/* Primary nav */}

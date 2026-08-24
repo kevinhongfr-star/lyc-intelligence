@@ -507,18 +507,39 @@ export function LensesPageV3(): React.ReactElement {
 
       <div style={{ maxWidth: V3.appContentMax, margin: `${V3.appPageHeaderPad}px auto 0` }}>
         {!loaded ? (
-          <div aria-busy style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div aria-busy style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
             <Skeleton width="100%" height={56} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24, marginTop: 12 }}>
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} style={{ border: `1px solid ${V3.ink100}`, padding: 20, background: V3.white }}>
-                  <Skeleton width={120} height={14} style={{ marginBottom: 10 }} />
-                  <Skeleton width={180} height={10} style={{ marginBottom: 18 }} />
-                  <Skeleton width="100%" height={10} style={{ marginBottom: 10 }} />
-                  <Skeleton width="75%" height={10} style={{ marginBottom: 20 }} />
-                  <Skeleton width="100%" height={2} />
-                </div>
-              ))}
+
+            {/* SHIFT skeleton — 5 cards */}
+            <div>
+              <Skeleton width={80} height={12} style={{ marginBottom: 12 }} />
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24, marginTop: 8 }}>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={`shift-${i}`} style={{ border: `1px solid ${V3.ink100}`, padding: 20, background: V3.white }}>
+                    <Skeleton width={120} height={14} style={{ marginBottom: 10 }} />
+                    <Skeleton width={180} height={10} style={{ marginBottom: 18 }} />
+                    <Skeleton width="100%" height={10} style={{ marginBottom: 10 }} />
+                    <Skeleton width="75%" height={10} style={{ marginBottom: 20 }} />
+                    <Skeleton width="100%" height={2} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Advisory skeleton — 6 cards */}
+            <div>
+              <Skeleton width={100} height={12} style={{ marginBottom: 12 }} />
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24, marginTop: 8 }}>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={`adv-${i}`} style={{ border: `1px solid ${V3.ink100}`, padding: 20, background: V3.white }}>
+                    <Skeleton width={120} height={14} style={{ marginBottom: 10 }} />
+                    <Skeleton width={180} height={10} style={{ marginBottom: 18 }} />
+                    <Skeleton width="100%" height={10} style={{ marginBottom: 10 }} />
+                    <Skeleton width="75%" height={10} style={{ marginBottom: 20 }} />
+                    <Skeleton width="100%" height={2} />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         ) : (

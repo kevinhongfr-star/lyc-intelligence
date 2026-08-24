@@ -128,6 +128,9 @@ function sseEngine(
   res.end();
 }
 
+// Force Node.js runtime (Vercel v5 defaults)
+export const config = { runtime: "nodejs20.x" };
+
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse,

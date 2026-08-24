@@ -700,9 +700,12 @@ export function CardSkeleton({
 export function Wordmark({
   onDark = false,
   size = 'md',
+  tagline = false,
 }: {
   onDark?: boolean;
   size?: 'sm' | 'md' | 'lg' | 'sidebar';
+  /** Show "Executive intelligence" tagline below the wordmark (mockup spec) */
+  tagline?: boolean;
 }): React.ReactElement {
   let fontSize = '1.2rem';
   switch (size) {
@@ -712,7 +715,7 @@ export function Wordmark({
     case 'md':
     default: fontSize = '1.2rem';
   }
-  return (
+  const wordmarkEl = (
     <span
       style={{
         fontFamily: V3.displayFont,
@@ -725,6 +728,26 @@ export function Wordmark({
     >
       NEXUS<span style={{ color: V3.fuchsia600 }}>.</span>
     </span>
+  );
+
+  if (!tagline) return wordmarkEl;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      {wordmarkEl}
+      <span
+        style={{
+          fontFamily: V3.monoFont,
+          fontSize: '0.62rem',
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: onDark ? V3.onDarkDim : V3.ink400,
+          lineHeight: 1,
+        }}
+      >
+        Executive intelligence
+      </span>
+    </div>
   );
 }
 
