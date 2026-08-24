@@ -427,8 +427,40 @@ export function ChatPageV3(): React.ReactElement {
       created_at: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, assistantPlaceholder]);
-    const placeholderIndex = messages.length + (savedUser ? 1 : 1);
+    const placeholderIndex = messages.length + 1;
     setStreamingMsgIndex(placeholderIndex);
+
+    // Clear any lingering interval (no longer the primary streamer, but just in case).
+    if (streamIntervalRef.current != null) {
+      window.clearInterval(streamIntervalRef.current);
+      streamIntervalRef.current = null;
+    }
+
+    const appendDelta = (delta: string) => {
+      setMessages((prev) => {
+        const copy = [...prev];
+        if (copy[placeholderIndex]) {
+          copy[placeholderIndex] = {
+            ...copy[placeholderIndex],
+            content: copy[placeholderIndex].content + delta,
+          };
+        }
+        return copy;
+      });
+    };
+
+    const replaceFull = (text: string) => {
+      setMessages((prev) => {
+        const copy = [...prev];
+        if (copy[placeholderIndex]) {
+          copy[placeholderIndex] = {
+            ...copy[placeholderIndex],
+            content: text,
+          };
+        }
+        return copy;
+      });
+    };
 
     try {
       const nexusResult = await sendNexusMessage(text, {
@@ -444,6 +476,8 @@ export function ChatPageV3(): React.ReactElement {
           tier: profile?.tier,
           icp: profile?.icp,
         },
+        onToken: appendDelta,
+        onFullReplace: replaceFull,
       });
       const fullResponse = nexusResult.response;
 
@@ -471,47 +505,34 @@ export function ChatPageV3(): React.ReactElement {
         ),
       );
 
-      if (streamIntervalRef.current != null) {
-        window.clearInterval(streamIntervalRef.current);
-      }
+      // Ensure the final message content matches the accumulated version
+      // (covers the case where client never got the final full replacement).
+      setMessages((prev) => {
+        const copy = [...prev];
+        if (copy[placeholderIndex] && copy[placeholderIndex].content !== fullResponse) {
+          copy[placeholderIndex] = {
+            ...copy[placeholderIndex],
+            content: fullResponse,
+          };
+        }
+        return copy;
+      });
 
-      let revealed = 0;
-      streamIntervalRef.current = window.setInterval(() => {
-        revealed = Math.min(revealed + 1, fullResponse.length);
+      setStreamingMsgIndex(null);
+      const finalMsg: NexusMessage = {
+        conversation_id: activeConversationId,
+        role: 'assistant',
+        content: fullResponse,
+        created_at: new Date().toISOString(),
+      };
+      const saved = await insertMessage(finalMsg);
+      if (saved) {
         setMessages((prev) => {
           const copy = [...prev];
-          if (copy[placeholderIndex]) {
-            copy[placeholderIndex] = {
-              ...copy[placeholderIndex],
-              content: fullResponse.slice(0, revealed),
-            };
-          }
+          copy[placeholderIndex] = saved;
           return copy;
         });
-        if (revealed >= fullResponse.length) {
-          if (streamIntervalRef.current != null) {
-            window.clearInterval(streamIntervalRef.current);
-            streamIntervalRef.current = null;
-          }
-          setStreamingMsgIndex(null);
-          (async () => {
-            const finalMsg: NexusMessage = {
-              conversation_id: activeConversationId,
-              role: 'assistant',
-              content: fullResponse,
-              created_at: new Date().toISOString(),
-            };
-            const saved = await insertMessage(finalMsg);
-            if (saved) {
-              setMessages((prev) => {
-                const copy = [...prev];
-                copy[placeholderIndex] = saved;
-                return copy;
-              });
-            }
-          })();
-        }
-      }, 12);
+      }
     } catch (e) {
       console.error('[ChatPageV3] handleSend error:', e);
       setStreamingMsgIndex(null);

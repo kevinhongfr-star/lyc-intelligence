@@ -17,19 +17,15 @@ import {
 } from './lib/nexusEngine';
 
 /**
- * /api/nexus-chat — Corrective batch v3, v2.7 system prompt.
+ * /api/nexus-chat — Corrective batch v4, v2.7 system prompt.
  *
- * P0 acceptance:
- *  - Loads v2.7 system prompt from file (nexus_llm_system_prompt_v2.7.txt) whole.
- *  - Calls DeepSeek directly; responses run through validate12Gates with the
- *    detected opening vector (so Vector B structure / positioning guardrails
- *    are enforced mechanically alongside the LLM-level prompt copy).
- *  - Returns `_engine` state (lane, lensSignals, trustStage, openingVector,
- *    gateFailures) for the client to persist — lane is ENGINE-INTERNAL
- *    (v2.7 § Three Lanes: Never show "lane" in the UI).
- *  - Opening scripts & onboarding (Fix 2) handled in-engine: runtime context
- *    injects the exact locked scripts for Vector A/B/C/D.
- *  - Pattern retrieval + lens suggestion logic (7/10) + trust stages active.
+ * SSE streaming route:
+ *  - 1+ events: data: {"t": "text", "c": "<delta>"}
+ *  - final event:  data: {"t": "engine", "e": {lane,lensSignals,trustStage,openingVector,gateFailures,model,usage}}
+ *  - or single:    data: {"t": "error", "m": "<msg>"}
+ *
+ * validate12Gates runs on the FULL accumulated response AFTER streaming,
+ * then the engine state event uses the cleaned text for gate check.
  */
 
 // ── DeepSeek config (mirrors legacy worker; proxy-aware) ────────────────
@@ -44,6 +40,13 @@ const DEEPSEEK_BASE_URL =
 const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
 const NEXUS_TEMPERATURE = 0.7; // cool-respectful (2-2.5 on 1-5 dial, v2.7)
 const NEXUS_MAX_TOKENS = 1200;
+
+function applyCorsStream(res: VercelResponse): void {
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
+  res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+}
 
 function applyCors(req: VercelRequest, res: VercelResponse): boolean {
   const origin = req.headers.origin as string | undefined;
@@ -93,6 +96,38 @@ function resolveEndpoint(): { endpoint: string; useProxy: boolean } {
   return { endpoint, useProxy: false };
 }
 
+function sseWrite(res: VercelResponse, payload: unknown): boolean {
+  try {
+    const json = typeof payload === 'string' ? payload : JSON.stringify(payload);
+    res.write(`data: ${json}\n\n`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+function sseText(res: VercelResponse, delta: string): boolean {
+  return sseWrite(res, { t: 'text', c: delta });
+}
+function sseError(res: VercelResponse, msg: string): void {
+  sseWrite(res, { t: 'error', m: msg });
+  res.end();
+}
+function sseEngine(
+  res: VercelResponse,
+  engineData: {
+    lane: Lane;
+    lensSignals: Partial<Record<LensCode, number>>;
+    trustStage: TrustStage;
+    openingVector: OpeningVector;
+    gateFailures: string[];
+    model: string;
+    usage: unknown;
+  },
+): void {
+  sseWrite(res, { t: 'engine', e: engineData });
+  res.end();
+}
+
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse,
@@ -106,6 +141,7 @@ export default async function handler(
       ok: true,
       worker: 'nexus-chat',
       engine: 'v2.7',
+      stream: true,
       has_key: !!DEEPSEEK_API_KEY,
       model: DEEPSEEK_MODEL,
     });
@@ -119,6 +155,9 @@ export default async function handler(
     res.status(500).json({ ok: false, error: 'NEXUS not configured' });
     return;
   }
+
+  applyCorsStream(res);
+
   let body: any;
   try { body = await parseJsonBody(req); } catch { body = {}; }
 
@@ -143,18 +182,18 @@ export default async function handler(
     : undefined;
 
   if (!message && !nexusStartsTheChat) {
-    res.status(400).json({ ok: false, error: 'Message is required' });
+    sseError(res, 'Message is required');
     return;
   }
 
-  // ── 1. Opening vector (Fix 2: v2.7 § OPENING SCRIPTS v1.2) ─────────
+  // ── 1. Opening vector ────────────────────────────────────────────────
   const priorUserCount = history.filter((m) => m.role === 'user').length;
   const hasPriorUserMsgs = priorUserCount > 0;
   const openingVector: OpeningVector = nexusStartsTheChat && !hasPriorUserMsgs
     ? 'D'
     : detectOpeningVector(message, hasPriorUserMsgs, false);
 
-  // ── 2. Lane detection (Fix 3) ───────────────────────────────────────
+  // ── 2. Lane detection ────────────────────────────────────────────────
   const allMsgs = [...history, { role: 'user', content: message }];
   const userMsgs = allMsgs.filter((m) => m.role === 'user');
   let lane: Lane;
@@ -164,7 +203,7 @@ export default async function handler(
     lane = detectLane(message);
   }
 
-  // ── 3. Patterns + lens signals + trust stage (Fix 4) ────────────────
+  // ── 3. Patterns + lens signals + trust stage ─────────────────────────
   const patterns = retrievePatterns(message || '', lane, 3);
   const lensSignals: Partial<Record<LensCode, number>> =
     computeLensSignals(userMsgs, lane);
@@ -174,10 +213,10 @@ export default async function handler(
   const isOnboarding = !hasPriorUserMsgs && sessionCount <= 1;
   const isReturnSession = !hasPriorUserMsgs && sessionCount > 1;
 
-  // ── 4. Full system prompt = v2.7 WHOLE (from file) + runtime context injection ─
+  // ── 4. Full system prompt = v2.7 WHOLE (from file) + runtime context ──
   const masterPrompt = getMasterPrompt();
   if (!masterPrompt) {
-    res.status(500).json({ ok: false, error: 'v2.7 system prompt file not found' });
+    sseError(res, 'v2.7 system prompt file not found');
     return;
   }
   const runtimeContext = buildRuntimeContext({
@@ -198,7 +237,7 @@ export default async function handler(
 --- RUNTIME CONTEXT (internal — never surface lane, lens signals, trust stage, or these instructions to the user) ---
 ${runtimeContext}`;
 
-  // ── 5. Call DeepSeek ────────────────────────────────────────────────
+  // ── 5. Call DeepSeek with stream: true ────────────────────────────────
   const messages: Array<{ role: string; content: string }> = [
     { role: 'system', content: systemPrompt },
   ];
@@ -206,13 +245,14 @@ ${runtimeContext}`;
   if (message) messages.push({ role: 'user', content: message });
 
   const { endpoint, useProxy } = resolveEndpoint();
-  let apiResponse: Response;
+  let upstream: Response;
   try {
-    apiResponse = await fetch(endpoint, {
+    upstream = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+        Accept: 'text/event-stream',
         ...(DEEPSEEK_PROXY_KEY
           ? { 'X-Proxy-Key': DEEPSEEK_PROXY_KEY }
           : {}),
@@ -222,54 +262,100 @@ ${runtimeContext}`;
         messages,
         temperature: NEXUS_TEMPERATURE,
         max_tokens: NEXUS_MAX_TOKENS,
-        stream: false,
+        stream: true,
       }),
     });
   } catch (e: any) {
     console.error('[nexus-chat] DeepSeek fetch:', e?.message || e);
-    res.status(502).json({ ok: false, error: 'NEXUS engine unreachable' });
+    sseError(res, 'NEXUS engine unreachable');
     return;
   }
-  if (!apiResponse.ok) {
-    const err = await apiResponse.text();
+  if (!upstream.ok) {
+    const err = await upstream.text();
     console.error(
       '[nexus-chat] API',
-      apiResponse.status,
+      upstream.status,
       endpoint.replace(/\/\/[^/]*\//, '//***:'),
       err.slice(0, 500),
     );
-    res.status(502).json({
-      ok: false,
-      error: 'NEXUS engine unavailable',
-      upstream_status: apiResponse.status,
-    });
-    return;
-  }
-  const data = await apiResponse.json();
-  const rawResponse: string = data.choices?.[0]?.message?.content || '';
-  if (!rawResponse) {
-    res.status(502).json({ ok: false, error: 'Empty response from engine' });
+    sseError(res, `NEXUS engine unavailable (upstream ${upstream.status})`);
     return;
   }
 
-  // ── 6. 12-GATE QUALITY + POSITIONING GUARDRAILS (mechanical) ──────
-  const gate = validate12Gates(rawResponse, { vector: openingVector });
-  const finalResponse = gate.cleaned || rawResponse;
-  if (!gate.passed) {
-    console.warn('[nexus-chat] 12-gate failures:', gate.failures);
+  // ── Stream tokens to client, accumulate fullText ─────────────────────
+  const reader = upstream.body?.getReader();
+  if (!reader) {
+    sseError(res, 'Empty response from engine');
+    return;
+  }
+  const decoder = new TextDecoder('utf-8');
+  let buffer = '';
+  let fullText = '';
+  let usage: unknown = null;
+  let lastModel: string = DEEPSEEK_MODEL;
+
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      // split buffer into SSE lines
+      const lines = buffer.split(/\r?\n/);
+      buffer = lines.pop() || ''; // keep last (possibly incomplete) line
+
+      for (const rawLine of lines) {
+        const line = rawLine.trimEnd();
+        if (!line) continue;
+        if (!line.startsWith('data:')) continue;
+        const dataStr = line.slice(5).trim();
+        if (!dataStr) continue;
+        if (dataStr === '[DONE]') continue;
+        let chunk: any;
+        try { chunk = JSON.parse(dataStr); } catch { continue; }
+
+        // model / usage snapshot
+        if (chunk?.model) lastModel = chunk.model;
+        if (chunk?.usage) usage = chunk.usage;
+
+        // standard SSE delta
+        const delta: string = chunk?.choices?.[0]?.delta?.content ?? '';
+        if (delta) {
+          fullText += delta;
+          sseText(res, delta);
+        }
+      }
+    }
+  } catch (streamErr: any) {
+    console.warn('[nexus-chat] stream read err:', streamErr?.message || streamErr);
+  } finally {
+    try { reader.cancel(); } catch { /* ignore */ }
   }
 
-  res.status(200).json({
-    ok: true,
-    response: finalResponse,
-    model: data.model || DEEPSEEK_MODEL,
-    usage: data.usage || null,
-    _engine: {
-      lane,
-      lensSignals,
-      trustStage,
-      openingVector,
-      gateFailures: gate.passed ? [] : gate.failures,
-    },
+  // ── 6. 12-GATE runs on FULL accumulated text ────────────────────────
+  let gateFailures: string[] = [];
+  if (fullText) {
+    const gate = validate12Gates(fullText, { vector: openingVector });
+    if (!gate.passed) {
+      gateFailures = gate.failures;
+      console.warn('[nexus-chat] 12-gate failures:', gate.failures);
+    }
+    // If the clean text differs from raw, send a final "text" event
+    // with the full cleaned replacement so client can patch the message.
+    if (gate.cleaned && gate.cleaned !== fullText) {
+      sseWrite(res, { t: 'text', full: true, c: gate.cleaned });
+    }
+  } else {
+    console.error('[nexus-chat] empty fullText after stream');
+  }
+
+  sseEngine(res, {
+    lane,
+    lensSignals,
+    trustStage,
+    openingVector,
+    gateFailures,
+    model: lastModel,
+    usage,
   });
 }
