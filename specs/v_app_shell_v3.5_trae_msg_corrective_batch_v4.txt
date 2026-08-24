@@ -1,0 +1,119 @@
+V-APP v3.5 — Corrective Batch v4: Streaming + Vercel Hardening
+
+**Branch:** v3.5-app-shell
+**Priority:** P1 — deploy went live with v2.7 engine, now harden UX and reliability
+**Ground truth still:** nexus-engine/nexus_llm_system_prompt_v2.7.txt (unchanged, 510 lines)
+
+## WHAT TO FIX
+
+### Fix 1: Chat streaming (P1 — UX blocker for production feel)
+
+Current state: `/api/nexus-chat` returns a single JSON response after full completion. User waits with no feedback.
+
+Required: Convert to SSE streaming — words arrive progressively like ChatGPT.
+
+**Implementation:**
+- `/api/nexus-chat` should call DeepSeek with `stream: true`
+- Stream back to client using Server-Sent Events (`text/event-stream` content type)
+- Frontend (`sendNexusMessage` in `nexusChat.ts`) must handle streaming response
+- `ChatPageV3.tsx` must progressively append to the message as tokens arrive
+- `_engine` state (lane, lensSignals, trustStage, gateFailures) should be sent as a final event at the end of the stream (after the full text), not in the initial response
+
+**DeepSeek streaming API:**
+- Use `stream: true` in the request body
+- Response is `text/event-stream` with `data: { ... }` lines
+- Each chunk has `choices[0].delta.content` (partial text)
+- Final chunk has `choices[0].finish_reason` and `choices[0].message` with full content
+- Parse with standard SSE / line-by-line reading
+
+**Engine state injection order:**
+1. Stream the text content (token by token) → user sees response building
+2. After streaming completes, run `validate12Gates()` on the full text
+3. Send final SSE event: `_engine` object with lane, lensSignals, trustStage, openingVector, gateFailures
+4. Client persists `_engine` to `nexus_conversations` / local state
+
+**Quality gates in streaming mode:**
+- G12 voice validation still runs on the FULL response at the end (can't gate partial text meaningfully)
+- If gate failures exist, log them but still show the text (auto-cleaned where possible — hedges, warm signoffs, exclamation marks, jargon, confrontational language, coach-templates already stripped by regex)
+- The `validate12Gates` function already auto-cleans (replaces/strips), so use the cleaned version for streaming
+
+**Acceptance:**
+- Chat response streams word-by-word, not waiting for full completion
+- User sees response building progressively (minimal perceived latency)
+- Engine state (lane, trust stage, lens signals) arrives at the end of the stream
+- No visual flicker or message replacement
+- DeepSeek API error handling still works (stream error → show error state)
+
+### Fix 2: Vercel function configuration (P1 — reliability)
+
+Current state: `api/nexus-chat.ts` is NOT in `vercel.json` `functions` config. Default timeout is 10s, default memory is 1024MB.
+
+DeepSeek streaming responses for longer answers could exceed 10s. Add explicit config:
+
+```json
+{
+  "functions": {
+    "api/nexus-chat.ts": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  }
+}
+```
+
+30s gives headroom for longer diagnostic responses on slow connections.
+
+### Fix 3: Prompt file bundling assurance (P0 — belt & suspenders)
+
+Current state: `getMasterPrompt()` reads from `nexus-engine/nexus_llm_system_prompt_v2.7.txt` via `process.cwd()`. This works on Vercel (confirmed in production test), but add a colocated copy as a failsafe so the function never has an empty prompt.
+
+**Action:**
+- Copy `nexus-engine/nexus_llm_system_prompt_v2.7.txt` → `api/nexus_llm_system_prompt_v2.7.txt`
+- The fallback path in `getMasterPrompt()` already checks `api/nexus_llm_system_prompt_v2.7.txt`, so just putting the file there adds redundancy
+- Both copies should always be identical (same source of truth)
+
+### Fix 4: Remove old `/api/chat` rewrite (P2 — cleanup)
+
+`vercel.json` has:
+```json
+{ "source": "/api/chat", "destination": "/api/workers/chat" }
+```
+
+But `api/workers/chat.ts` doesn't exist (was the old Coze endpoint). The rewrite will 404. Since ChatPageV3 uses `/api/nexus-chat`, this is dead code.
+
+**Action:** Remove the rewrite from `vercel.json`. No other code references `/api/chat`.
+
+---
+
+## ACCEPTANCE CRITERIA
+
+P0:
+[ ] v2.7 prompt file accessible via BOTH paths (nexus-engine/ AND api/)
+[ ] Prompt content verified identical in both locations
+
+P1:
+[ ] Chat streams token-by-token (SSE)
+[ ] Engine state arrives at end of stream as final event
+[ ] validate12Gates runs on full response at end of stream
+[ ] nexus-chat function configured with 30s timeout in vercel.json
+[ ] Old /api/chat rewrite removed from vercel.json
+
+Regression:
+[ ] Zero visual regression on chat UI
+[ ] All other v3.5 surfaces still work
+[ ] v2.7 voice quality unchanged (same prompt, same engine)
+[ ] DeepSeek still the LLM backend
+
+---
+
+## FILES TO TOUCH
+
+- `api/nexus-chat.ts` — add SSE streaming + final engine state event
+- `api/nexus_llm_system_prompt_v2.7.txt` — NEW: colocated copy as failsafe
+- `src/services/nexusChat.ts` — handle streaming response client-side
+- `src/pages/app-v3/ChatPageV3.tsx` — progressive message rendering
+- `vercel.json` — add nexus-chat function config + remove old /api/chat rewrite
+
+---
+
+Read the v3 corrective batch first for full context. This is a targeted follow-up, not a rewrite. Ground truth files are the same.
