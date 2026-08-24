@@ -24,6 +24,8 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 // with relative paths across the api/src boundary.
 // All imports stay within /api/ directory tree.
 
+import runWeeklyDigestPipeline from '../lib/weeklyDigest.js';
+
 const SUPABASE_URL =
   process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
 const SUPABASE_ANON_KEY =
@@ -511,13 +513,17 @@ async function runAiJob(row: any): Promise<any> {
 
   // Scheduled jobs
   if (kind.startsWith('scheduled:')) {
-    if (kind === 'scheduled:weekly-digest' || kind === 'scheduled:monthly-summary') {
+    if (kind === 'scheduled:weekly-digest') {
+      const summary = await runWeeklyDigestPipeline();
       return {
-        note: 'digest enqueues downstream email job',
-        enqueue_email_kind:
-          kind === 'scheduled:weekly-digest'
-            ? 'email:weekly_digest'
-            : 'email:monthly_summary',
+        note: 'weekly-digest pipeline completed',
+        summary,
+      };
+    }
+    if (kind === 'scheduled:monthly-summary') {
+      return {
+        note: 'monthly-summary enqueues downstream email job',
+        enqueue_email_kind: 'email:monthly_summary',
         payload,
       };
     }
