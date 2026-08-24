@@ -29,6 +29,10 @@
     "api/workers/[job].ts": {
       "memory": 1024,
       "maxDuration": 30
+    },
+    "api/nexus-chat.ts": {
+      "memory": 1024,
+      "maxDuration": 30
     }
   },
   "headers": [
@@ -280,10 +284,6 @@
     { "source": "/login-old",                       "destination": "/login",                            "permanent": true }
   ],
   "rewrites": [
-    {
-      "source": "/api/chat",
-      "destination": "/api/workers/chat"
-    },
     {
       "source": "/((?!api/|assets/|og-image/|sitemap.xml$|robots.txt$|favicon.ico$|favicon\\..*|manifest.webmanifest$).*)",
       "destination": "/"
