@@ -14,7 +14,7 @@ import {
   type LensCode,
   type TrustStage,
   type OpeningVector,
-} from './lib/nexusEngine';
+} from '../lib/nexusEngine';
 
 /**
  * /api/nexus-chat — Corrective batch v4, v2.7 system prompt.

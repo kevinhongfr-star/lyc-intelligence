@@ -1,5 +1,5 @@
 // nexusChat.ts — Corrective batch v4, v2.7 system prompt.
-// Client for /api/nexus-chat SSE streaming. Replaces legacy sendChatMessage
+// Client for /api/nexus/chat SSE streaming. Replaces legacy sendChatMessage
 // (coze.ts → old /api/chat). Takes onToken callback so caller progressively
 // appends to the placeholder message. Returns { response, _engine } state once
 // the "engine" SSE event is received. _engine.lane is ENGINE-INTERNAL —
@@ -54,7 +54,7 @@ export interface NexusChatOptions {
 }
 
 /**
- * SSE streaming call to /api/nexus-chat.
+ * SSE streaming call to /api/nexus/chat.
  * - Stream deltas → opts.onToken(delta)
  * - Optionally opts.onFullReplace(text) — cleaned full text override
  * - Returns { response, _engine } once the engine event arrives
@@ -65,7 +65,7 @@ export async function sendNexusMessage(
 ): Promise<NexusChatResponse> {
   const { onToken, onFullReplace, ...request } = opts;
 
-  const res = await fetch('/api/nexus-chat', {
+  const res = await fetch('/api/nexus/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
