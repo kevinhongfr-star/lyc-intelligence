@@ -69,7 +69,7 @@ const ClientPortalLayout = lazy(() => import('@/components/layouts/ConsultantPor
 const AdminLayout = lazy(() => import('@/components/layouts/AdminLayout').then(m => ({ default: m.AdminLayout })));
 const CandidatePortalLayout = lazy(() => import('@/components/layouts/CandidatePortalLayout').then(m => ({ default: m.CandidatePortalLayout })));
 // ── Phase 17 — V-App v3.5 layout + placeholder pages ────────────────
-const AppShellV3Layout = lazy(() => import('@/components/layouts/AppShellV3Layout').then(m => ({ default: m.AppShellV3Layout })));
+// BUILD DIAGNOSTIC: const AppShellV3Layout = lazy(() => import('@/components/layouts/AppShellV3Layout').then(m => ({ default: m.AppShellV3Layout })));
 
 // ── Landing + Auth ──
 const Landing = lazy(() => import('@/pages/Landing').then(m => ({ default: m.Landing })));
@@ -203,14 +203,14 @@ function LegacyAssessmentTakeRedirect() {
 }
 
 // ── Phase 17 / V-App v3.5 surface pages — /app/v3/* ────────────────
-const NexusChatPageV3 = lazy(() => import('@/pages/app-v3/ChatPageV3').then(m => ({ default: m.ChatPageV3 })));
-const LensesLibraryV3Page = lazy(() => import('@/pages/app-v3/LensesPageV3').then(m => ({ default: m.LensesPageV3 })));
-const LensDetailV3Page = lazy(() => import('@/pages/app-v3/LensDetailPageV3').then(m => ({ default: m.LensDetailPageV3 })));
-const MilestonesV3Page = lazy(() => import('@/pages/app-v3/MilestonesPageV3').then(m => ({ default: m.MilestonesPageV3 })));
-const DocumentsV3Page = lazy(() => import('@/pages/app-v3/DocumentsPageV3').then(m => ({ default: m.DocumentsPageV3 })));
-const ProfileV3Page = lazy(() => import('@/pages/app-v3/ProfilePageV3').then(m => ({ default: m.ProfilePageV3 })));
-const SettingsV3Page = lazy(() => import('@/pages/app-v3/SettingsPageV3').then(m => ({ default: m.SettingsPageV3 })));
-const CoachingV3Page = lazy(() => import('@/pages/app-v3/CoachingPageV3').then(m => ({ default: m.CoachingPageV3 })));
+// BUILD DIAGNOSTIC: const NexusChatPageV3 = lazy(() => import('@/pages/app-v3/ChatPageV3').then(m => ({ default: m.ChatPageV3 })));
+// BUILD DIAGNOSTIC: const LensesLibraryV3Page = lazy(() => import('@/pages/app-v3/LensesPageV3').then(m => ({ default: m.LensesPageV3 })));
+// BUILD DIAGNOSTIC: const LensDetailV3Page = lazy(() => import('@/pages/app-v3/LensDetailPageV3').then(m => ({ default: m.LensDetailPageV3 })));
+// BUILD DIAGNOSTIC: const MilestonesV3Page = lazy(() => import('@/pages/app-v3/MilestonesPageV3').then(m => ({ default: m.MilestonesPageV3 })));
+// BUILD DIAGNOSTIC: const DocumentsV3Page = lazy(() => import('@/pages/app-v3/DocumentsPageV3').then(m => ({ default: m.DocumentsPageV3 })));
+// BUILD DIAGNOSTIC: const ProfileV3Page = lazy(() => import('@/pages/app-v3/ProfilePageV3').then(m => ({ default: m.ProfilePageV3 })));
+// BUILD DIAGNOSTIC: const SettingsV3Page = lazy(() => import('@/pages/app-v3/SettingsPageV3').then(m => ({ default: m.SettingsPageV3 })));
+// BUILD DIAGNOSTIC: const CoachingV3Page = lazy(() => import('@/pages/app-v3/CoachingPageV3').then(m => ({ default: m.CoachingPageV3 })));
 
 // ── Authenticated user pages — shared across leader / (in future) candidate ──
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
