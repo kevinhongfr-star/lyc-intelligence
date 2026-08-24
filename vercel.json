@@ -27,12 +27,8 @@
       "maxDuration": 30
     },
     "api/workers/[job].ts": {
-      "memory": 1024,
-      "maxDuration": 30
-    },
-    "api/nexus/chat.ts": {
-      "memory": 1024,
-      "maxDuration": 30
+      "memory": 1536,
+      "maxDuration": 60
     }
   },
   "headers": [
@@ -618,7 +614,11 @@
   "rewrites": [
     {
       "source": "/api/nexus-chat",
-      "destination": "/api/nexus/chat"
+      "destination": "/api/workers/nexus-chat"
+    },
+    {
+      "source": "/api/nexus/chat",
+      "destination": "/api/workers/nexus-chat"
     },
     {
       "source": "/((?!api/|assets/|og-image/|sitemap.xml$|robots.txt$|favicon.ico$|favicon\\..*|manifest.webmanifest$).*)",
