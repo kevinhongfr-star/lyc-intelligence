@@ -13,10 +13,10 @@ import { trackCTA } from '@/analytics/eventTracker';
  * NEXUS. wordmark (no space before dot). Hero video with 60% SOLID black
  * overlay. 5-tier membership with Pro featured dark. 11 lenses in one row.
  *
- * Copy is locked per spec. CTAs route to /auth/signup.
+ * Copy is locked per spec. CTAs route to /signup.
  */
 
-const SIGNUP = '/auth/signup';
+const SIGNUP = '/signup';
 
 // ── 11 lenses (compact capabilities row) ──
 const LENSES: Array<{ code: string; name: string }> = [
@@ -910,17 +910,10 @@ function MarketingFooter(): React.ReactElement {
           </div>
 
           <div>
-            <p style={colLabel}>Company</p>
-            <Link to="/about" style={footerLink}>About</Link>
-            <Link to="/about" style={footerLink}>LYC Partners</Link>
-            <Link to="/about" style={footerLink}>Press</Link>
-          </div>
-
-          <div>
             <p style={colLabel}>Legal</p>
             <Link to="/privacy" style={footerLink}>Privacy</Link>
             <Link to="/terms" style={footerLink}>Terms</Link>
-            <Link to="/security" style={footerLink}>Security</Link>
+            <Link to="/cookies" style={footerLink}>Cookies</Link>
           </div>
         </div>
 
