@@ -30,7 +30,7 @@ const CAPABILITIES = [
   {
     mono: 'CAREER · STRATEGY',
     title: 'Career trajectory mapping',
-    desc: 'Placement data from 7,400+ executive mandates means the next move is not a guess. LYC Intelligence surfaces the roles, geographies, and compensation bands where your profile compounds best.',
+    desc: 'Placement data from 7,400+ executive mandates means the next move is not a guess. NEXUS surfaces the roles, geographies, and compensation bands where your profile compounds best.',
   },
   {
     mono: 'COMP · BENCHMARK',
@@ -61,7 +61,7 @@ const STEPS = [
     n: '02',
     eyebrow: 'TAKE THE ASSESSMENT',
     title: 'Measure yourself. The conversation gets specific.',
-    desc: 'When you take the executive diagnostic, LYC Intelligence reads your structure — archetypes, dimensions, gaps. Follow-ups stop being generic and start being about you.',
+    desc: 'When you take the executive diagnostic, NEXUS reads your structure — archetypes, dimensions, gaps. Follow-ups stop being generic and start being about you.',
   },
   {
     n: '03',
@@ -100,7 +100,7 @@ const ACCESS_TIERS = [
   {
     name: 'Executive Introduction',
     price: 'Complimentary',
-    detail: '5 messages to experience LYC Intelligence',
+    detail: '5 messages to experience NEXUS',
     cta: 'Begin Introduction',
     href: '/dex/chat',
     accent: false,
@@ -150,7 +150,7 @@ export function DexLandingPage() {
       `}</style>
 
       <SEO
-        title="DEX AI — Executive Advisory for China-APAC Leaders | LYC Intelligence"
+        title="DEX AI — Executive Advisory for China-APAC Leaders | NEXUS by LYC Partners"
         description="Your always-on advisory for career strategy, compensation benchmarking, and cross-border transitions. Trained on 7,400+ executive mandates across China and APAC."
         path="/dex"
       />
@@ -232,7 +232,7 @@ export function DexLandingPage() {
               lineHeight: V1.leadingBody,
               maxWidth: 640,
             }}>
-              LYC Intelligence is your always-on advisor for career strategy, compensation benchmarking, and cross-border transitions — trained on LYC Partners&rsquo; placement intelligence across 7,400+ executive mandates.
+              NEXUS is your always-on advisor for career strategy, compensation benchmarking, and cross-border transitions — trained on LYC Partners&rsquo; placement intelligence across 7,400+ executive mandates.
             </p>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 40 }}>
@@ -787,7 +787,7 @@ export function DexLandingPage() {
           textAlign: 'center',
           letterSpacing: V1.trackingMono,
         }}>
-          Powered by LYC Intelligence · DEX AI · All rights reserved.
+          NEXUS by LYC Partners · All rights reserved.
         </footer>
       </main>
     </div>

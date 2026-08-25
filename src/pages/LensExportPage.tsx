@@ -117,7 +117,7 @@ export function LensExportPage() {
       'A detailed PDF report with individual candidate assessments is attached.',
       '',
       'Best regards,',
-      'LYC Intelligence',
+      'NEXUS — Executive Intelligence by LYC Partners',
     ];
     return lines.join('\n');
   }, [mandate, sortedPipeline]);
@@ -164,7 +164,7 @@ export function LensExportPage() {
       }
 
       doc.setFontSize(7); doc.setTextColor(100, 100, 120);
-      doc.text('LYC Intelligence — Confidential', margin, doc.internal.pageSize.getHeight() - 10);
+      doc.text('NEXUS — Confidential', margin, doc.internal.pageSize.getHeight() - 10);
       doc.text(`Generated: ${new Date().toLocaleString()}`, pw - margin - 40, doc.internal.pageSize.getHeight() - 10);
       doc.save(`LYC_LENS_${mandate?.id?.slice(0, 8) || 'report'}.pdf`);
     } catch (err) { console.error('PDF export failed:', err); }

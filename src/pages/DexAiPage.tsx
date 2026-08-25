@@ -86,13 +86,13 @@ function Hero() {
           color: DS.text, maxWidth: 720, margin: '0 auto 24px',
           letterSpacing: '-0.02em',
         }}>
-          Built on <em style={{ fontStyle: 'italic', color: DS.accent, fontWeight: 400 }}>LYC Intelligence.</em>
+          Powered by <span style={{ fontFamily: 'Crimson Pro, Georgia, serif', fontStyle: 'normal', fontWeight: 600, color: DS.accent, letterSpacing: '-0.02em' }}>NEXUS<span style={{ color: DS.accent }}>.</span></span>
         </h1>
         <p style={{ fontSize: 18, maxWidth: 640, margin: '0 auto 32px', color: DS.muted, lineHeight: 1.6 }}>
           Multi-agent AI systems, specialized assessment models, and talent market data — all working together to power leadership intelligence for executives on the move.
         </p>
         <div style={{ fontFamily: DS.monoFont, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: DS.mutedDim, marginBottom: 40 }}>
-          LYC Intelligence is the service. NEXUS is the experience.
+          Executive intelligence. Built by LYC Partners.
         </div>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link to="/nexus" style={btnPrimary} {...ctaCompressHandlers}
@@ -130,7 +130,7 @@ function Architecture() {
           <h2 style={{ fontFamily: DS.headingFont, fontWeight: 700, fontSize: 38, lineHeight: 1.15, color: DS.text, marginBottom: 20, letterSpacing: '-0.02em' }}>
             How it works <em style={{ fontStyle: 'italic', color: DS.accent, fontWeight: 400 }}>under the hood.</em>
           </h2>
-          <p style={{ fontSize: 17, color: DS.muted, lineHeight: 1.6 }}>LYC Intelligence isn't a single model. It's a system of specialized AI components that work together — orchestrated by NEXUS to deliver leadership intelligence you can trust.</p>
+          <p style={{ fontSize: 17, color: DS.muted, lineHeight: 1.6 }}>NEXUS isn't a single model. It's a system of specialized AI components that work together — orchestrated to deliver leadership intelligence you can trust, built on 20 years of LYC Partners methodology.</p>
         </div>
 
         {/* Architecture stack diagram */}
@@ -244,9 +244,9 @@ function BackCTA() {
         {/* Ticket #1355 — eyebrow label light gray (use lightened gray for dark bg: DS.mutedDim equivalent works on dark) */}
         <span style={{ ...monoStyle, color: DS.mutedDim, marginBottom: 20, display: 'block' }}>See it in action</span>
         <h2 style={{ fontFamily: DS.headingFont, color: DS.bg, maxWidth: 640, margin: '0 auto 20px', fontSize: 40, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.02em' }}>
-          LYC Intelligence powers <em style={{ fontStyle: 'italic', color: DS.accent, fontWeight: 400 }}>NEXUS.</em><br />See what it can do for you.
+          <span style={{ fontFamily: 'Crimson Pro, Georgia, serif', fontSize: 26, fontWeight: 600, letterSpacing: '-0.02em' }}>NEXUS<span style={{ color: DS.accent }}>.</span></span><br />See what it can do for you.
         </h2>
-        <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: 520, margin: '0 auto 36px', fontSize: 17, lineHeight: 1.6 }}>The best way to understand LYC Intelligence is to experience it through NEXUS. Start with the Executive Introduction — about 15 minutes.</p>
+        <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: 520, margin: '0 auto 36px', fontSize: 17, lineHeight: 1.6 }}>The best way to understand NEXUS is to experience it. Start with the Executive Introduction — about 15 minutes.</p>
         <Link to="/nexus#start" style={{ ...btnPrimary, padding: '16px 36px' }} {...ctaCompressHandlers}
           onMouseEnter={(e) => (e.currentTarget.style.background = DS.accentDark)}
           onMouseLeave={(e) => (e.currentTarget.style.background = DS.accent)}>
@@ -270,7 +270,7 @@ function Footer() {
         <div className="da-footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
           <div>
             <h4 style={{ fontFamily: DS.headingFont, fontSize: 20, fontWeight: 700, marginBottom: 8, color: DS.text, lineHeight: 1.2, display: 'flex', alignItems: 'baseline', gap: 6 }}>
-              LYC Intelligence <span style={{ fontFamily: DS.monoFont, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', color: DS.mutedDim, fontWeight: 400 }}>Technology</span>
+              <span style={{ fontFamily: 'Crimson Pro, Georgia, serif', fontWeight: 600, letterSpacing: '-0.02em' }}>NEXUS<span style={{ color: DS.accent }}>.</span></span>
             </h4>
             <p style={{ color: DS.muted, fontSize: 14, maxWidth: 280, marginTop: 16, lineHeight: 1.6 }}>Multi-agent AI systems, specialized assessment models, and talent market data — powering leadership intelligence for executives on the move.</p>
           </div>
@@ -301,7 +301,7 @@ function Footer() {
           </div>
         </div>
         <div style={{ paddingTop: 32, borderTop: `1px solid ${DS.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: DS.mutedDim, fontFamily: DS.monoFont, flexWrap: 'wrap', gap: 12 }}>
-          <span>© 2026 LYC Intelligence. All rights reserved.</span>
+          <span>© 2026 LYC Partners. All rights reserved.</span>
           <span>Made for leaders</span>
         </div>
       </div>

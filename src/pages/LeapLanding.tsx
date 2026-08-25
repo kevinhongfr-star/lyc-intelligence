@@ -118,7 +118,7 @@ const LEAP_FAQ = [
   },
   {
     q: 'Is my data private?',
-    a: 'Yes. LEAP results are private to your LYC Intelligence account. We do not sell personal information, and assessment data is never used to train public-facing models or shared outside LYC Intelligence / LYC Partners unless explicitly authorised.',
+    a: 'Yes. LEAP results are private to your NEXUS account. We do not sell personal information, and assessment data is never used to train public-facing models or shared outside NEXUS / LYC Partners unless explicitly authorised.',
   },
 ];
 
@@ -151,7 +151,7 @@ export function LeapLanding() {
       ctaLabel="Start Your LEAP Assessment"
       finalCtaLabel="Get Your LEAP Profile"
       finalSubtext="A few minutes. A clear scorecard. Seventeen archetypes. An APAC translation overlay. Your complimentary baseline covers the self-assessment layer and archetype classification."
-      seoTitle="LEAP — Leadership Archetype & APAC Translation | LYC Intelligence"
+      seoTitle="LEAP — Leadership Archetype & APAC Translation | NEXUS by LYC Partners"
       seoDescription="The deepest single-instrument leadership profile in the LYC suite. 5 dimensions, 17 archetypes, APAC translation overlay. ~15 minutes. Complimentary Executive Introduction baseline."
       seoPath="/assessment/leap"
       prefix="leap"

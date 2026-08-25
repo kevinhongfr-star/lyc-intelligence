@@ -136,7 +136,7 @@ export function AssessmentDepthPage() {
     SAMPLE_REPORT_TEXT[key] ??
     '[Emily: sample report preview description — placeholder. Composite score, dimension breakdowns, written interpretation, visualization samples, and action plan preview.]';
 
-  const seoTitle = `${fullName} | LYC Intelligence`;
+  const seoTitle = `${fullName} | NEXUS by LYC Partners`;
   const seoDescription = `${tagline} ${costTier} diagnostic · ${format.questions} questions · ~${format.minutes} minutes · ${mileCost} ${mileCost === 1 ? 'mile' : 'miles'}. Run with NEXUS.`;
   const seoPath = `/assessment/${key.toLowerCase()}/deep`;
 

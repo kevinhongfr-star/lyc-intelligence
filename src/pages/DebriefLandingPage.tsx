@@ -149,7 +149,7 @@ export function DebriefLandingPage() {
     <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text }}>
       <SEO
         page="landing"
-        title="[Emily: SEO title — placeholder. Debrief Sessions | LYC Intelligence]"
+        title="[Emily: SEO title — placeholder. Debrief Sessions | NEXUS by LYC Partners]"
         description="[Emily: SEO meta description — placeholder. 1:1 human debrief sessions with certified career, executive, leadership, and CPI coaches. Tier-discounted pricing, complimentary session allocations, and APAC expertise.]"
         path="/debrief"
       />

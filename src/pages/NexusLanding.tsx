@@ -99,7 +99,7 @@ function Hero() {
         </div>
         <div style={{ width: 1, height: 60, background: DS.borderStrong, margin: '0 auto' }} />
         <div style={{ marginTop: 80, fontFamily: DS.monoFont, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.12em', color: DS.mutedDim }}>
-          Built on <strong style={{ color: DS.text, fontWeight: 500, letterSpacing: '0.12em' }}>LYC Intelligence</strong>
+          <span style={{ fontFamily: 'Crimson Pro, Georgia, serif', fontSize: 28, fontWeight: 600, letterSpacing: '-0.02em' }}>NEXUS<span style={{ color: DS.accent }}>.</span></span>
         </div>
       </div>
     </section>
@@ -405,7 +405,7 @@ function Pricing() {
 // #1370 — standardized on lucide-react icons (no mixed emoji/text symbols).
 const TRUST = [
   { icon: Star, title: 'Backed by LYC Partners', desc: "10+ years of executive search and assessment expertise across China and APAC. We've placed hundreds of senior leaders." },
-  { icon: Zap, title: 'Built on LYC Intelligence', desc: 'Multi-agent AI systems, specialized assessment models, and talent market data — all working together behind the scenes.' },
+  { icon: Zap, title: 'NEXUS Intelligence Platform', desc: 'Multi-agent AI systems, specialized assessment models, and talent market data — all working together behind the scenes.' },
   { icon: Target, title: 'Global Benchmarks', desc: "Every diagnostic is benchmarked against executives across 47 markets. You're not just comparing to yourself." },
 ];
 function Trust() {
@@ -432,8 +432,9 @@ function Trust() {
         </div>
         <div className="nl-reveal" style={{ textAlign: 'center', marginTop: 64, paddingTop: 48, borderTop: `1px solid ${DS.border}` }}>
           <span style={{ ...monoStyle, color: DS.mutedDim, marginBottom: 12, display: 'block' }}>The intelligence engine</span>
-          {/* Ticket #1356 — internal DEX code name removed from public copy. This is LYC Intelligence platform. */}
-          <strong style={{ fontFamily: DS.headingFont, fontSize: 20, fontWeight: 700, color: DS.text }}>Built on LYC Intelligence</strong><br />
+          {/* Ticket #1356 — internal DEX code name removed from public copy. NEXUS is the platform. */}
+          <span style={{ fontFamily: 'Crimson Pro, Georgia, serif', fontSize: 22, fontWeight: 600, letterSpacing: '-0.02em', color: DS.text }}>NEXUS<span style={{ color: DS.accent }}>.</span></span><br />
+          <span style={{ fontFamily: DS.monoFont, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', color: DS.mutedDim }}>Executive intelligence</span>
         </div>
       </div>
     </section>
@@ -503,7 +504,7 @@ function Footer() {
           </div>
         </div>
         <div className="footer-inline" style={{ paddingTop: 32, borderTop: `1px solid ${DS.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: DS.mutedDim, fontFamily: DS.monoFont, flexWrap: 'wrap', gap: 12 }}>
-          <span>© 2026 LYC Intelligence. All rights reserved.</span>
+          <span>© 2026 LYC Partners. All rights reserved.</span>
           <span>Made for leaders.</span>
         </div>
       </div>

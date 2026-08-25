@@ -83,7 +83,7 @@ export default function ShiftPage() {
 
   return (
     <div className="space-y-8">
-      <SEO title="Leadership Diagnostic Suite — 5 Assessments | LYC Intelligence" description="Five-instrument suite measuring learning, execution, inquiry, coaching, and impact. Each diagnostic takes 10 minutes. 99-149 miles per assessment. Part of the LYC Intelligence diagnostic catalog." path="/assessment/shift" />
+      <SEO title="Leadership Diagnostic Suite — 5 Assessments | NEXUS by LYC Partners" description="Five-instrument suite measuring learning, execution, inquiry, coaching, and impact. Each diagnostic takes 10 minutes. 99-149 miles per assessment. Part of the NEXUS diagnostic catalog, by LYC Partners." path="/assessment/shift" />
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Leadership Diagnostic Suite</h1>
         <p className="text-sm text-slate-500 mt-1">

@@ -162,7 +162,7 @@ export function NexusLandingPage() {
       `}</style>
 
       <SEO
-        title="NEXUS — Executive Intelligence System | LYC Intelligence"
+        title="NEXUS — Executive Intelligence System | NEXUS by LYC Partners"
         description="Your always-on intelligence partner for leadership, career, and organizational decisions. Built on two decades of executive search methodology. 6 assessments, analysis, and advisory in one system."
         path="/nexus"
       />
@@ -829,7 +829,7 @@ export function NexusLandingPage() {
               fontFamily: V1.bodyFont, fontSize: V1.textCaption,
               color: V1.textDim, marginTop: 8,
             }}>
-              © 2026 LYC Intelligence
+              © 2026 LYC Partners
             </div>
           </div>
         </footer>

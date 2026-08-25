@@ -19,7 +19,7 @@ export default function ErrorPage() {
         color: '#000000',
       }}
     >
-      <SEO title="Error — LYC Intelligence" description="Something went wrong. LYC Intelligence." path="/error" />
+      <SEO title="Error — NEXUS" description="Something went wrong. Executive intelligence by LYC Partners." path="/error" />
       {/* Left accent column */}
       <div
         style={{
@@ -73,8 +73,8 @@ export default function ErrorPage() {
         </div>
 
         <div style={{ opacity: 0.72, fontSize: 12, letterSpacing: '0.02em' }}>
-          <div style={{ marginBottom: 8 }}>LYC Intelligence</div>
-          <div>lyc-intelligence.app</div>
+          <div style={{ fontFamily: 'Crimson Pro, Georgia, serif', fontSize: 24, fontWeight: 600, letterSpacing: '-0.02em', marginBottom: 4 }}>NEXUS<span style={{ color: '#C108AB' }}>.</span></div>
+          <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.5)' }}>Executive intelligence</div>
         </div>
       </div>
 

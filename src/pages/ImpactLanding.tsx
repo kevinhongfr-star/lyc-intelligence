@@ -117,7 +117,7 @@ const IMPACT_FAQ = [
   },
   {
     q: 'Is my data private?',
-    a: 'Yes. IMPACT results are private to your LYC Intelligence account. We do not sell personal information, and assessment data is never used to train public-facing models or shared outside LYC Intelligence / LYC Partners unless explicitly authorised.',
+    a: 'Yes. IMPACT results are private to your NEXUS account. We do not sell personal information, and assessment data is never used to train public-facing models or shared outside NEXUS / LYC Partners unless explicitly authorised.',
   },
 ];
 
@@ -150,7 +150,7 @@ export function ImpactLanding() {
       ctaLabel="Start Your IMPACT Assessment"
       finalCtaLabel="Get Your IMPACT Profile"
       finalSubtext="Fifteen minutes. Five mandate verdicts. One board archetype. Your complimentary baseline covers the self-assessment layer and composite mandate score."
-      seoTitle="IMPACT — Board Effectiveness Assessment | LYC Intelligence"
+      seoTitle="IMPACT — Board Effectiveness Assessment | NEXUS by LYC Partners"
       seoDescription="Benchmark your board and organisational impact. 5 dimensions, 8 board archetypes, APAC mandate credibility. ~15 minutes. Complimentary Executive Introduction baseline."
       seoPath="/assessment/impact"
       prefix="impact"

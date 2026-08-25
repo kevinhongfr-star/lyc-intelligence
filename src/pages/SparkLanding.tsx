@@ -94,7 +94,7 @@ const SPARK_FAQ = [
   },
   {
     q: 'Is my data private?',
-    a: 'Yes. SPARK results are private to your LYC Intelligence account. We do not sell personal information, and assessment data is never used to train public-facing models or shared outside LYC Intelligence / LYC Partners unless explicitly authorised.',
+    a: 'Yes. SPARK results are private to your NEXUS account. We do not sell personal information, and assessment data is never used to train public-facing models or shared outside NEXUS / LYC Partners unless explicitly authorised.',
   },
 ];
 
@@ -127,7 +127,7 @@ export function SparkLanding() {
       ctaLabel="Start Your SPARK Assessment"
       finalCtaLabel="Get Your SPARK Readiness Profile"
       finalSubtext="Twelve minutes. Three dimension verdicts. One governance archetype. Your complimentary baseline covers the self-assessment layer and composite readiness band."
-      seoTitle="SPARK — AI Leadership Readiness & Governance | LYC Intelligence"
+      seoTitle="SPARK — AI Leadership Readiness & Governance | NEXUS by LYC Partners"
       seoDescription="Assess your readiness to lead in the age of AI. 3 dimensions, 4 governance archetypes, composite readiness band. ~12 minutes. Complimentary Executive Introduction baseline."
       seoPath="/assessment/spark"
       prefix="spark"

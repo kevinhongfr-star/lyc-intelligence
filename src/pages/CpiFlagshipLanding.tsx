@@ -32,7 +32,7 @@ const CPI_ARCHETYPES = [
 const FAQ_ITEMS = [
   { q: 'What is CPI?', a: 'CPI (Core Professional Insight) is the flagship LYC executive self-awareness assessment. It measures 6 dimensions of professional operation, determines your primary and secondary archetype, and produces a composite 0-100 profile with dimension-level detail.' },
   { q: 'How long does it take?', a: 'The self-assessment layer takes approximately 15 minutes. Executive Introduction users receive a complete complimentary baseline including composite score, dimension breakdown, primary + secondary archetype, and NEXUS follow-up integration.' },
-  { q: 'Is my data private?', a: 'Yes. CPI results are private to your LYC Intelligence account. We do not sell personal information. Assessment data is never used to train public-facing models or shared with third parties outside LYC Intelligence / LYC Partners unless explicitly authorized.' },
+  { q: 'Is my data private?', a: 'Yes. CPI results are private to your NEXUS account. We do not sell personal information. Assessment data is never used to train public-facing models or shared with third parties outside NEXUS / LYC Partners unless explicitly authorized.' },
   { q: 'What do I get with Executive Introduction?', a: 'Executive Introduction (the no-cost entry tier) includes one complimentary CPI baseline, basic NEXUS access (5 introductory messages), the core report, and pricing upgrade options for the professional deep-dive layers, multi-rater 360, or consultant debrief.' },
 ];
 
@@ -69,7 +69,7 @@ export function CpiFlagshipLanding() {
     <>
       <SEO
         page="landing"
-        title="CPI — Core Professional Insight | LYC Intelligence"
+        title="CPI — Core Professional Insight | NEXUS by LYC Partners"
         description="The flagship executive self-awareness assessment by LYC Partners. 6 dimensions, 6 archetypes, 3 layers of depth. Built on two decades of C-suite executive search methodology."
       />
       <main data-cpi-page>

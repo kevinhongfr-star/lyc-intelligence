@@ -114,7 +114,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "I'm NEXUS — LYC's executive intelligence system. I ask the questions most executives skip. Tell me a little about where you are, and we'll work through it together.",
+      content: "I'm NEXUS. I ask the questions most executives skip. Tell me a little about where you are, and we'll work through it together.",
     },
   ]);
   /**
@@ -690,7 +690,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
     setSessionId(newId);
     setMessages([{
       role: 'assistant',
-      content: "I'm NEXUS — LYC's executive intelligence system. I ask the questions most executives skip. Tell me a little about where you are, and we'll work through it together.",
+      content: "I'm NEXUS. I ask the questions most executives skip. Tell me a little about where you are, and we'll work through it together.",
     }]);
     setMessageCount(0);
     setShowSidebar(false);
@@ -841,7 +841,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
               >
                 <Menu className="w-5 h-5" />
               </button>
-              <a href="/" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none' }}>LYC Intelligence</a>
+              <a href="/" style={{ fontFamily: 'Crimson Pro, Georgia, serif', fontSize: '20px', fontWeight: 600, letterSpacing: '-0.02em', color: DS.text, textDecoration: 'none' }}>NEXUS<span style={{ color: '#C108AB' }}>.</span></a>
             </div>
             <div style={{ display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' }}>
               {/*
@@ -1256,7 +1256,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center', marginBottom: '20px' }}>
             <Shield style={{ width: 12, height: 12, color: DS.muted }} />
-            <span style={{ fontSize: '11px', color: DS.muted }}>Leadership isn't a title — it's a trajectory. Powered by LYC Intelligence.</span>
+            <span style={{ fontSize: '11px', color: DS.muted }}>Executive intelligence. Always on.</span>
           </div>
         </div>
       </div>
