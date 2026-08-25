@@ -88,7 +88,7 @@ function isEventShape(o: unknown): o is EventShape {
 }
 
 // Force Node.js runtime
-export const config = { runtime: "nodejs20.x" };
+export const config = { runtime: "nodejs" };
 
 export default function handler(req: VercelRequest, res: VercelResponse): void {
   // #1314: reject oversized URLs before any processing.
