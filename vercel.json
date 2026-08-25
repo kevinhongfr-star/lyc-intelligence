@@ -285,6 +285,30 @@
       "destination": "/api/workers/chat"
     },
     {
+      "source": "/api/lead-capture",
+      "destination": "/api/workers/lead-capture"
+    },
+    {
+      "source": "/api/contact",
+      "destination": "/api/workers/contact"
+    },
+    {
+      "source": "/api/email",
+      "destination": "/api/workers/email"
+    },
+    {
+      "source": "/api/stripe/checkout",
+      "destination": "/api/workers/stripe-checkout"
+    },
+    {
+      "source": "/api/nexus-chat",
+      "destination": "/api/workers/nexus-chat"
+    },
+    {
+      "source": "/api/nexus/chat",
+      "destination": "/api/workers/nexus-chat"
+    },
+    {
       "source": "/((?!api/|assets/|og-image/|sitemap.xml$|robots.txt$|favicon.ico$|favicon\\..*|manifest.webmanifest$).*)",
       "destination": "/"
     }
