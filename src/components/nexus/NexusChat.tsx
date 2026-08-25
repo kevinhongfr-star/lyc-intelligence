@@ -768,428 +768,962 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
   }
 
   const upsellTrigger = shouldShowUpsell();
+  // ── v3.5 Design System Tokens (inline to avoid import churn) ──
+  const V = {
+    // Fonts
+    displayFont: "'Crimson Pro', Georgia, serif",
+    bodyFont: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    monoFont: "'IBM Plex Mono', 'Courier New', monospace",
+    // Ocean (primary brand)
+    ocean800: '#0F2C4A',
+    ocean700: '#183F5E',
+    ocean600: '#1E537A',
+    ocean500: '#2A6A95',
+    ocean400: '#3E86B5',
+    ocean300: '#6BA8CD',
+    ocean100: '#CFE1EE',
+    ocean50: '#EAF2F8',
+    // Teal (secondary accent)
+    teal700: '#0B5D6B',
+    teal600: '#0E7B8A',
+    teal500: '#1293A6',
+    teal400: '#2DB0C2',
+    teal300: '#5AC6D5',
+    teal100: '#BFE9F0',
+    teal50: '#E1F5F8',
+    // Fuchsia (flagship accent)
+    fuchsia700: '#A0078A',
+    fuchsia600: '#C108AB',
+    fuchsia500: '#D814C0',
+    fuchsia400: '#E83CD2',
+    // Neutrals
+    ink900: '#0A0A0A',
+    ink800: '#1a1a1a',
+    ink700: '#333333',
+    ink500: '#666666',
+    ink400: '#999999',
+    ink200: '#e0e0e0',
+    ink100: '#f0f0f0',
+    ink50: '#fafafa',
+    cream: '#FAFAFA',
+    white: '#ffffff',
+    // Layout
+    sidebarW: '260px',
+    topbarH: 64,
+    railW: 240,
+  };
+
+  // Helper: format time for message timestamps
+  const formatTime = (ts?: number) => {
+    if (!ts) return '';
+    const d = new Date(ts);
+    return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+  };
+
+  // ── NEXUS Fairy Avatar Component (inline) ──
+  const FairyAvatar = () => (
+    <div style={{
+      width: 28, height: 28, flexShrink: 0, marginTop: 2,
+      position: 'relative', overflow: 'visible',
+    }}>
+      <style>{`
+        @keyframes nf-drift { 0%,100%{transform:translate(0,0)} 25%{transform:translate(0.5px,-0.5px)} 50%{transform:translate(0,-1px)} 75%{transform:translate(-0.5px,-0.5px)} }
+        @keyframes nf-t1 { 0%{transform:translate(-8px,-5px);opacity:.9} 25%{transform:translate(0,0);opacity:.6} 50%{transform:translate(8px,5px);opacity:.9} 75%{transform:translate(0,0);opacity:.5} 100%{transform:translate(-8px,-5px);opacity:.9} }
+        @keyframes nf-t2 { 0%{transform:translate(6px,-6px);opacity:.7} 33%{transform:translate(-4px,-2px);opacity:1} 66%{transform:translate(2px,6px);opacity:.6} 100%{transform:translate(6px,-6px);opacity:.7} }
+        @keyframes nf-f1 { 0%{transform:translate(-6px,4px);opacity:1} 50%{transform:translate(6px,-4px);opacity:.5} 100%{transform:translate(-6px,4px);opacity:1} }
+        @keyframes nf-f2 { 0%{transform:rotate(0deg) translateX(4px) rotate(0deg);opacity:.8} 100%{transform:rotate(360deg) translateX(4px) rotate(-360deg);opacity:.8} }
+        @keyframes nf-pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.5);opacity:.6} }
+        @media (min-width: 1024px) {
+          #nexus-sidebar-v35 { transform: translateX(0) !important; }
+        }
+        @media (max-width: 1023px) {
+          #nexus-main-v35 { margin-left: 0 !important; }
+          #nexus-sidebar-v35 { width: 280px !important; }
+        }
+        @media (max-width: 1023px) {
+          #nexus-composer-wrap { left: 0 !important; padding: 20px 16px 24px !important; }
+          #nexus-composer-inner { margin-left: 0 !important; max-width: 100% !important; }
+        }
+
+        .nf-wrap { position:absolute; inset:0; animation:nf-drift 4s ease-in-out infinite; }
+        .nf-dot { position:absolute; border-radius:50%; top:50%; left:50%; will-change:transform,opacity; }
+        .nf-dt1 { width:2px; height:2px; background:#5AC6D5; margin-left:-1px; margin-top:-1px; box-shadow:0 0 5px #2DB0C2, 0 0 10px rgba(45,176,194,.6); animation:nf-t1 3.5s ease-in-out infinite; }
+        .nf-dt2 { width:1.5px; height:1.5px; background:#8EDBE5; margin-left:-0.75px; margin-top:-0.75px; box-shadow:0 0 3px #5AC6D5; animation:nf-t2 4.8s ease-in-out infinite; }
+        .nf-df1 { width:2.5px; height:2.5px; background:#E83CD2; margin-left:-1.25px; margin-top:-1.25px; box-shadow:0 0 6px #C108AB, 0 0 12px rgba(193,8,171,.5); animation:nf-f1 2.8s ease-in-out infinite; }
+        .nf-df2 { width:1.5px; height:1.5px; background:#D814C0; margin-left:-0.75px; margin-top:-0.75px; box-shadow:0 0 3px #A0078A; animation:nf-f2 2s linear infinite; }
+        .nf-focal { position:absolute; width:4px; height:4px; top:50%; left:50%; margin-left:-2px; margin-top:-2px; background:#C108AB; border-radius:50%; box-shadow:0 0 8px #C108AB, 0 0 16px rgba(193,8,171,.7); animation:nf-pulse 2.2s ease-in-out infinite; }
+      `}</style>
+      <div className="nf-wrap">
+        <span className="nf-dot nf-dt1" />
+        <span className="nf-dot nf-dt2" />
+        <span className="nf-dot nf-df1" />
+        <span className="nf-dot nf-df2" />
+        <span className="nf-focal" />
+      </div>
+    </div>
+  );
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.bg, display: 'flex' }}>
-      <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" style={{ display: showSidebar ? 'block' : 'none' }} 
-        onClick={() => setShowSidebar(false)} />
-
-      <aside
-        className={showSidebar ? 'nexus-sidebar-open' : 'nexus-sidebar-closed'}
+    <div style={{
+      minHeight: '100vh',
+      background: V.cream,
+      display: 'flex',
+      fontFamily: V.bodyFont,
+      color: V.ink900,
+      lineHeight: 1.6,
+      WebkitFontSmoothing: 'antialiased',
+    }}>
+      {/* Mobile overlay */}
+      <div
         style={{
-          width: '280px',
-          background: DS.bgAlt,
-          borderRight: `1px solid ${DS.border}`,
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 40,
+          display: showSidebar ? 'block' : 'none',
+        }}
+        onClick={() => setShowSidebar(false)}
+      />
+
+      {/* ── Sidebar (v3.5 dark style) ── */}
+      <aside id="nexus-sidebar-v35"
+        style={{
+          width: V.sidebarW,
+          background: V.ink900,
+          color: V.cream,
           position: 'fixed',
-          left: 0,
-          top: 0,
-          bottom: 0,
+          left: 0, top: 0, bottom: 0,
           zIndex: 50,
           overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          borderRight: '1px solid rgba(255,255,255,0.06)',
+          transform: showSidebar ? 'translateX(0)' : 'translateX(-100%)', // overidden on desktop by #nexus-sidebar-v35 media query
+          transition: 'transform 250ms ease',
         }}
+
       >
-        <div className="p-4 border-b border-border">
-          <button 
+        {/* Brand block */}
+        <div style={{
+          padding: '28px 24px 22px',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+        }}>
+          <button
             onClick={() => setShowSidebar(false)}
-            className="lg:hidden p-2 mb-2 text-text-muted hover:text-text-primary"
+            style={{
+              display: 'block', marginBottom: 10, background: 'none', border: 'none',
+              color: V.ink400, cursor: 'pointer', padding: 4,
+            }}
+            className="lg:hidden"
           >
             <X className="w-5 h-5" />
           </button>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-accent/10 flex items-center justify-center">
-              <MessageSquare className="w-5 h-5 text-accent" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-text-primary">NEXUS</h3>
-              <p className="text-xs text-text-muted">{sessions.length} conversations</p>
-            </div>
+          <div style={{
+            fontFamily: V.displayFont,
+            fontSize: 22, fontWeight: 600,
+            color: V.cream, letterSpacing: '-0.02em', lineHeight: 1,
+          }}>
+            NEXUS<span style={{ color: V.fuchsia600 }}>.</span>
           </div>
+          <div style={{
+            marginTop: 6, fontFamily: V.monoFont, fontSize: 10,
+            letterSpacing: '0.12em', textTransform: 'uppercase',
+            color: V.ink500, fontWeight: 400,
+          }}>
+            Executive intelligence
+          </div>
+          {/* Tier badge */}
+          {user && (
+            <div style={{
+              marginTop: 16, padding: '7px 11px',
+              background: 'rgba(15, 44, 74, 0.4)',
+              border: '1px solid rgba(42, 106, 149, 0.25)',
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <div style={{ width: 5, height: 5, background: V.teal400, flexShrink: 0, borderRadius: '50%' }} />
+              <span style={{
+                fontFamily: V.monoFont, fontSize: 10,
+                letterSpacing: '0.1em', textTransform: 'uppercase',
+                color: V.ocean200 || V.ocean300, fontWeight: 500,
+              }}>
+                {canonicalTierLabel(canonicalTier)}
+              </span>
+            </div>
+          )}
         </div>
 
-        <button
-          onClick={createNewSession}
-          className="w-full m-4 px-4 py-3 bg-accent text-white font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          New Chat
-        </button>
+        {/* Nav */}
+        <nav style={{ flex: 1, overflowY: 'auto', padding: '18px 10px' }}>
+          {/* New Chat button */}
+          <button
+            onClick={createNewSession}
+            style={{
+              width: 'calc(100% - 20px)', margin: '0 10px 18px', padding: '10px 14px',
+              background: 'transparent', color: V.cream,
+              border: `1px solid rgba(255,255,255,0.12)`,
+              fontFamily: V.bodyFont, fontSize: '0.82rem', fontWeight: 500,
+              cursor: 'pointer', display: 'flex', alignItems: 'center',
+              justifyContent: 'center', gap: 8,
+              transition: 'all 200ms ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
+            }}
+          >
+            <Plus style={{ width: 14, height: 14 }} />
+            New Chat
+          </button>
 
-        <div className="px-2 space-y-1">
-          {sessions.map(session => (
-            <button
-              key={session.id}
-              className={`w-full text-left px-3 py-3 hover:bg-bg-tertiary transition-colors ${
-                session.id === sessionId ? 'bg-accent/10' : ''
-              }`}
+          {/* Conversations list */}
+          <div style={{
+            fontFamily: V.monoFont, fontSize: 9.5,
+            letterSpacing: '0.14em', textTransform: 'uppercase',
+            color: V.ink500, fontWeight: 500,
+            padding: '0 14px 8px',
+          }}>
+            Conversations
+          </div>
+          <div style={{ padding: '0 4px' }}>
+            {sessions.length > 0 ? sessions.map(session => (
+              <button
+                key={session.id}
+                onClick={() => {
+                  setSessionId(session.id);
+                  setMessages(session.messages || []);
+                  setMessageCount(session.messages?.length || 0);
+                  setShowSidebar(false);
+                }}
+                style={{
+                  display: 'block', width: '100%', textAlign: 'left',
+                  padding: '8px 12px', background: 'transparent',
+                  border: 'none',
+                  borderLeft: session.id === sessionId
+                    ? `2px solid ${V.ocean400}` : '2px solid transparent',
+                  color: session.id === sessionId ? V.cream : V.ink400,
+                  fontSize: '0.78rem', fontWeight: session.id === sessionId ? 500 : 400,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  transition: 'all 150ms ease',
+                  background: session.id === sessionId ? 'rgba(15, 44, 74, 0.35)' : 'transparent',
+                }}
+                onMouseEnter={(e) => {
+                  if (session.id !== sessionId) {
+                    e.currentTarget.style.color = V.cream;
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (session.id !== sessionId) {
+                    e.currentTarget.style.color = V.ink400;
+                    e.currentTarget.style.background = 'transparent';
+                  }
+                }}
+              >
+                <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {session.title}
+                </div>
+                <div style={{
+                  fontFamily: V.monoFont, fontSize: 9.5,
+                  color: V.ink500, marginTop: 2,
+                  letterSpacing: '0.08em',
+                }}>
+                  {session.messages?.length || 0} messages
+                </div>
+              </button>
+            )) : (
+              <div style={{
+                padding: '8px 14px', fontSize: '0.75rem',
+                color: V.ink500, fontStyle: 'italic',
+              }}>
+                No saved conversations
+              </div>
+            )}
+          </div>
+
+          {/* Miles panel (for signed-in users) */}
+          {user?.id && milesBalance !== null && (
+            <div style={{
+              margin: '24px 10px 18px', padding: 14,
+              background: 'rgba(15, 44, 74, 0.25)',
+              border: '1px solid rgba(42, 106, 149, 0.18)',
+            }}>
+              <div style={{
+                fontFamily: V.monoFont, fontSize: 9.5,
+                letterSpacing: '0.12em', textTransform: 'uppercase',
+                color: V.ocean300, marginBottom: 6,
+              }}>
+                Miles Balance
+              </div>
+              <div style={{
+                fontFamily: V.displayFont, fontSize: 26,
+                fontWeight: 400, color: V.cream,
+                lineHeight: 1, letterSpacing: '-0.02em',
+              }}>
+                {milesBalance}<span style={{
+                  fontFamily: V.bodyFont, fontSize: '0.7rem',
+                  color: V.ink400, fontWeight: 400,
+                  marginLeft: 4, letterSpacing: 0,
+                }}> miles</span>
+              </div>
+              <div style={{
+                marginTop: 10, height: 2,
+                background: 'rgba(255,255,255,0.08)',
+                position: 'relative',
+              }}>
+                <div style={{
+                  position: 'absolute', top: 0, left: 0, height: '100%',
+                  width: `${Math.min(100, (milesBalance / 50) * 100)}%`,
+                  background: V.ocean400,
+                }} />
+              </div>
+            </div>
+          )}
+
+          {/* Quick links */}
+          <div style={{
+            fontFamily: V.monoFont, fontSize: 9.5,
+            letterSpacing: '0.14em', textTransform: 'uppercase',
+            color: V.ink500, fontWeight: 500,
+            padding: '16px 14px 8px',
+          }}>
+            Explore
+          </div>
+          {[
+            { href: '/assessment', label: 'Assessments' },
+            { href: '/match', label: 'Score Match' },
+            { href: '/b2b', label: 'For Firms' },
+            { href: '/pricing', label: 'Pricing' },
+          ].map(link => (
+            <a
+              key={link.href}
+              href={link.href}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '8px 14px',
+                color: V.ink400, fontSize: '0.8rem',
+                textDecoration: 'none',
+                borderLeft: '2px solid transparent',
+                transition: 'all 150ms ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = V.cream;
+                e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = V.ink400;
+                e.currentTarget.style.background = 'transparent';
+              }}
             >
-              <p className="text-sm font-medium text-text-primary truncate">{session.title}</p>
-              <p className="text-xs text-text-muted truncate">
-                {session.messages.length} messages
-              </p>
-            </button>
+              {link.label}
+            </a>
           ))}
+        </nav>
+
+        {/* Sidebar footer — user info */}
+        <div style={{
+          padding: '16px 14px',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+        }}>
+          {user ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 6 }}>
+              <div style={{
+                width: 30, height: 30,
+                background: V.ocean700,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontFamily: V.displayFont, fontSize: 12, fontWeight: 600,
+                color: V.cream, flexShrink: 0,
+              }}>
+                {profile?.name?.charAt(0) || user.email?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontSize: '0.78rem', fontWeight: 500, color: V.cream,
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                }}>
+                  {profile?.name || user.email?.split('@')[0] || 'User'}
+                </div>
+                <div style={{
+                  fontSize: '0.68rem', color: V.ink500,
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                }}>
+                  {user.email}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <a
+              href="/login"
+              style={{
+                display: 'block', textAlign: 'center',
+                padding: '8px 16px', fontSize: '0.8rem',
+                color: V.cream, textDecoration: 'none',
+                border: `1px solid rgba(255,255,255,0.15)`,
+                fontWeight: 500,
+              }}
+            >
+              Sign in
+            </a>
+          )}
         </div>
       </aside>
 
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      {/* ── Main Content Area ── */}
+      <div id="nexus-main-v35" style={{
+        flex: 1,
+        marginLeft: '260px',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        background: V.cream,
+      }}>
+        {/* Top bar */}
         {showHeader && (
-          <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${DS.border}` }}>
-            <div className="flex items-center gap-4">
-              <button 
+          <header style={{
+            height: V.topbarH,
+            background: V.white,
+            borderBottom: `1px solid ${V.ink100}`,
+            display: 'flex', alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 48px',
+            position: 'sticky', top: 0, zIndex: 40,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <button
                 onClick={() => setShowSidebar(true)}
-                className="lg:hidden p-2 text-text-muted hover:text-text-primary"
+                style={{
+                  display: 'none', background: 'none', border: 'none',
+                  cursor: 'pointer', color: V.ink500, padding: 4,
+                }}
+                className="lg:hidden"
               >
-                <Menu className="w-5 h-5" />
+                <Menu style={{ width: 18, height: 18 }} />
               </button>
-              <a href="/" style={{ fontFamily: 'Crimson Pro, Georgia, serif', fontSize: '20px', fontWeight: 600, letterSpacing: '-0.02em', color: DS.text, textDecoration: 'none' }}>NEXUS<span style={{ color: '#C108AB' }}>.</span></a>
+              <span style={{
+                fontFamily: V.monoFont, fontSize: 10,
+                letterSpacing: '0.12em', textTransform: 'uppercase',
+                color: V.ocean600, fontWeight: 500,
+              }}>
+                NEXUS Chat
+              </span>
+              <span style={{ width: 1, height: 16, background: V.ink200 }} />
+              <span style={{
+                fontFamily: V.displayFont, fontSize: '1.05rem',
+                fontWeight: 500, color: V.ink900,
+                letterSpacing: '-0.01em',
+              }}>
+                {sessionId ? 'Active session' : 'New conversation'}
+              </span>
             </div>
-            <div style={{ display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' }}>
-              {/*
-                Brand rule: 5 tiers = Explorer / Starter / Pro / Executive / Council.
-                Currency = miles (mi suffix). The entry tier is "Executive Introduction"
-                — never use the word "free" in the UI.
-              */}
-              {user && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+              {/* Citations badge */}
+              {citations && citations.length > 0 && (
                 <div
-                  className="flex items-center gap-2 px-3 py-1.5"
+                  title={`Grounded on ${citations.length} source${citations.length === 1 ? '' : 's'}`}
                   style={{
-                    background:
-                      canonicalTier === TIER_KEYS_CANONICAL.EXPLORER ? `${DS.accent}14` : '#FFF7ED',
-                    border: `1px solid ${
-                      canonicalTier === TIER_KEYS_CANONICAL.EXPLORER ? `${DS.accent}40` : '#FED7AA'
-                    }`,
- 
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '4px 10px', fontSize: 11,
+                    background: V.ocean50,
+                    border: `1px solid ${V.ocean100}`,
+                    color: V.ocean700, fontWeight: 500,
+                    fontFamily: V.bodyFont,
                   }}
                 >
-                  <Crown
-                    className="w-4 h-4"
-                    style={{
-                      color:
-                        canonicalTier === TIER_KEYS_CANONICAL.EXPLORER ? DS.accent : '#C2410C',
-                    }}
-                  />
-                  <span
-                    className="text-sm font-medium"
-                    style={{
-                      color:
-                        canonicalTier === TIER_KEYS_CANONICAL.EXPLORER ? DS.accent : '#9A3412',
-                    }}
-                  >
-                    {canonicalTierLabel(canonicalTier)}
-                  </span>
+                  <Shield style={{ width: 12, height: 12 }} />
+                  {citations.length} source{citations.length === 1 ? '' : 's'}
                 </div>
               )}
-
-              {/* Miles balance badge (always for signed-in users) */}
+              {/* Miles badge */}
               {user?.id && (
                 <MilesBadge balance={milesBalance ?? 0} size="sm" />
               )}
-
-              {/* S7-T01: intent badge + budget usage */}
+              {/* Intent badge */}
               {lastIntentLabel && (
                 <div
-                  title={`Intent: ${lastIntentLabel} (${lastIntent})`}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#F3F0FF]"
-                  style={{ border: '1px solid #EDE9FE' }}
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-[#7C3AED]" />
-                  <span className="text-xs font-medium text-[#6D28D9]">{lastIntentLabel}</span>
-                </div>
-              )}
-              {budgetStatus && (
-                <div
-                  title={`Daily NEXUS budget: ¥${budgetStatus.spent_cny.toFixed(2)} / ¥${budgetStatus.budget_cny.toFixed(2)} (${budgetStatus.utilization_pct.toFixed(0)}%)`}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-100"
-                  style={{ border: '1px solid #E5E7EB' }}
-                >
-                  <Zap className="w-3.5 h-3.5 text-gray-600" />
-                  <span className="text-xs font-medium text-gray-700">
-                    ¥{budgetStatus.spent_cny.toFixed(1)}/{budgetStatus.budget_cny.toFixed(0)}
-                    {lastUsageTokens !== null && ` · ${lastUsageTokens}t`}
-                  </span>
-                </div>
-              )}
-              {/* S7-T03: tier badge + miles balance + active mandates — rename credits → miles */}
-              {userContextMeta && (
-                <div
-                  title={`Tier: ${userContextMeta.tier} | Seniority: ${userContextMeta.seniority}${
-                    userContextMeta.credit_balance !== null
-                      ? ` | Miles: ${userContextMeta.credit_balance}`
-                      : ''
-                  }${userContextMeta.active_mandates > 0 ? ` | Active mandates: ${userContextMeta.active_mandates}` : ''} | Conversations: ${userContextMeta.conversation_count}`}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#FFF7ED]"
-                  style={{ border: '1px solid #FED7AA' }}
-                >
-                  <Crown className="w-3.5 h-3.5 text-[#C2410C]" />
-                  <span className="text-xs font-medium text-[#9A3412] capitalize">
-                    {mapToCanonicalTier(userContextMeta.tier) === TIER_KEYS_CANONICAL.EXPLORER
-                      ? 'Executive Introduction'
-                      : userContextMeta.tier}
-                  </span>
-                  {userContextMeta.credit_balance !== null && (
-                    <span className="text-xs text-[#9A3412]">
-                      {' '}· {userContextMeta.credit_balance} mi
-                    </span>
-                  )}
-                  {userContextMeta.active_mandates > 0 && (
-                    <span className="text-xs text-[#9A3412]">
-                      {' '}· {userContextMeta.active_mandates} mandate
-                      {userContextMeta.active_mandates === 1 ? '' : 's'}
-                    </span>
-                  )}
-                </div>
-              )}
-              {retrievedMemories !== null && retrievedMemories > 0 && (
-                <div
-                  title={`NEXUS retrieved ${retrievedMemories} relevant memor${retrievedMemories === 1 ? 'y' : 'ies'} from past conversations`}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#ECFDF5]"
-                  style={{ border: '1px solid #A7F3D0' }}
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-[#059669]" />
-                  <span className="text-xs font-medium text-[#047857]">
-                    {retrievedMemories} memor{retrievedMemories === 1 ? 'y' : 'ies'}
-                  </span>
-                </div>
-              )}
-              {citations && citations.length > 0 && (
-                <div
-                  title={`Grounded on ${citations.length} source${citations.length === 1 ? '' : 's'} from the LYC content library:\n${citations.map((c, i) =>`[${i + 1}] ${c.title}${c.source ? ` — ${c.source}` : ''} (${(c.score * 100).toFixed(0)}%)`).join('\n')}`}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#EFF6FF]"
-                  style={{ border: '1px solid #BFDBFE' }}
-                >
-                  <Shield className="w-3.5 h-3.5 text-[#2563EB]" />
-                  <span className="text-xs font-medium text-[#1D4ED8]">
-                    {citations.length} source{citations.length === 1 ? '' : 's'}
-                  </span>
-                </div>
-              )}
-              <a href="/b2b" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>For Firms</a>
-              <a href="/assessment" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Assessments</a>
-              <a href="/match" style={{ fontSize: '13px', color: DS.muted, textDecoration: 'none' }}>Score Match</a>
-            </div>
-          </nav>
-        )}
-
-        <div style={{ flex: 1, maxWidth: '800px', width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', padding: '0 24px' }}>
-          {showHeader && (
-            <div style={{ textAlign: 'center', padding: '32px 0 20px' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', background: `${DS.accent}15`,  marginBottom: '12px' }}>
-                <span className="nexus-pulse-dot" />
-                <span style={{ fontSize: '12px', color: DS.accent, fontWeight: 600 }}>NEXUS</span>
-              </div>
-              <h1 style={{ fontFamily: DS.headingFont, fontSize: '32px', fontWeight: 700, color: DS.text, margin: '0 0 4px' }}>NEXUS</h1>
-              <p style={{ fontSize: '14px', color: DS.muted }}>Know where you stand. Know where to go.</p>
-            </div>
-          )}
-
-          {/* Proactive Suggestions Panel — S7-T05 (only when authenticated) */}
-          {user?.id && (
-            <ProactiveSuggestionsPanel />
-          )}
-
-          {/* Diagnostic Progress Bar — shows when diagnostic started */}
-          {diagnosticProgress > 0 && (
-            <DiagnosticProgressBar
-              dimensions={diagnosticDimensions}
-              progress={diagnosticProgress}
-            />
-          )}
-
-          {/* Milestone Banner — shows session goal progress */}
-          {(milestones.some(m => m.complete) || currentGoal) && (
-            <MilestoneBanner
-              milestones={milestones}
-              currentGoal={currentGoal}
-            />
-          )}
-
-          <div style={{ flex: 1, overflowY: 'auto', marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: 'calc(100vh - 280px)' }}>
-            {messages.map((m, i) => {
-              // ── Branch by metadata type for a product-aware stream renderer ──
-              const type = m.metadata?.type;
-
-              // (a) Recommendation meta-message → render the product CTA card
-              //     (visually distinct, not a chat bubble — per spec)
-              if (type === 'recommendation' && m.metadata?.instrumentCode) {
-                const code = m.metadata.instrumentCode;
-                const kb = NEXUS_ASSESSMENT_KB[code];
-                if (!kb) return null;
-                const rec = m.metadata.recommendation;
-                return (
-                  <div
-                    key={`rec-${i}`}
-                    style={{ alignSelf: 'stretch', width: '100%' }}
-                  >
-                    <AssessmentCtaCard
-                      kb={kb}
-                      rationale={rec?.rationaleText}
-                      outcome={rec?.outcomeText}
-                      currentMilesBalance={milesBalance}
-                      onMilesBalanceChange={(newBal) => setMilesBalance(newBal)}
-                    />
-                  </div>
-                );
-              }
-
-              // (b) Earning meta-message → subtle inline chip, not a full bubble
-              if (type === 'earning') {
-                const amt = m.metadata?.earningAmount || 0;
-                const desc = m.metadata?.earningMessage || 'Miles earned';
-                return (
-                  <div
-                    key={`earn-${i}`}
-                    style={{
-                      alignSelf: 'flex-start',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '6px 12px',
-                      background: `${DS.accent}12`,
-                      border: `1px solid ${DS.accent}40`,
- 
-                      fontFamily: DS.monoFont,
-                      fontSize: '11px',
-                      letterSpacing: '0.06em',
-                      color: DS.accent,
-                      maxWidth: '80%',
-                    }}
-                  >
-                    <Sparkles style={{ width: 11, height: 11 }} />
-                    +{amt} mi · {desc}
-                  </div>
-                );
-              }
-
-              // (c) Default: user/assistant chat bubble
-              const isUser = m.role === 'user';
-              return (
-                <div
-                  key={i}
+                  title={`Intent: ${lastIntentLabel}`}
                   style={{
-                    alignSelf: isUser ? 'flex-end' : 'flex-start',
-                    maxWidth: isUser ? '70%' : '80%',
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '4px 10px', fontSize: 11,
+                    background: '#F3F0FF', border: '1px solid #EDE9FE',
+                    color: '#6D28D9', fontWeight: 500,
                   }}
                 >
-                  <div
-                    style={{
-                      padding: '14px 18px',
-                      background: isUser ? DS.accent : DS.card,
-                      border: isUser ? 'none' : `1px solid ${DS.cardBorder}`,
-                      color: isUser ? '#FFFFFF' : DS.text,
-                      fontSize: '14px',
-                      lineHeight: '1.6',
-                      wordBreak: 'break-word',
- 
-                      whiteSpace: 'pre-wrap',
-                    }}
-                  >
-                    {m.content}
-                  </div>
+                  <Sparkles style={{ width: 12, height: 12 }} />
+                  {lastIntentLabel}
                 </div>
-              );
-            })}
+              )}
+              {/* Budget */}
+              {budgetStatus && (
+                <div
+                  title={`Daily budget: ¥${budgetStatus.spent_cny.toFixed(2)} / ¥${budgetStatus.budget_cny.toFixed(2)}`}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '4px 10px', fontSize: 11,
+                    background: V.ink50, border: `1px solid ${V.ink100}`,
+                    color: V.ink700, fontWeight: 500,
+                  }}
+                >
+                  <Zap style={{ width: 12, height: 12 }} />
+                  ¥{budgetStatus.spent_cny.toFixed(1)}
+                </div>
+              )}
+            </div>
+          </header>
+        )}
 
-            {streamingContent && (
-              <div
-                style={{
-                  alignSelf: 'flex-start',
-                  maxWidth: '80%',
-                  padding: '14px 18px',
-                  background: DS.card,
-                  border: `1px solid ${DS.cardBorder}`,
-                  color: DS.text,
-                  fontSize: '14px',
-                  lineHeight: '1.6',
-                }}
-              >
-                {streamingContent}
-                <span className="animate-pulse">|</span>
+        {/* Chat + Right Rail container */}
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          maxWidth: 1120,
+          width: '100%',
+          margin: '0 auto',
+          padding: '40px 48px 140px',
+          gap: 56,
+        }}>
+          {/* ── Messages Area ── */}
+          <div style={{
+            flex: 1, minWidth: 0,
+            display: 'flex', flexDirection: 'column',
+            gap: 40,
+          }}>
+            {/* Welcome / Onboarding (only for first message, no user msgs yet) */}
+            {messageCount === 0 && messages.length <= 1 && showHeader && (
+              <div style={{ textAlign: 'center', padding: '8px 0 4px' }}>
+                <div style={{
+                  fontFamily: V.displayFont,
+                  fontSize: 28, fontWeight: 600, color: V.ink900,
+                  letterSpacing: '-0.02em', lineHeight: 1.2,
+                  marginBottom: 8,
+                }}>
+                  NEXUS<span style={{ color: V.fuchsia600 }}>.</span>
+                </div>
+                <div style={{ fontSize: '0.9rem', color: V.ink500 }}>
+                  Executive intelligence. Always on.
+                </div>
               </div>
             )}
 
-            {upsellTrigger && (
-              <CouncilUpsell
-                trigger={upsellTrigger}
-                messageCount={messageCount}
-                onUpgrade={() => setShowUpgradeModal(true)}
+            {/* Proactive Suggestions */}
+            {user?.id && <ProactiveSuggestionsPanel />}
+
+            {/* Diagnostic progress */}
+            {diagnosticProgress > 0 && (
+              <DiagnosticProgressBar
+                dimensions={diagnosticDimensions}
+                progress={diagnosticProgress}
               />
             )}
 
-            <CareerInsight
-              messageCount={messageCount}
-              conversationHistory={messages}
-              onUpgrade={() => setShowUpgradeModal(true)}
-            />
+            {/* Milestones */}
+            {(milestones.some(m => m.complete) || currentGoal) && (
+              <MilestoneBanner
+                milestones={milestones}
+                currentGoal={currentGoal}
+              />
+            )}
 
-            {aiState === 'thinking' && !streamingContent && (
-              <div
-                style={{
-                  alignSelf: 'flex-start',
-                  maxWidth: '80%',
-                }}
-              >
-                <div
-                  style={{
-                    padding: '14px 18px',
-                    background: DS.card,
-                    border: `1px solid ${DS.cardBorder}`,
-                    color: DS.muted,
-                    fontSize: '14px',
-                    lineHeight: '1.6',
-                    fontFamily: DS.monoFont,
-                    letterSpacing: '0.15em',
-                  }}
-                >
-                  <span className="animate-pulse">···</span>
+            {/* Messages list */}
+            <div style={{
+              flex: 1, display: 'flex', flexDirection: 'column', gap: 40,
+            }}>
+              {messages.map((m, i) => {
+                const type = m.metadata?.type;
+
+                // Recommendation meta-message
+                if (type === 'recommendation' && m.metadata?.instrumentCode) {
+                  const code = m.metadata.instrumentCode;
+                  const kb = NEXUS_ASSESSMENT_KB[code];
+                  if (!kb) return null;
+                  const rec = m.metadata.recommendation;
+                  return (
+                    <div key={`rec-${i}`} style={{ alignSelf: 'stretch', width: '100%' }}>
+                      <AssessmentCtaCard
+                        kb={kb}
+                        rationale={rec?.rationaleText}
+                        outcome={rec?.outcomeText}
+                        currentMilesBalance={milesBalance}
+                        onMilesBalanceChange={(newBal) => setMilesBalance(newBal)}
+                      />
+                    </div>
+                  );
+                }
+
+                // Earning meta-message
+                if (type === 'earning') {
+                  const amt = m.metadata?.earningAmount || 0;
+                  const desc = m.metadata?.earningMessage || 'Miles earned';
+                  return (
+                    <div
+                      key={`earn-${i}`}
+                      style={{
+                        alignSelf: 'flex-start',
+                        display: 'inline-flex', alignItems: 'center', gap: 8,
+                        padding: '6px 12px',
+                        background: `${V.fuchsia600}15`,
+                        border: `1px solid ${V.fuchsia600}40`,
+                        fontFamily: V.monoFont,
+                        fontSize: 11, letterSpacing: '0.06em',
+                        color: V.fuchsia600,
+                      }}
+                    >
+                      <Sparkles style={{ width: 11, height: 11 }} />
+                      +{amt} mi · {desc}
+                    </div>
+                  );
+                }
+
+                // User message
+                if (m.role === 'user') {
+                  return (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <div style={{ maxWidth: 460 }}>
+                        <div style={{
+                          padding: '14px 18px',
+                          background: V.ocean700,
+                          color: V.cream,
+                          fontSize: '0.9rem', lineHeight: 1.6,
+                          textAlign: 'left',
+                        }}>
+                          {m.content}
+                        </div>
+                        <div style={{
+                          textAlign: 'right', marginTop: 6,
+                          fontFamily: V.monoFont, fontSize: 9.5,
+                          letterSpacing: '0.1em', textTransform: 'uppercase',
+                          color: V.ink400,
+                        }}>
+                          you
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                // Assistant (NEXUS) message
+                return (
+                  <div key={i} style={{ display: 'flex', gap: 14 }}>
+                    <FairyAvatar />
+                    <div style={{ flex: 1, minWidth: 0, maxWidth: 640 }}>
+                      <div style={{
+                        display: 'flex', alignItems: 'baseline', gap: 12,
+                        marginBottom: 12,
+                      }}>
+                        <span style={{
+                          fontFamily: V.displayFont,
+                          fontSize: '0.95rem', fontWeight: 500,
+                          color: V.ink900,
+                        }}>NEXUS</span>
+                        {m.timestamp && (
+                          <span style={{
+                            fontFamily: V.monoFont, fontSize: 9.5,
+                            letterSpacing: '0.1em', textTransform: 'uppercase',
+                            color: V.ink400,
+                          }}>{formatTime(m.timestamp)}</span>
+                        )}
+                      </div>
+                      <div style={{
+                        fontSize: '0.95rem', lineHeight: 1.75,
+                        color: V.ink700,
+                      }}>
+                        {m.content}
+                      </div>
+                      <div style={{
+                        marginTop: 20, paddingTop: 14,
+                        borderTop: `1px solid ${V.ink100}`,
+                        display: 'flex', alignItems: 'center', gap: 20,
+                      }}>
+                        <span style={{
+                          fontFamily: V.monoFont, fontSize: 9.5,
+                          letterSpacing: '0.1em', textTransform: 'uppercase',
+                          color: V.ink400, cursor: 'pointer',
+                          fontWeight: 500,
+                          transition: 'color 150ms ease',
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.color = V.ink700; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = V.ink400; }}
+                        onClick={() => {
+                          navigator.clipboard?.writeText(m.content);
+                        }}
+                        >
+                          Copy
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Streaming indicator */}
+              {streamingContent && (
+                <div style={{ display: 'flex', gap: 14 }}>
+                  <FairyAvatar />
+                  <div style={{
+                    flex: 1, maxWidth: 640,
+                    padding: 0, fontSize: '0.95rem', lineHeight: 1.75,
+                    color: V.ink700,
+                  }}>
+                    {streamingContent}
+                    <span style={{
+                      display: 'inline-block', width: 2, height: '1em',
+                      background: V.ink400, marginLeft: 2,
+                      verticalAlign: 'text-bottom',
+                      animation: 'nf-pulse 1s ease-in-out infinite',
+                    }} />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {aiState === 'error' && (
-              <div style={{ alignSelf: 'flex-start', width: '100%', maxWidth: '400px', background: 'rgba(193, 8, 171, 0.1)', border: '1px solid rgba(193, 8, 171, 0.3)',  padding: '16px' }}>
-                <p style={{ fontSize: '13px', color: DS.textSecondary, marginBottom: '12px' }}>
-                  Oops, something went wrong. Want to try again?
-                </p>
-                <button
-                  onClick={retry}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '8px 16px',
-                    background: DS.accent,
-                    color: '#FFFFFF',
-                    border: 'none',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    minHeight: '36px'
-                  }}
-                >
-                  <RefreshCw style={{ width: 14, height: 14 }} />
-                  Retry
-                </button>
-              </div>
-            )}
-            <div ref={chatEndRef} />
-          </div>
+              {/* Thinking state */}
+              {aiState === 'thinking' && !streamingContent && (
+                <div style={{ display: 'flex', gap: 14 }}>
+                  <FairyAvatar />
+                  <div style={{
+                    padding: '14px 18px',
+                    fontFamily: V.monoFont,
+                    fontSize: 11, letterSpacing: '0.15em',
+                    color: V.ink400,
+                  }}>
+                    <span style={{ animation: 'nf-pulse 1.2s ease-in-out infinite' }}>···</span>
+                  </div>
+                </div>
+              )}
 
-          <div className="space-y-3 mb-4">
-            <p className="text-xs text-text-muted text-center">Suggested questions:</p>
-            <div className="flex flex-wrap gap-2 justify-center">
-              {suggestedPrompts.slice(0, 3).map((prompt, i) => (
-                <button
-                  key={i}
-                  onClick={() => handlePromptSelect(prompt)}
-                  className="px-3 py-1.5 bg-bg-tertiary hover:bg-bg-secondary text-text-muted hover:text-text-primary text-xs transition-colors"
-                >
-                  {prompt}
-                </button>
-              ))}
+              {/* Error state */}
+              {aiState === 'error' && (
+                <div style={{
+                  alignSelf: 'flex-start', width: '100%', maxWidth: 400,
+                  background: 'rgba(193, 8, 171, 0.08)',
+                  border: `1px solid rgba(193, 8, 171, 0.25)`,
+                  padding: 16,
+                }}>
+                  <p style={{ fontSize: '0.85rem', color: V.ink700, marginBottom: 12 }}>
+                    NEXUS is temporarily unavailable — want to try again?
+                  </p>
+                  <button
+                    onClick={retry}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      padding: '8px 16px',
+                      background: V.fuchsia600, color: '#fff', border: 'none',
+                      fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer',
+                      fontFamily: V.bodyFont,
+                    }}
+                  >
+                    <RefreshCw style={{ width: 14, height: 14 }} />
+                    Retry
+                  </button>
+                </div>
+              )}
+
+              {/* Upsell & career insight (keep existing) */}
+              {upsellTrigger && (
+                <CouncilUpsell
+                  trigger={upsellTrigger}
+                  messageCount={messageCount}
+                  onUpgrade={() => setShowUpgradeModal(true)}
+                />
+              )}
+              <CareerInsight
+                messageCount={messageCount}
+                conversationHistory={messages}
+                onUpgrade={() => setShowUpgradeModal(true)}
+              />
+
+              <div ref={chatEndRef} />
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
+          {/* ── Right Context Rail ── */}
+          {showHeader && messages.length > 1 && (
+            <aside style={{
+              width: V.railW, flexShrink: 0, paddingTop: 4,
+            }}>
+              {/* Session info */}
+              <div style={{ marginBottom: 28 }}>
+                <div style={{
+                  fontFamily: V.monoFont, fontSize: 9.5,
+                  letterSpacing: '0.14em', textTransform: 'uppercase',
+                  color: V.ink400, marginBottom: 12,
+                  paddingBottom: 10, borderBottom: `1px solid ${V.ink100}`,
+                  fontWeight: 500,
+                }}>
+                  Session
+                </div>
+                <div style={{
+                  padding: '8px 0',
+                  borderBottom: `1px solid ${V.ink50}`,
+                }}>
+                  <div style={{ fontSize: '0.72rem', color: V.ink500, marginBottom: 3 }}>
+                    Messages
+                  </div>
+                  <div style={{ fontSize: '0.82rem', color: V.ink900, fontWeight: 500 }}>
+                    {messageCount} turns
+                  </div>
+                </div>
+                {user?.id && milesBalance !== null && (
+                  <div style={{
+                    padding: '8px 0',
+                    borderBottom: `1px solid ${V.ink50}`,
+                  }}>
+                    <div style={{ fontSize: '0.72rem', color: V.ink500, marginBottom: 3 }}>
+                      Miles balance
+                    </div>
+                    <div style={{
+                      fontFamily: V.monoFont, fontSize: '0.7rem',
+                      fontWeight: 500, color: V.ocean600,
+                      letterSpacing: '0.05em',
+                    }}>
+                      {milesBalance} mi
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Try next */}
+              {suggestedPrompts.length > 0 && messageCount > 0 && (
+                <div style={{ marginBottom: 28 }}>
+                  <div style={{
+                    fontFamily: V.monoFont, fontSize: 9.5,
+                    letterSpacing: '0.14em', textTransform: 'uppercase',
+                    color: V.ink400, marginBottom: 12,
+                    paddingBottom: 10, borderBottom: `1px solid ${V.ink100}`,
+                    fontWeight: 500,
+                  }}>
+                    Try next
+                  </div>
+                  {suggestedPrompts.slice(0, 3).map((prompt, i) => (
+                    <div
+                      key={i}
+                      onClick={() => handlePromptSelect(prompt)}
+                      style={{
+                        padding: '9px 11px',
+                        border: `1px solid ${V.ink100}`,
+                        marginBottom: 6,
+                        fontSize: '0.76rem', color: V.ink700,
+                        cursor: 'pointer',
+                        transition: 'all 150ms ease',
+                        lineHeight: 1.45,
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = V.ocean300;
+                        e.currentTarget.style.background = V.ocean50;
+                        e.currentTarget.style.color = V.ocean700;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = V.ink100;
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.color = V.ink700;
+                      }}
+                    >
+                      {prompt}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Citations (if present) */}
+              {citations && citations.length > 0 && (
+                <div style={{ marginBottom: 28 }}>
+                  <div style={{
+                    fontFamily: V.monoFont, fontSize: 9.5,
+                    letterSpacing: '0.14em', textTransform: 'uppercase',
+                    color: V.ink400, marginBottom: 12,
+                    paddingBottom: 10, borderBottom: `1px solid ${V.ink100}`,
+                    fontWeight: 500,
+                  }}>
+                    Sources
+                  </div>
+                  {citations.slice(0, 4).map((c, i) => (
+                    <div key={i} style={{
+                      padding: '8px 0',
+                      borderBottom: `1px solid ${V.ink50}`,
+                    }}>
+                      <div style={{
+                        fontSize: '0.76rem', color: V.ink900,
+                        fontWeight: 500, lineHeight: 1.4,
+                      }}>
+                        {c.title}
+                      </div>
+                      {c.source && (
+                        <div style={{
+                          fontSize: '0.68rem', color: V.ink400,
+                          marginTop: 2, fontFamily: V.monoFont,
+                        }}>
+                          {c.source}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Tier / upgrade CTA for Explorer */}
+              {canonicalTier === TIER_KEYS_CANONICAL.EXPLORER && messageCount > 2 && (
+                <div style={{
+                  padding: 14,
+                  border: `1px solid ${V.ocean100}`,
+                  background: V.ocean50,
+                }}>
+                  <div style={{
+                    fontFamily: V.displayFont, fontSize: '0.9rem',
+                    fontWeight: 500, color: V.ocean800,
+                    marginBottom: 4,
+                  }}>
+                    Upgrade to Pro
+                  </div>
+                  <div style={{
+                    fontSize: '0.72rem', color: V.ocean600,
+                    lineHeight: 1.5, marginBottom: 10,
+                  }}>
+                    Unlock all 6 leadership assessments and deeper analysis.
+                  </div>
+                  <a
+                    href="/pricing"
+                    style={{
+                      fontSize: '0.7rem', color: V.ocean700,
+                      fontWeight: 500, textDecoration: 'none',
+                      fontFamily: V.monoFont, letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    View plans →
+                  </a>
+                </div>
+              )}
+            </aside>
+          )}
+        </div>
+
+        {/* ── Composer ── */}
+        <div id="nexus-composer-wrap" style={{
+          position: 'fixed',
+          bottom: 0,
+          left: '260px',,
+          right: 0, // mobile: left: 0 (overridden by #nexus-composer-v35 media query)
+          padding: '20px 48px 32px',
+          background: `linear-gradient(to top, ${V.cream} 65%, rgba(250,250,250,0))`,
+          zIndex: 30,
+          pointerEvents: 'none',
+        }}>
+          <div id="nexus-composer-inner" style={{
+            maxWidth: 640,
+            marginLeft: 42,
+            pointerEvents: 'auto',
+            background: V.white,
+            border: `1px solid ${V.ink200}`,
+            transition: 'border-color 200ms ease, box-shadow 200ms ease',
+          }}
+          onFocusIn={(e) => {
+            e.currentTarget.style.borderColor = V.ocean500;
+            e.currentTarget.style.boxShadow = '0 2px 20px rgba(15, 44, 74, 0.08)';
+          }}
+          onFocusOut={(e) => {
+            e.currentTarget.style.borderColor = V.ink200;
+            e.currentTarget.style.boxShadow = 'none';
+          }}
+          >
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -1199,68 +1733,115 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
                   send();
                 }
               }}
-              placeholder="Ask about LYC Partners, executive search, career strategy..."
+              placeholder="Ask NEXUS anything — strategy, research, diagnostics..."
+              rows={2}
               style={{
-                flex: 1,
-                padding: '14px 16px',
-                background: DS.card,
-                border: `1px solid ${DS.cardBorder}`,
-                color: DS.text,
-                fontSize: '14px',
-                outline: 'none',
-                resize: 'none',
+                width: '100%',
+                padding: '16px 18px 12px',
+                border: 'none', outline: 'none', resize: 'none',
                 fontFamily: 'inherit',
-                lineHeight: '1.4',
-                minHeight: '44px',
-                maxHeight: '200px',
+                fontSize: '0.9rem', lineHeight: 1.6,
+                color: V.ink900, background: 'transparent',
+                minHeight: 46, maxHeight: 180,
               }}
-              rows={1}
             />
-            <button
-              onClick={handleDocumentUpload}
-              disabled={loading}
-              style={{
-                padding: '14px',
-                background: DS.card,
-                border: `1px solid ${DS.cardBorder}`,
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.5 : 1,
-                minHeight: '44px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              {loading ? (
-                <Loader2 style={{ width: 18, height: 18, color: DS.accent, animation: 'spin 1s linear infinite' }} />
-              ) : (
-                <Paperclip style={{ width: 18, height: 18, color: DS.textSecondary }} />
-              )}
-            </button>
-            <button
-              onClick={send}
-              disabled={loading || !input.trim()}
-              style={{
-                padding: '14px 20px',
-                background: DS.accent,
-                color: '#FFFFFF',
-                border: 'none',
-                cursor: (loading || !input.trim()) ? 'not-allowed' : 'pointer',
-                opacity: (loading || !input.trim()) ? 0.5 : 1,
-                minHeight: '44px',
-              }}
-            >
-              <ArrowRight style={{ width: 18, height: 18 }} />
-            </button>
+            <div style={{
+              display: 'flex', alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '8px 12px 10px',
+              borderTop: `1px solid ${V.ink100}`,
+            }}>
+              <div style={{ display: 'flex', gap: 4 }}>
+                <button
+                  onClick={handleDocumentUpload}
+                  disabled={loading}
+                  style={{
+                    width: 30, height: 30,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: V.ink400, cursor: loading ? 'not-allowed' : 'pointer',
+                    background: 'none', border: 'none',
+                    opacity: loading ? 0.5 : 1,
+                    transition: 'all 150ms ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!loading) {
+                      e.currentTarget.style.color = V.ink700;
+                      e.currentTarget.style.background = V.ink50;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = V.ink400;
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                  title="Attach document"
+                >
+                  <Paperclip style={{ width: 15, height: 15 }} />
+                </button>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                {user?.id && (
+                  <span style={{
+                    fontFamily: V.monoFont, fontSize: 9.5,
+                    letterSpacing: '0.1em', textTransform: 'uppercase',
+                    color: V.teal600, fontWeight: 500,
+                  }}>
+                    ~0.5 mi
+                  </span>
+                )}
+                <button
+                  onClick={send}
+                  disabled={loading || !input.trim()}
+                  style={{
+                    padding: '8px 20px',
+                    background: V.ocean700,
+                    color: V.cream,
+                    border: 'none',
+                    fontFamily: 'inherit',
+                    fontSize: '0.8rem', fontWeight: 500,
+                    cursor: (loading || !input.trim()) ? 'not-allowed' : 'pointer',
+                    opacity: (loading || !input.trim()) ? 0.5 : 1,
+                    transition: 'background 200ms ease',
+                    letterSpacing: '0.01em',
+                    display: 'flex', alignItems: 'center', gap: 6,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!loading && input.trim()) {
+                      e.currentTarget.style.background = V.ocean600;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = V.ocean700;
+                  }}
+                >
+                  {loading ? (
+                    <Loader2 style={{ width: 14, height: 14, animation: 'spin 1s linear infinite' }} />
+                  ) : (
+                    <ArrowRight style={{ width: 14, height: 14 }} />
+                  )}
+                  Send
+                </button>
+              </div>
+            </div>
           </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center', marginBottom: '20px' }}>
-            <Shield style={{ width: 12, height: 12, color: DS.muted }} />
-            <span style={{ fontSize: '11px', color: DS.muted }}>Executive intelligence. Always on.</span>
+          <div style={{
+            display: 'flex', alignItems: 'center',
+            justifyContent: 'center', gap: 6,
+            marginTop: 12,
+            pointerEvents: 'auto',
+          }}>
+            <Shield style={{ width: 12, height: 12, color: V.ink400 }} />
+            <span style={{
+              fontFamily: V.monoFont, fontSize: 9.5,
+              letterSpacing: '0.08em', textTransform: 'uppercase',
+              color: V.ink400,
+            }}>
+              Executive intelligence. Always on.
+            </span>
           </div>
         </div>
       </div>
 
+      {/* ── Modals (keep existing) ── */}
       {pendingApproval && (
         <CreditGate
           messageCount={messageCount + 1}
@@ -1272,65 +1853,60 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
 
       {showUpgradeModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white max-w-lg w-full overflow-hidden shadow-2xl" style={{ }}>
-            <div className="p-6 text-white" style={{ background: `linear-gradient(135deg, ${DS.accent} 0%, #8B067B 100%)` }}>
+          <div className="bg-white max-w-lg w-full overflow-hidden shadow-2xl">
+            <div className="p-6 text-white" style={{ background: `linear-gradient(135deg, ${V.fuchsia600} 0%, #8B067B 100%)` }}>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-white/20 flex items-center justify-center">
                   <Crown className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold" style={{ fontFamily: DS.headingFont }}>Starter & Pro — add miles to your plan</h3>
+                  <h3 className="text-xl font-bold" style={{ fontFamily: V.displayFont }}>Starter &amp; Pro — add miles to your plan</h3>
                   <p className="text-white/80 text-sm">Move past Executive Introduction. Open all 6 leadership assessments with miles.</p>
                 </div>
               </div>
             </div>
-
             <div className="p-6">
               <div className="space-y-4 mb-6">
                 <div className="flex items-center gap-3">
-                  <Sparkles className="w-5 h-5" style={{ color: DS.accent }} />
+                  <Sparkles className="w-5 h-5" style={{ color: V.fuchsia600 }} />
                   <div>
                     <p className="font-semibold text-text-primary">Earn + spend miles</p>
                     <p className="text-sm text-text-muted">Deep dives earn +5 mi. Reflections +3 mi. Assessments refund +10 mi.</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Award className="w-5 h-5" style={{ color: DS.accent }} />
+                  <Award className="w-5 h-5" style={{ color: V.fuchsia600 }} />
                   <div>
                     <p className="font-semibold text-text-primary">All 6 leadership assessments</p>
                     <p className="text-sm text-text-muted">Standard and Premium tiers, covering transition, execution, AI readiness, cross-border, and global navigation.</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Shield className="w-5 h-5" style={{ color: DS.accent }} />
+                  <Shield className="w-5 h-5" style={{ color: V.fuchsia600 }} />
                   <div>
                     <p className="font-semibold text-text-primary">Personalised reports</p>
                     <p className="text-sm text-text-muted">Per-dimension bands, blind-spot mapping, C-suite benchmarked.</p>
                   </div>
                 </div>
               </div>
-
               <div className="text-center mb-6">
-                <p className="text-3xl font-bold" style={{ color: DS.accent, fontFamily: DS.headingFont }}>from $29</p>
+                <p className="text-3xl font-bold" style={{ color: V.fuchsia600, fontFamily: V.displayFont }}>from $29</p>
                 <p className="text-text-muted text-sm">per month · Starter tier</p>
               </div>
-
               <button
                 onClick={() => {
                   setShowUpgradeModal(false);
                   window.open('/pricing', '_blank');
                 }}
-                className="w-full py-3 px-4 bg-accent text-white font-medium hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
-                style={{ }}
+                className="w-full py-3 px-4 text-white font-medium flex items-center justify-center gap-2"
+                style={{ background: V.fuchsia600 }}
               >
                 Add miles to plan
                 <ArrowRight className="w-4 h-4" />
               </button>
-
               <button
                 onClick={() => setShowUpgradeModal(false)}
-                className="w-full mt-3 py-3 px-4 bg-bg-tertiary text-text-primary font-medium hover:bg-bg-secondary transition-colors"
-                style={{ }}
+                className="w-full mt-3 py-3 px-4 bg-bg-tertiary text-text-primary font-medium"
               >
                 Keep exploring
               </button>
