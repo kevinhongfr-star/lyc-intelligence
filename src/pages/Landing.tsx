@@ -765,7 +765,7 @@ function Testimonial(): React.ReactElement {
             margin: 0,
           }}
         >
-          Willy Te / VP Operations · Fortune 500
+          VP Operations · Fortune 500
         </p>
       </div>
     </section>
