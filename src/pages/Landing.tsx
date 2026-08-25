@@ -765,7 +765,7 @@ function Testimonial(): React.ReactElement {
             margin: 0,
           }}
         >
-          VP Operations · Fortune 500
+          Jeffrey Ng / VP Operations · Fortune 500
         </p>
       </div>
     </section>
