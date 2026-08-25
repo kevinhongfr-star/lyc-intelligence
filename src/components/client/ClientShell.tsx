@@ -62,12 +62,13 @@ export function ClientShell() {
         }`}
       >
         <div className="h-16 flex items-center gap-3 px-5 border-b border-bg-tertiary">
-          <div className="w-9 h-9 flex items-center justify-center text-white font-bold text-sm" style={{ background: '#C108AB' }}>
-            LYC
-          </div>
           <div>
-            <div className="text-sm font-semibold text-text-primary">Client Portal</div>
-            <div className="text-xs text-text-muted">Executive Search</div>
+            <div style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1 }}>
+              NEXUS<span style={{ color: '#C108AB' }}>.</span>
+            </div>
+            <div className="text-xs text-text-muted mt-1" style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: '4px' }}>
+              Client Portal
+            </div>
           </div>
         </div>
 

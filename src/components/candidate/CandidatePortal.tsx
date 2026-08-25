@@ -301,7 +301,7 @@ export function CandidatePortal({ candidateId, onLogout }: CandidatePortalProps)
         <div className="p-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-accent flex items-center justify-center">
-              <span className="text-white font-bold text-lg">LYC</span>
+              <span style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: "18px", fontWeight: 600, letterSpacing: "-0.02em" }}>NEXUS<span style={{ color: "#C108AB" }}>.</span></span>
             </div>
             {sidebarOpen && (
               <span className="font-semibold text-text-primary">Candidate Portal</span>

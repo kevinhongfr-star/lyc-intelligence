@@ -76,7 +76,7 @@ function Nav({ config }: { config: AssessmentLandingConfig }) {
             fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
             fontSize: 10, fontWeight: 400, textTransform: 'uppercase',
             letterSpacing: '0.08em', color: EYEBROW_GRAY,
-          }}>by LYC</span>
+          }}>by NEXUS</span>
         </Link>
         <ul className="al-nav-desktop" style={{ display: 'flex', gap: 28, listStyle: 'none', alignItems: 'center', margin: 0, padding: 0 }}>
           <li><a href="#discover" style={navLinkStyle}
@@ -625,7 +625,7 @@ function Footer({ config }: { config: AssessmentLandingConfig }) {
           <div>
             <span style={{ fontFamily: serif, fontSize: 18, fontWeight: 700, color: INK }}>{name}</span>
             <p style={{ fontSize: 13, color: G600, marginTop: 12, lineHeight: 1.5 }}>
-              Part of the LYC Intelligence assessment suite. Know where you stand. Know where to go.
+              Powered by NEXUS — Executive intelligence. Always on.
             </p>
           </div>
           <div>
@@ -643,7 +643,7 @@ function Footer({ config }: { config: AssessmentLandingConfig }) {
             <div style={{ ...monoStyle, color: EYEBROW_GRAY, marginBottom: 12 }}>Platform</div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <Link to="/nexus" style={footerLink}>NEXUS</Link>
-              <Link to="/dex-ai" style={footerLink}>LYC Intelligence</Link>
+              <Link to="/" style={footerLink}>NEXUS</Link>
               <Link to="/pricing" style={footerLink}>Pricing</Link>
               <Link to="/login" style={footerLink}>Login</Link>
             </div>
@@ -653,7 +653,7 @@ function Footer({ config }: { config: AssessmentLandingConfig }) {
           paddingTop: 32, borderTop: `1px solid ${G200}`,
           display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12,
         }}>
-          <span style={{ fontSize: 12, color: EYEBROW_GRAY }}>© 2026 LYC Intelligence by LYC Partners.</span>
+          <span style={{ fontSize: 12, color: EYEBROW_GRAY }}>© 2026 NEXUS by LYC Partners.</span>
           <span style={{ ...monoStyle, color: ACCENT }}>{name}</span>
         </div>
       </div>

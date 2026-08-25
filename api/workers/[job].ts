@@ -409,7 +409,7 @@ async function handleTemplateRender(
           ${body.content || escapeHtml(`This is the ${kind} email template. Content will be populated when the full email engine is available.`)}
         </p>
       </div>
-      <p style="font-size:12px;color:#999;text-align:center;">LYC Intelligence · Executive Intelligence</p>
+      <p style="font-size:12px;color:#999;text-align:center;">NEXUS · Executive Intelligence</p>
     </td></tr>
   </table>
 </body>

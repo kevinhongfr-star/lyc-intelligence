@@ -262,7 +262,7 @@ export function renderAssessmentEmailTemplate(invitation: AssessmentInvitationDa
 } {
   const subject = `Assessment Invitation for ${invitation.mandate_title}`;
 
-  const body = `Hi ${invitation.candidate_name}, You've been invited to complete a ${invitation.assessment_type} assessment for ${invitation.mandate_title} at ${invitation.client_name}. Click here to start: ${invitation.assessment_link} Estimated time: ${invitation.duration_minutes} minutes. Important notes: - The assessment is mobile-friendly, so you can complete it on any device - Your progress is auto-saved, so you can resume if interrupted ${invitation.expires_at ?`- Please complete by ${new Date(invitation.expires_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`: ''} If you have any questions, please contact ${invitation.consultant_name} at ${invitation.consultant_email}. Best regards, LYC Intelligence`.trim();
+  const body = `Hi ${invitation.candidate_name}, You've been invited to complete a ${invitation.assessment_type} assessment for ${invitation.mandate_title} at ${invitation.client_name}. Click here to start: ${invitation.assessment_link} Estimated time: ${invitation.duration_minutes} minutes. Important notes: - The assessment is mobile-friendly, so you can complete it on any device - Your progress is auto-saved, so you can resume if interrupted ${invitation.expires_at ?`- Please complete by ${new Date(invitation.expires_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`: ''} If you have any questions, please contact ${invitation.consultant_name} at ${invitation.consultant_email}. Best regards, NEXUS — Executive Intelligence by LYC Partners`.trim();
 
   return { subject, body };
 }

@@ -72,14 +72,14 @@ function Footer({ config }: { config: AssessmentResultsConfig }) {
               fontSize: 18, fontWeight: 700, color: INK,
             }}>{assessmentName}</span>
             <p style={{ fontSize: 13, color: G600, marginTop: 12, lineHeight: 1.5, maxWidth: 300 }}>
-              Part of the LYC Intelligence diagnostic suite. Know where you stand. Know where to go.
+              Powered by NEXUS — Executive intelligence. Always on.
             </p>
           </div>
           <div>
             <div style={{ ...monoStyle, color: G400, marginBottom: 12 }}>Platform</div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <Link to="/nexus" style={footerLink}>NEXUS</Link>
-              <Link to="/dex-ai" style={footerLink}>LYC Intelligence</Link>
+              <Link to="/" style={footerLink}>NEXUS</Link>
               <Link to="/pricing" style={footerLink}>Pricing</Link>
             </div>
           </div>
@@ -89,7 +89,7 @@ function Footer({ config }: { config: AssessmentResultsConfig }) {
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           <span style={{ fontSize: 12, color: G400 }}>
-            © 2026 LYC Intelligence by LYC Partners.
+            © 2026 NEXUS by LYC Partners.
           </span>
           <span style={{ ...monoStyle, color: accent }}>
             {assessmentName}

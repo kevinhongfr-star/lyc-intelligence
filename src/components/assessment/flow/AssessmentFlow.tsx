@@ -776,7 +776,7 @@ export function AssessmentFlow({ config }: Props) {
               fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
               fontSize: 9, fontWeight: 400, textTransform: 'uppercase',
               letterSpacing: '0.08em', color: G400,
-            }}>by LYC</span>
+            }}>by NEXUS</span>
           </Link>
           <Link to={landingPath} style={{
             fontSize: 13, color: G600, textDecoration: 'none',

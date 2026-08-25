@@ -59,7 +59,7 @@ export const ResultExportBar: React.FC<ResultExportBarProps> = ({
   };
 
   const handleCopyEmailLink = async () => {
-    const subject = encodeURIComponent(`My ${code} Assessment Report from LYC`);
+    const subject = encodeURIComponent(`My ${code} Assessment Report from NEXUS`);
     const body = encodeURIComponent(`Here are my ${code} assessment results:\n\n${pageUrl}\n\nView the full report online.`);
     const mailto = `mailto:?subject=${subject}&body=${body}`;
     try {
@@ -89,12 +89,12 @@ export const ResultExportBar: React.FC<ResultExportBarProps> = ({
 
   const openTwitter = () => {
     const url = encodeURIComponent(pageUrl);
-    const text = encodeURIComponent(`My ${code} Assessment Report from LYC`);
+    const text = encodeURIComponent(`My ${code} Assessment Report from NEXUS`);
     window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank', 'noopener,noreferrer,width=600,height=600');
   };
 
   const openMailto = () => {
-    const subject = encodeURIComponent(`My ${code} Assessment Report from LYC`);
+    const subject = encodeURIComponent(`My ${code} Assessment Report from NEXUS`);
     const body = encodeURIComponent(`Here are my ${code} assessment results:\n\n${pageUrl}\n\nView the full report online.`);
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
   };

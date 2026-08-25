@@ -346,7 +346,7 @@ export function CandidateResults({ result, onClose, showExitButton = true }: Can
       <footer className="bg-white border-t border-gray-200 mt-8">
         <div className="max-w-2xl mx-auto px-4 py-6 text-center text-sm text-text-muted">
           <p>
-            This assessment was conducted by LYC Intelligence as part of the executive search process
+            This assessment is powered by NEXUS — Executive intelligence by LYC Partners
             for {result.mandate_title}.
           </p>
           <p className="mt-2">

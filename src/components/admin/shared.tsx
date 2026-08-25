@@ -185,7 +185,7 @@ export const B2C_ADMIN = {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontFamily: HEADING, fontWeight: 700, fontSize: 14,
               userSelect: 'none',
-            }} aria-hidden="true">LYC</div>
+            }} aria-hidden="true">NEXUS<span style={{ color: "#C108AB" }}>.</span></div>
             <div style={{ minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <h1 style={{

@@ -80,7 +80,7 @@ export function ClientMandateList({ onMandateClick }: ClientMandateListProps) {
           <div className="flex items-center gap-3">
             <Building2 className="w-8 h-8 text-blue-600" />
             <div>
-              <h1 className="text-xl font-bold text-gray-800">LYC Intelligence</h1>
+              <h1 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: "22px", fontWeight: 600, letterSpacing: "-0.02em" }}>NEXUS<span style={{ color: "#C108AB" }}>.</span></h1>
               <p className="text-sm text-gray-500">Client Portal</p>
             </div>
           </div>

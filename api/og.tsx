@@ -2,8 +2,8 @@
  * Phase 17 / T01 (#1287) — Dynamic OG image generator.
  *
  * Edge function using @vercel/og's ImageResponse.
- * Renders 1200×630 PNG with LYC Intelligence brand template:
- *   - LYC wordmark in corner
+ * Renders 1200×630 PNG with NEXUS brand template:
+ *   - NEXUS wordmark in corner
  *   - Page title in system serif stack (generic serif family)
  *   - Accent color bar at bottom (#C108AB)
  *   - One template, per-page title variable
@@ -29,7 +29,7 @@ const BODY_FONT = '"DM Sans", system-ui, sans-serif';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<ImageResponse> {
   const { searchParams } = new URL(req.url || 'http://localhost');
-  const title = (searchParams.get('title') || 'LYC Intelligence').slice(0, 80);
+  const title = (searchParams.get('title') || 'NEXUS').slice(0, 80);
   const subtitle = (searchParams.get('subtitle') || '').slice(0, 120);
 
   return new ImageResponse(
@@ -81,7 +81,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
               color: '#000000',
             }}
           >
-            LYC Intelligence
+            NEXUS.
           </span>
         </div>
 

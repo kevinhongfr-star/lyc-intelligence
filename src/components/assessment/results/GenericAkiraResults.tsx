@@ -250,7 +250,7 @@ export function GenericAkiraResults({
 
   const handleDownload = useCallback(() => {
     if (!state.standaloneHtml || !state.sourceLabel) return;
-    const filename = `LYC_${instrumentKey}_Report_${resultId || new Date().toISOString().split('T')[0]}.html`;
+    const filename = `NEXUS_${instrumentKey}_Report_${resultId || new Date().toISOString().split('T')[0]}.html`;
     downloadBlob(filename, state.standaloneHtml);
   }, [instrumentKey, resultId, state.standaloneHtml, state.sourceLabel]);
 
@@ -574,7 +574,7 @@ export function GenericAkiraResults({
                 {instrumentKey}
               </span>
               <p style={{ fontSize: 13, color: G600, marginTop: 12, lineHeight: 1.5, maxWidth: 300 }}>
-                Part of the LYC Intelligence diagnostic suite. Know where you stand. Know where to go.
+                Powered by NEXUS — Executive intelligence. Always on.
               </p>
             </div>
             <div>
@@ -607,7 +607,7 @@ export function GenericAkiraResults({
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           }}>
             <span style={{ fontSize: 12, color: G400 }}>
-              © 2026 LYC Intelligence by LYC Partners.
+              © 2026 NEXUS by LYC Partners.
             </span>
             <span style={{ ...monoStyle, color: ACCENT }}>
               {instrumentKey}

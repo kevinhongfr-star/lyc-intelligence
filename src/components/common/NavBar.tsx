@@ -53,8 +53,8 @@ export function NavBar() {
       zIndex: 100,
     }}>
       {/* Logo */}
-      <Link to="/dashboard" style={{ fontFamily: DS.headingFont, fontSize: '18px', fontWeight: 700, color: DS.text, textDecoration: 'none' }}>
-        LYC Intelligence
+      <Link to="/dashboard" style={{ fontFamily: 'Crimson Pro\, Georgia, serif, fontSize: '20px', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1, color: DS.text, textDecoration: 'none' }}>
+        NEXUS<span style={{ color: DS.accent }}>.</span>
       </Link>
 
       {/* Desktop Navigation */}
