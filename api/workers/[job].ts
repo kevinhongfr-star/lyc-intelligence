@@ -199,7 +199,7 @@ async function handleGet(
       worker: 'chat',
       has_key: !!DEEPSEEK_API_KEY,
       model: DEEPSEEK_MODEL,
-      guest_limit: CHAT_GUEST_LIMIT,
+      auth_required: true,
     });
   }
 
@@ -685,10 +685,6 @@ const DEEPSEEK_BASE_URL =
   process.env.VITE_DEEPSEEK_BASE_URL ||
   'https://api.deepseek.com/v1';
 const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
-const CHAT_GUEST_LIMIT = 3;
-
-// In-memory guest counter (per function instance; resets on cold start)
-const chatGuestCounts = new Map<string, number>();
 
 const CHAT_SYSTEM_PROMPT = `You are NEXUS, an Executive Intelligence layer for leaders.
 
@@ -704,11 +700,43 @@ How to behave:
 
 Tone: thoughtful, precise, senior. A peer who has read deeply on leadership and organizational behavior.`;
 
+/**
+ * Verify a Supabase JWT by calling Supabase auth's /user endpoint.
+ * Returns the user object (id, email) if valid, null otherwise.
+ * This is the canonical server-side check — not a local decode, so
+ * revoked / expired tokens are correctly rejected.
+ */
+async function verifySupabaseToken(token: string): Promise<{ id: string; email: string | null } | null> {
+  try {
+    const res = await fetch(`${SUPABASE_URL.replace(/\/$/, '')}/auth/v1/user`, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    // Require confirmed email — Kevin's rule: only registered email users
+    if (!data.email_confirmed_at && !(data as any).confirmed_at) return null;
+    return { id: data.id, email: data.email ?? null };
+  } catch {
+    return null;
+  }
+}
+
+function extractBearerToken(req: VercelRequest): string | null {
+  const h = (req.headers.authorization || req.headers.Authorization) as string | undefined;
+  if (!h) return null;
+  const m = /^Bearer\s+(.+)$/i.exec(h.trim());
+  return m ? m[1] : null;
+}
+
 async function handleChat(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET') {
     return res.status(200).json({
       ok: true,
-      guest_limit: CHAT_GUEST_LIMIT,
+      auth_required: true,
       has_key: !!DEEPSEEK_API_KEY,
       model: DEEPSEEK_MODEL,
     });
@@ -722,6 +750,21 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
     return res
       .status(500)
       .json({ ok: false, error: 'Chat service not configured' });
+  }
+
+  // ── Auth: require valid Supabase JWT with confirmed email ────────
+  const token = extractBearerToken(req);
+  if (!token) {
+    return res
+      .status(401)
+      .json({ ok: false, error: 'Authentication required. Sign in to use NEXUS chat.' });
+  }
+
+  const authUser = await verifySupabaseToken(token);
+  if (!authUser) {
+    return res
+      .status(401)
+      .json({ ok: false, error: 'Invalid or expired session. Please sign in again.' });
   }
 
   try {
@@ -745,25 +788,18 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
         .json({ ok: false, error: 'Message is required' });
     }
 
-    // Auth check
-    const authHeader = req.headers.authorization;
-    const isAuthed = !!(authHeader && authHeader.startsWith('Bearer '));
-
-    // Guest rate limit
-    let remaining: number | undefined;
-    if (!isAuthed) {
-      const ip = chatGetClientIp(req);
-      const count = (chatGuestCounts.get(ip) || 0) + 1;
-      chatGuestCounts.set(ip, count);
-      if (count > CHAT_GUEST_LIMIT) {
-        return res.status(429).json({
-          ok: false,
-          error:
-            'Guest limit reached. Sign up for unlimited NEXUS conversations.',
-          remaining: 0,
-        });
-      }
-      remaining = CHAT_GUEST_LIMIT - count;
+    // ── Basic input limits ───────────────────────────────────────────
+    if (message.length > 4000) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Message too long (max 4000 characters).',
+      });
+    }
+    if (history.length > 20) {
+      return res.status(400).json({
+        ok: false,
+        error: 'History too large (max 20 messages).',
+      });
     }
 
     // Build system prompt
@@ -792,8 +828,6 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
     messages.push({ role: 'user', content: message });
 
     // Call DeepSeek API
-    // Determine which endpoint to use
-    // If proxy key is available, use the proxy (direct DeepSeek key is often depleted)
     const useProxy =
       process.env.CHAT_USE_PROXY === '1' ||
       process.env.CHAT_USE_PROXY === 'true' ||
@@ -805,7 +839,6 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
     if (useProxy && DEEPSEEK_PROXY_KEY) {
       endpoint = PROXY_URL;
     } else {
-      // Build from DEEPSEEK_BASE_URL
       const base = DEEPSEEK_BASE_URL.replace(/\/+$/, '');
       if (base.endsWith('/chat/completions')) {
         endpoint = base;
@@ -838,7 +871,7 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
     if (!apiResponse.ok) {
       const errorText = await apiResponse.text();
       console.error(
-        '[chat] DeepSeek API error:',
+        `[chat] DeepSeek API error (user=${authUser.id}):`,
         apiResponse.status,
         endpoint,
         errorText.slice(0, 500),
@@ -850,7 +883,6 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
           error: 'Chat service unavailable',
           upstream_status: apiResponse.status,
           upstream_error: errorText.slice(0, 200),
-          endpoint,
         });
     }
 
@@ -862,7 +894,7 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       response: responseText,
       model: data.model || DEEPSEEK_MODEL,
       usage: data.usage || null,
-      remaining,
+      user_id: authUser.id,
     });
   } catch (error: any) {
     console.error('[chat] Unhandled error:', error?.message || error);
@@ -871,6 +903,7 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       .json({ ok: false, error: 'Internal server error' });
   }
 }
+
 
 function chatGetClientIp(req: VercelRequest): string {
   const fwd = req.headers['x-forwarded-for'];
@@ -923,3 +956,4 @@ function escapeHtml(str: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+

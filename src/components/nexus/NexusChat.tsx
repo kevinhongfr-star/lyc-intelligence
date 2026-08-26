@@ -391,12 +391,21 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
     const timeout = setTimeout(() => controller.abort(), 30000);
 
     try {
+      // Get current Supabase session token for API auth
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token || '';
+
+      const chatHeaders: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
+      if (accessToken) {
+        chatHeaders['Authorization'] = `Bearer ${accessToken}`;
+      }
+
       const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        headers: chatHeaders,
         body: JSON.stringify({
           message: userMsg,
           history: getContextWindow(),
@@ -424,6 +433,11 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
           const errBody = await res.json();
           serverMsg = errBody.response || errBody.error || serverMsg;
         } catch {}
+        // If auth failed, force a session refresh + sign out for clean UX
+        if (res.status === 401) {
+          await supabase.auth.signOut();
+          toast('Your session has expired. Please sign in again.');
+        }
         throw new Error(serverMsg);
       }
 
@@ -1917,3 +1931,4 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
     </div>
   );
 }
+
