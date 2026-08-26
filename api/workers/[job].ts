@@ -30,6 +30,10 @@ const SUPABASE_ANON_KEY =
   process.env.VITE_SUPABASE_ANON_KEY ||
   process.env.SUPABASE_ANON_KEY ||
   '';
+const SUPABASE_SERVICE_ROLE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.VITE_SUPABASE_SERVICE_ROLE_KEY ||
+  '';
 const WORKER_SHARED_SECRET =
   process.env.WORKER_SHARED_SECRET ||
   process.env.VITE_WORKER_SHARED_SECRET ||
@@ -732,6 +736,69 @@ function extractBearerToken(req: VercelRequest): string | null {
   return m ? m[1] : null;
 }
 
+// ── Service-role Supabase REST (bypasses RLS for credit operations) ──
+// The anon key used by supabaseFetch is subject to RLS and cannot reliably
+// read/write a user's credits row from a serverless function. handleChat
+// uses this for server-side credit enforcement (P0-1).
+function supabaseServiceFetch(
+  path: string,
+  options: RequestInit = {},
+): Promise<{ data: any; error: any }> {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    return Promise.resolve({
+      data: null,
+      error: { message: 'Supabase service role not configured' },
+    });
+  }
+  const url = `${SUPABASE_URL.replace(/\/$/, '')}/rest/v1${path}`;
+  return fetch(url, {
+    ...options,
+    headers: {
+      apikey: SUPABASE_SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=representation',
+      ...(options.headers || {}),
+    },
+  }).then(async (res) => {
+    const text = await res.text();
+    let data: any = null;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = text;
+    }
+    if (!res.ok) {
+      return { data: null, error: data || { message: `HTTP ${res.status}` } };
+    }
+    return { data, error: null };
+  });
+}
+
+// Best-effort credit refund (P0-1): increment the user's balance after a
+// failed DeepSeek call so they are never charged for a failed response.
+async function refundCredit(userId: string, amount: number): Promise<void> {
+  try {
+    const balRes = await supabaseServiceFetch(
+      `/credits?select=balance&user_id=eq.${encodeURIComponent(userId)}&limit=1`,
+    );
+    const balRow = Array.isArray(balRes.data) ? balRes.data[0] : null;
+    const currentBalance = Number(balRow?.balance ?? 0);
+    await supabaseServiceFetch(
+      `/credits?user_id=eq.${encodeURIComponent(userId)}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({
+          balance: currentBalance + amount,
+          updated_at: new Date().toISOString(),
+        }),
+      },
+    );
+  } catch (e: any) {
+    console.error('[chat] refundCredit failed:', e?.message || e);
+  }
+}
+
 async function handleChat(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET') {
     return res.status(200).json({
@@ -767,6 +834,11 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       .json({ ok: false, error: 'Invalid or expired session. Please sign in again.' });
   }
 
+  // P0-1: track whether a credit was deducted so we can refund on any
+  // failure path (DeepSeek error or unhandled throw).
+  let creditDeducted = false;
+  let creditBalance: number | undefined;
+
   try {
     const body = await parseJsonBody(req);
     const message: string = body.message || '';
@@ -800,6 +872,54 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
         ok: false,
         error: 'History too large (max 20 messages).',
       });
+    }
+
+    // ── P0-1: Server-side credit enforcement ──────────────────────────
+    // The user must have ≥1 mile in the `credits` table. We deduct 1
+    // atomically (conditional update on the balance we read) BEFORE calling
+    // DeepSeek, and refund it if the DeepSeek call fails so users are never
+    // charged for a failed response. Uses the service role key to bypass RLS
+    // (the serverless function cannot rely on the caller's JWT for writes).
+    {
+      const uid = encodeURIComponent(authUser.id);
+      const balRes = await supabaseServiceFetch(
+        `/credits?select=balance&user_id=eq.${uid}&limit=1`,
+      );
+      const balRow = Array.isArray(balRes.data) ? balRes.data[0] : null;
+      const currentBalance = Number(balRow?.balance ?? 0);
+      if (balRes.error || !balRow || currentBalance < 1) {
+        return res.status(402).json({
+          ok: false,
+          error: 'Insufficient credits. Upgrade or wait for daily reset.',
+          code: 'INSUFFICIENT_CREDITS',
+        });
+      }
+
+      // Atomic deduction: only updates if balance still equals the value
+      // we read, preventing race conditions / double-spend across
+      // concurrent requests.
+      const deductRes = await supabaseServiceFetch(
+        `/credits?user_id=eq.${uid}&balance=eq.${currentBalance}&select=balance`,
+        {
+          method: 'PATCH',
+          body: JSON.stringify({
+            balance: currentBalance - 1,
+            updated_at: new Date().toISOString(),
+          }),
+        },
+      );
+      const deductRow = Array.isArray(deductRes.data)
+        ? deductRes.data[0]
+        : null;
+      if (deductRes.error || !deductRow) {
+        return res.status(402).json({
+          ok: false,
+          error: 'Failed to deduct credit. Please retry.',
+          code: 'CREDIT_DEDUCTION_FAILED',
+        });
+      }
+      creditBalance = Number(deductRow.balance);
+      creditDeducted = true;
     }
 
     // Build system prompt
@@ -876,6 +996,12 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
         endpoint,
         errorText.slice(0, 500),
       );
+      // P0-1: refund the deducted credit — the call failed, so the user
+      // must not be charged for it.
+      if (creditDeducted) {
+        await refundCredit(authUser.id, 1);
+        creditDeducted = false;
+      }
       return res
         .status(502)
         .json({
@@ -895,8 +1021,18 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       model: data.model || DEEPSEEK_MODEL,
       usage: data.usage || null,
       user_id: authUser.id,
+      credit_balance: creditBalance,
     });
   } catch (error: any) {
+    // P0-1: safety net — if anything threw after a successful deduction
+    // (e.g. JSON parse failure), refund the credit before erroring out.
+    if (creditDeducted) {
+      try {
+        await refundCredit(authUser.id, 1);
+      } catch {
+        /* best-effort refund — already logged inside refundCredit */
+      }
+    }
     console.error('[chat] Unhandled error:', error?.message || error);
     return res
       .status(500)

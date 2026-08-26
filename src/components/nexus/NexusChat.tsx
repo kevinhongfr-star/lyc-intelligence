@@ -403,7 +403,9 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
         chatHeaders['Authorization'] = `Bearer ${accessToken}`;
       }
 
-      const res = await fetch('/api/chat', {
+      // P0-1: hit the enforcing endpoint (/api/workers/chat) so the server
+      // verifies identity, deducts a mile, and returns credit_balance.
+      const res = await fetch('/api/workers/chat', {
         method: 'POST',
         headers: chatHeaders,
         body: JSON.stringify({
@@ -475,6 +477,8 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
       retrieved_memories?: number;
       user_context?: { tier: string; seniority: string; credit_balance: number | null; active_mandates: number; conversation_count: number };
       citations?: Array<{ title: string; source: string | null; category: string; score: number }>;
+      /** P0-1: post-deduction credit balance returned by /api/workers/chat */
+      credit_balance?: number;
     },
     /** The user message that triggered this response. Used to run recommendation engine */
     triggeringUserMsg?: string,
@@ -575,7 +579,12 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
       });
     }
     
-    if (user?.id) {
+    // P0-1: prefer the server-returned post-deduction balance (authoritative
+    // — it reflects the mile just deducted by /api/workers/chat). Only
+    // re-fetch from the DB when the response didn't include it.
+    if (data.credit_balance !== undefined && data.credit_balance !== null) {
+      setCreditBalance(data.credit_balance);
+    } else if (user?.id) {
       getCreditBalance(user.id).then(info => {
         if (info) setCreditBalance(info.balance);
       });
