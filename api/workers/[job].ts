@@ -922,6 +922,86 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       creditDeducted = true;
     }
 
+    // ── P0-2: Session ownership validation ───────────────────────────
+    // The client sends a session_id; we must verify it belongs to the
+    // authenticated user before proceeding. If the session doesn't exist,
+    // create it server-side as a safety net (mirrors the frontend's
+    // createChatSession insert shape) so subsequent messages persist
+    // against a row the user actually owns. This does NOT move session
+    // CRUD server-side — the frontend still creates sessions via
+    // createChatSession(); this only guards against cross-user session_id
+    // spoofing and preserves the localStorage fallback.
+    const sessionId: string | null =
+      typeof body.session_id === 'string' && body.session_id.trim()
+        ? body.session_id.trim()
+        : null;
+
+    if (sessionId) {
+      const sidEnc = encodeURIComponent(sessionId);
+      const ownRes = await supabaseServiceFetch(
+        `/chat_sessions?select=user_id&id=eq.${sidEnc}&limit=1`,
+      );
+      const ownRow = Array.isArray(ownRes.data) ? ownRes.data[0] : null;
+
+      if (ownRes.error) {
+        // Transient Supabase error — fail safe: refund + 500.
+        if (creditDeducted) {
+          await refundCredit(authUser.id, 1);
+          creditDeducted = false;
+        }
+        return res.status(500).json({
+          ok: false,
+          error: 'Session validation unavailable. Please retry.',
+          code: 'SESSION_LOOKUP_FAILED',
+        });
+      }
+
+      if (ownRow) {
+        // Session exists — enforce ownership.
+        if (String(ownRow.user_id) !== String(authUser.id)) {
+          if (creditDeducted) {
+            await refundCredit(authUser.id, 1);
+            creditDeducted = false;
+          }
+          return res.status(403).json({
+            ok: false,
+            error: 'Session does not belong to authenticated user.',
+            code: 'SESSION_FORBIDDEN',
+          });
+        }
+        // Owned by this user — proceed.
+      } else {
+        // Session not found — create it server-side. Use the first 50
+        // chars of the message as the title (matches frontend convention).
+        const newTitle =
+          message.length > 50 ? message.substring(0, 50) : message;
+        const insRes = await supabaseServiceFetch(`/chat_sessions`, {
+          method: 'POST',
+          body: JSON.stringify({
+            id: sessionId,
+            user_id: authUser.id,
+            title: newTitle,
+            use_case: null,
+            diagnostic_progress: 0,
+            diagnostic_dimensions: [],
+            milestone_status: {},
+          }),
+        });
+        // If creation fails (e.g. UUID-typed id rejecting a localStorage
+        // fallback id like "session_123…", or a concurrent-insert PK
+        // collision), do NOT fail the request — there is no ownership to
+        // violate on a non-existent session, and the localStorage fallback
+        // must keep working.
+        if (insRes.error) {
+          console.warn(
+            `[chat] Could not create session ${sessionId} server-side ` +
+              `(user=${authUser.id}); proceeding without it:`,
+            insRes.error?.message || insRes.error,
+          );
+        }
+      }
+    }
+
     // Build system prompt
     const sysPrompt =
       systemPrompt && systemPrompt.trim().length > 20
