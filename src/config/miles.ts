@@ -159,6 +159,46 @@ export const EXPLORER_FREE_ASSESSMENTS: string[] = ['LEAP', 'PRISM'];
 export const CPI_REQUIRED_TIER: TierKey = 'council';
 
 // ═══════════════════════════════════════════════════════════════════════
+// Per-assessment required tier (access gating) — P1-1
+// ═══════════════════════════════════════════════════════════════════════
+//
+// The `assessments` catalog table has no `required_tier` column, so this map
+// is the server-side source of truth for assessment access gating (mirrors
+// how INSTRUMENT_MILE_COST is the cost SSOT — also a constant, not a DB
+// lookup). Derived from the canonical mile engine (services/mileEngine.ts
+// checkAssessmentAccess) + DIAGNOSTIC_TIER_REQUIREMENT (config/tierConfig,
+// legacy keys mapped to the new 5-tier system) + EXPLORER_FREE_ASSESSMENTS.
+//
+//   CPI              → council     (canonical — see checkAssessmentAccess)
+//   LEAP, PRISM      → explorer    (complimentary onboarding tokens)
+//   SPARK            → explorer    (complimentary diagnostic)
+//   FORGE/BRIDGE/    → professional (standard paid diagnostics)
+//   MOSAIC/QUEST/
+//   COACH/IMPACT
+//   DRIVE            → executive   (premium exclusive)
+export const ASSESSMENT_REQUIRED_TIER: Record<string, TierKey> = {
+  CPI:    CPI_REQUIRED_TIER, // council
+  LEAP:   'explorer',
+  PRISM:  'explorer',
+  SPARK:  'explorer',
+  FORGE:  'professional',
+  BRIDGE: 'professional',
+  MOSAIC: 'professional',
+  QUEST:  'professional',
+  COACH:  'professional',
+  IMPACT: 'professional',
+  DRIVE:  'executive',
+};
+
+/**
+ * Get the required tier for an assessment code. Defaults to 'professional'
+ * for unknown codes (conservative: must be a paid tier).
+ */
+export function getAssessmentRequiredTier(code: string): TierKey {
+  return ASSESSMENT_REQUIRED_TIER[String(code).toUpperCase()] ?? 'professional';
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // Refund policy
 // ═══════════════════════════════════════════════════════════════════════
 

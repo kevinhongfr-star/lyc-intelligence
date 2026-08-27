@@ -55,7 +55,8 @@ import { z } from 'zod';
 // Matches src/config/miles.ts INSTRUMENT_MILE_COST — the single source of truth.
 // COACH is not an assessment (0 cost). CANVAS is future (2, same as Standard).
 // ═══════════════════════════════════════════════════════════════════════════
-import { INSTRUMENT_MILE_COST } from '../../src/config/miles';
+import { INSTRUMENT_MILE_COST, getAssessmentRequiredTier } from '../../src/config/miles';
+import { normalizeTier, tierMeets } from '../../src/config/tiers';
 
 const ASSESSMENT_COSTS: Record<string, number> = INSTRUMENT_MILE_COST;
 
@@ -96,10 +97,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // #1314: reject oversized URLs before processing.
     assertUrlLength(req);
 
-    // Allow anonymous users for complimentary assessment access (marketing funnel)
-    const ctx = await getAuthorizedContext(req, true);
-    const isAnonymous = !ctx;
-    const userId = (!isAnonymous && ctx) ? (ctx.userId as string) : null;
+    // P1-1: authentication is required — unauthenticated callers get 401
+    // (getAuthorizedContext(false) throws RequestAuthError → handleApiError
+    // → 401). The prior anonymous CPI "marketing funnel" path is removed to
+    // align run.ts with the canonical mile engine (services/mileEngine.ts),
+    // which gates CPI to the Council tier.
+    const ctx = await getAuthorizedContext(req, false);
+    const isAnonymous = false;
+    const userId = ctx.userId as string;
 
     // V3-7 / #1346 Rate limit: 20 writes / 60s per user (or IP for anon)
     const rl = rateLimit(req, userId);
@@ -160,20 +165,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const code = normalizeCode(body.code);
 
-    // V3-4 / #1344: Tier check BEFORE running.
-    // Executive Introduction (executive_introduction / explorer) or unauthenticated
-    // users may ONLY run the complimentary CPI assessment.
-    const isUnauth = isAnonymous;
-    const userTier = (!isUnauth && ctx) ? (ctx.tier || null) : null;
-    const isExecIntro = isUnauth
-      ? true
-      : (!userTier || userTier === 'executive_introduction' || userTier === 'explorer');
-    if (isExecIntro && code !== 'CPI') {
+    // P1-1: Server-side tier gating using the canonical 5-tier hierarchy
+    // (Explorer < Starter < Pro < Executive < Council). Each assessment has a
+    // required_tier looked up server-side from the miles SSOT
+    // (ASSESSMENT_REQUIRED_TIER), never trusted from the client. Higher tiers
+    // inherit access from lower tiers via tierMeets().
+    const userTier = normalizeTier(ctx.tier) ?? 'explorer';
+    const requiredTier = getAssessmentRequiredTier(code);
+    if (!tierMeets(userTier, requiredTier)) {
       return res.status(403).json({
         ok: false,
-        code: 'TIER_RESTRICTED',
-        message: 'This assessment requires an Executive Deep-Dive subscription or higher.',
-        upgradeHref: '/pricing',
+        error: 'This assessment requires a higher tier.',
+        code: 'TIER_INSUFFICIENT',
+        required_tier: requiredTier,
+        current_tier: userTier,
       });
     }
 
@@ -241,6 +246,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Admins + internal staff are exempted from paying (operational/QA).
     const chargeMiles = !isAnonymous && !isAdminRole(ctx.role);
     let remainingBalance = 0;
+    // P1-1: tracks whether a mile deduction has occurred so any failure
+    // after this point (scoring throw, insert error, unhandled exception)
+    // can refund the debited miles — users are never charged for a run
+    // that didn't persist a result.
+    let milesDebited = false;
 
     if (chargeMiles) {
       // 1) Fetch current balance row, fail if < cost.
@@ -254,9 +264,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (!creditRow || Number(creditRow.miles ?? creditRow.balance) < cost) {
         return res.status(402).json({
-          error: 'Insufficient miles balance',
-          required: cost,
+          ok: false,
+          error: 'Insufficient credits.',
+          credits_needed: cost,
           current: Number(creditRow?.miles ?? creditRow?.balance ?? 0),
+          code: 'INSUFFICIENT_CREDITS',
         });
       }
 
@@ -296,6 +308,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       } else {
         remainingBalance = Number(after ?? 0);
       }
+
+      // P1-1: a deduction has been committed to the credits row — from
+      // here on, any failure must trigger a refund (see insert-error block
+      // below + the handler's top-level catch).
+      milesDebited = true;
 
       // 3) Append to credit_transactions so the audit trail exists.
       try {
@@ -356,7 +373,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (insErr) {
       // Best-effort refund (if we already debited) to avoid stuck-loss.
-      if (chargeMiles) {
+      if (chargeMiles && milesDebited) {
         try {
           // Try new refund RPC first, fall back to old
           const { error: refundErr } = await supabase.rpc('refund_miles_balanced', {
@@ -374,6 +391,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             });
           }
         } catch { /* ignore — ops alert */ }
+        // Mark refunded so the top-level catch doesn't double-refund.
+        milesDebited = false;
       }
       // #1314: don't leak insErr.message — log server-side, return safe msg.
       logServerError('api/assessments/run insert failed', insErr, req);
@@ -389,6 +408,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       remaining_balance: remainingBalance,
     });
   } catch (e: any) {
+    // P1-1: safety net — if anything threw AFTER a successful mile
+    // deduction (e.g. a scoring throw before the insert), refund the
+    // debited miles before erroring out so the user is never charged for
+    // a run that didn't persist. Idempotent: milesDebited is cleared by
+    // the insert-error block above after its own refund.
+    if (milesDebited) {
+      try {
+        const { error: refundErr } = await supabase.rpc('refund_miles_balanced', {
+          p_user_id: ctx.userId,
+          p_amount: cost,
+          p_instrument_code: code,
+          p_assessment_id: idem || null,
+          p_description: `Assessment error: ${code} (refund)`,
+        });
+        if (refundErr) {
+          await supabase.rpc('increment_credits_balanced', {
+            p_user_id: ctx.userId,
+            p_amount: cost,
+          });
+        }
+      } catch { /* best-effort refund — already logged by RPC layer */ }
+    }
     // #1314: centralized error handling — never leaks stack traces.
     handleApiError(res, e, 'api/assessments/run unexpected', req);
     return;
