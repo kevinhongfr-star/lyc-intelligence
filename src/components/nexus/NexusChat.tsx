@@ -179,6 +179,13 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
   const [pendingApproval, setPendingApproval] = useState(false);
   const [streamingContent, setStreamingContent] = useState<string | null>(null);
 
+  // P1-2: chat document upload + RAG context injection. `attachedDocIds`
+  // holds document_ids returned by the /api/workers/chat process_doc action
+  // — these are forwarded as document_ids on each subsequent chat message
+  // so the backend can fetch + inject the chunked text into the prompt.
+  const [attachedDocIds, setAttachedDocIds] = useState<string[]>([]);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
+
   /** Exploration earning tracker — resets per sessionId */
   const explorationTracker = useMemo<ExplorationEarningTracker | null>(
     () => (sessionId ? new ExplorationEarningTracker(sessionId) : null),
@@ -424,6 +431,10 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
           // #1324: forward the user's assessment context so the server-side
           // persona can inject the user's actual results into the system prompt.
           assessment_context: combinedContext || undefined,
+          // P1-2: forward attached document_ids so the worker fetches their
+          // chunks from chat_document_chunks and injects a "Document
+          // context:" block into the system prompt (RAG).
+          document_ids: attachedDocIds.length ? attachedDocIds : undefined,
         }),
         signal: controller.signal,
       });
@@ -687,22 +698,87 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
   };
 
   const handleDocumentUpload = useCallback(async () => {
+    if (uploadingDoc) return;
+    if (!user?.id) {
+      toast.warning('Sign in to attach documents.');
+      return;
+    }
+
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.pdf,.docx,.txt';
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
-      
+
       if (file.size > 10 * 1024 * 1024) {
-        toast.warning('File size exceeds 10MB limit');
+        toast.warning('File size exceeds 10MB limit.');
         return;
       }
 
-      toast.warning('Document upload unavailable — please retry later');
+      // P1-2: storage path = {user_id}/{session_id}/{timestamp}_{filename}.
+      // First segment MUST be user.id — Storage RLS enforces owner-only
+      // access by comparing (storage.foldername(name))[1] to auth.uid().
+      const safeName = file.name.replace(/[^\w.\-]+/g, '_');
+      const folder = sessionId || 'unsynced';
+      const storagePath = `${user.id}/${folder}/${Date.now()}_${safeName}`;
+
+      setUploadingDoc(true);
+      try {
+        // 1) Upload to the chat-uploads bucket (RLS: owner-only CRUD).
+        const { error: uploadErr } = await supabase.storage
+          .from('chat-uploads')
+          .upload(storagePath, file, {
+            cacheControl: '3600',
+            upsert: false,
+            contentType: file.type || undefined,
+          });
+        if (uploadErr) {
+          toast.error(`Upload failed: ${uploadErr.message}`);
+          return;
+        }
+
+        // 2) Worker downloads the file (service role), extracts text,
+        //    chunks it (~500 chars / 100 overlap), and stores rows in
+        //    chat_document_chunks under this user's id.
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData.session?.access_token || '';
+        const procRes = await fetch('/api/workers/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(accessToken
+              ? { Authorization: `Bearer ${accessToken}` }
+              : {}),
+          },
+          body: JSON.stringify({
+            action: 'process_doc',
+            storage_path: storagePath,
+            filename: file.name,
+            content_type: file.type || '',
+            session_id: sessionId,
+          }),
+        });
+        const procBody = await procRes.json().catch(() => ({ ok: false }));
+        if (!procRes.ok || !procBody.ok) {
+          toast.error(procBody.error || 'Document processing failed.');
+          return;
+        }
+
+        // 3) Track the document_id so subsequent chat messages forward
+        //    it as document_ids for RAG context injection server-side.
+        setAttachedDocIds((prev) => [...prev, procBody.document_id]);
+        toast.success(
+          `Attached "${file.name}" — ${procBody.chunk_count} chunks indexed.`,
+        );
+      } catch (err: any) {
+        toast.error(err?.message || 'Document upload failed.');
+      } finally {
+        setUploadingDoc(false);
+      }
     };
     input.click();
-  }, [sendMessage]);
+  }, [user?.id, sessionId, uploadingDoc]);
 
   const handlePromptSelect = (prompt: string) => {
     setInput(prompt);
@@ -1723,7 +1799,7 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
         <div id="nexus-composer-wrap" style={{
           position: 'fixed',
           bottom: 0,
-          left: '260px',,
+          left: '260px',
           right: 0, // mobile: left: 0 (overridden by #nexus-composer-v35 media query)
           padding: '20px 48px 32px',
           background: `linear-gradient(to top, ${V.cream} 65%, rgba(250,250,250,0))`,
@@ -1774,32 +1850,48 @@ export function NEXUSChat({ showHeader = true, initialPrompts, onMessageSent }: 
               padding: '8px 12px 10px',
               borderTop: `1px solid ${V.ink100}`,
             }}>
-              <div style={{ display: 'flex', gap: 4 }}>
+              <div style={{ position: 'relative', display: 'flex', gap: 4 }}>
                 <button
                   onClick={handleDocumentUpload}
-                  disabled={loading}
+                  disabled={loading || uploadingDoc}
                   style={{
                     width: 30, height: 30,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: V.ink400, cursor: loading ? 'not-allowed' : 'pointer',
+                    color: uploadingDoc ? V.teal600 : V.ink400,
+                    cursor: (loading || uploadingDoc) ? 'not-allowed' : 'pointer',
                     background: 'none', border: 'none',
-                    opacity: loading ? 0.5 : 1,
+                    opacity: (loading || uploadingDoc) ? 0.7 : 1,
                     transition: 'all 150ms ease',
                   }}
                   onMouseEnter={(e) => {
-                    if (!loading) {
+                    if (!loading && !uploadingDoc) {
                       e.currentTarget.style.color = V.ink700;
                       e.currentTarget.style.background = V.ink50;
                     }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.color = V.ink400;
+                    e.currentTarget.style.color = uploadingDoc ? V.teal600 : V.ink400;
                     e.currentTarget.style.background = 'transparent';
                   }}
-                  title="Attach document"
+                  title={uploadingDoc ? 'Indexing document…' : 'Attach document (PDF, DOCX, TXT)'}
                 >
-                  <Paperclip style={{ width: 15, height: 15 }} />
+                  {uploadingDoc ? (
+                    <Loader2 className="animate-spin" style={{ width: 15, height: 15 }} />
+                  ) : (
+                    <Paperclip style={{ width: 15, height: 15 }} />
+                  )}
                 </button>
+                {attachedDocIds.length > 0 && (
+                  <span style={{
+                    position: 'absolute', top: -2, right: -2,
+                    minWidth: 14, height: 14, padding: '0 4px',
+                    borderRadius: 7, background: V.teal600, color: V.cream,
+                    fontSize: 9, fontWeight: 700, lineHeight: '14px', textAlign: 'center',
+                    pointerEvents: 'none',
+                  }}>
+                    {attachedDocIds.length}
+                  </span>
+                )}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                 {user?.id && (

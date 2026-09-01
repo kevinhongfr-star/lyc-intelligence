@@ -799,6 +799,205 @@ async function refundCredit(userId: string, amount: number): Promise<void> {
   }
 }
 
+// ── P1-2: Document upload + RAG context injection ───────────────────
+// The frontend uploads a file to the `chat-uploads` Storage bucket at
+// `{user_id}/{session_id}/{filename}`, then POSTs here with
+// { action: 'process_doc', storage_path, filename, content_type, session_id }.
+// The worker downloads the bytes with the service role (bypasses RLS),
+// extracts text (pdf-parse / mammoth / raw), chunks it (~500 chars w/
+// 100-char overlap), and inserts rows into chat_document_chunks under the
+// caller's user_id. Returns { document_id, chunk_count, char_count } so the
+// client can send document_ids back on subsequent chat messages for context
+// injection (handled below in the normal chat flow).
+
+function chunkText(
+  text: string,
+  chunkSize = 500,
+  overlap = 100,
+): string[] {
+  const chunks: string[] = [];
+  if (!text || !text.trim()) return chunks;
+  const step = Math.max(1, chunkSize - overlap);
+  for (let i = 0; i < text.length; i += step) {
+    const end = Math.min(i + chunkSize, text.length);
+    const slice = text.slice(i, end);
+    if (slice.trim().length > 0) chunks.push(slice);
+    if (end >= text.length) break;
+  }
+  return chunks;
+}
+
+async function extractTextFromBuffer(
+  buf: Buffer,
+  contentType: string,
+  filename: string,
+): Promise<string> {
+  const lower = filename.toLowerCase();
+  const ct = (contentType || '').toLowerCase();
+
+  // PDF → pdf-parse (lazy import so chat cold-starts don't pay the cost)
+  if (lower.endsWith('.pdf') || ct === 'application/pdf') {
+    const mod: any = await import('pdf-parse');
+    const pdfParse = mod.default || mod;
+    const result = await pdfParse(buf);
+    return String(result?.text ?? '');
+  }
+
+  // DOCX → mammoth (lazy import)
+  if (
+    lower.endsWith('.docx') ||
+    ct ===
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ) {
+    const mammoth: any = await import('mammoth');
+    const result = await mammoth.extractRawText({ arrayBuffer: buf });
+    return String(result?.value ?? '');
+  }
+
+  // .txt / fallback — return raw decoded text
+  return buf.toString('utf8');
+}
+
+// Download an object from the chat-uploads bucket using the service role.
+async function downloadChatUpload(
+  storagePath: string,
+): Promise<{ buffer: Buffer; contentType: string } | { error: string }> {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    return { error: 'Supabase service role not configured' };
+  }
+  // storagePath = "{user_id}/{session_id}/{filename}" (no bucket prefix).
+  // Storage object API: GET /storage/v1/object/{bucket}/{path}
+  const encoded = encodeURIComponent(storagePath);
+  const url = `${SUPABASE_URL.replace(/\/$/, '')}/storage/v1/object/chat-uploads/${encoded}`;
+  try {
+    const r = await fetch(url, {
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+      },
+    });
+    if (!r.ok) {
+      return { error: `storage fetch failed: HTTP ${r.status}` };
+    }
+    const ab = await r.arrayBuffer();
+    return {
+      buffer: Buffer.from(ab),
+      contentType: r.headers.get('content-type') || 'application/octet-stream',
+    };
+  } catch (e: any) {
+    return { error: e?.message || 'storage fetch error' };
+  }
+}
+
+// P1-2: process_doc action — extract text, chunk, store under caller's id.
+async function handleProcessDoc(
+  req: VercelRequest,
+  res: VercelResponse,
+  authUser: { id: string; email: string | null },
+  body: any,
+) {
+  const storagePath: string = String(body.storage_path || '').trim();
+  const filename: string = String(body.filename || '').trim();
+  const contentType: string = String(body.content_type || '').trim();
+  const sessionId: string | null =
+    typeof body.session_id === 'string' && body.session_id.trim()
+      ? body.session_id.trim()
+      : null;
+
+  if (!storagePath || !filename) {
+    return res
+      .status(400)
+      .json({ ok: false, error: 'storage_path and filename are required' });
+  }
+
+  // Security: the storage path MUST start with the caller's user_id so a
+  // user can't process another user's uploads.
+  if (!storagePath.startsWith(`${authUser.id}/`)) {
+    return res.status(403).json({
+      ok: false,
+      error: 'storage_path must be rooted at the authenticated user.',
+      code: 'STORAGE_PATH_FORBIDDEN',
+    });
+  }
+
+  // Download bytes via service role (bypasses RLS — server-side only).
+  const dl = await downloadChatUpload(storagePath);
+  if ('error' in dl) {
+    return res.status(502).json({ ok: false, error: dl.error });
+  }
+
+  let text: string;
+  try {
+    text = await extractTextFromBuffer(dl.buffer, dl.contentType, filename);
+  } catch (e: any) {
+    return res.status(422).json({
+      ok: false,
+      error: 'Text extraction failed for this file.',
+      detail: e?.message || String(e),
+    });
+  }
+
+  // Cap total chars to keep prompt size bounded (≈ 50k chars ≈ 12k tokens).
+  const MAX_TOTAL_CHARS = 50_000;
+  if (text.length > MAX_TOTAL_CHARS) text = text.slice(0, MAX_TOTAL_CHARS);
+
+  const chunks = chunkText(text);
+  if (chunks.length === 0) {
+    return res.status(422).json({
+      ok: false,
+      error: 'No extractable text found in document.',
+    });
+  }
+
+  // Generate a single document_id for all chunks of this upload.
+  const documentId =
+    (typeof crypto !== 'undefined' && 'randomUUID' in crypto)
+      ? (crypto as any).randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+  // Bulk-insert via PostgREST (service role bypasses RLS).
+  // PostgREST accepts an array body for multi-row insert.
+  const rows = chunks.map((content, i) => ({
+    user_id: authUser.id,
+    session_id: sessionId,
+    document_id: documentId,
+    filename,
+    content_type: contentType || dl.contentType,
+    chunk_index: i,
+    content,
+    char_count: content.length,
+    storage_path: storagePath,
+  }));
+
+  const insRes = await supabaseServiceFetch('/chat_document_chunks', {
+    method: 'POST',
+    headers: {
+      Prefer: 'return=representation',
+    },
+    body: JSON.stringify(rows),
+  });
+
+  if (insRes.error || !Array.isArray(insRes.data)) {
+    console.error(
+      `[chat] process_doc insert failed (user=${authUser.id}):`,
+      insRes.error?.message || insRes.error,
+    );
+    return res.status(500).json({
+      ok: false,
+      error: 'Failed to store document chunks.',
+      detail: insRes.error?.message || 'insert failed',
+    });
+  }
+
+  return res.status(200).json({
+    ok: true,
+    document_id: documentId,
+    chunk_count: insRes.data.length,
+    char_count: text.length,
+    filename,
+  });
+}
+
 async function handleChat(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET') {
     return res.status(200).json({
@@ -841,6 +1040,15 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
 
   try {
     const body = await parseJsonBody(req);
+
+    // P1-2: route document-processing requests to the dedicated handler
+    // BEFORE any credit deduction. Document upload/indexing is free —
+    // users are only charged when they send a chat message that consumes
+    // the document context (the normal flow below).
+    if (body.action === 'process_doc') {
+      return handleProcessDoc(req, res, authUser, body);
+    }
+
     const message: string = body.message || '';
     const history: Array<{ role: string; content: string }> = Array.isArray(
       body.history,
@@ -849,6 +1057,17 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       : [];
     const tier: string = body.tier || 'explorer';
     const systemPrompt: string | undefined = body.systemPrompt;
+
+    // P1-2: optional list of document_ids the client attached to this
+    // message. We fetch their chunks (owned by authUser) from
+    // chat_document_chunks and inject a "Document context:" preamble into
+    // the system prompt. Filtering happens server-side by user_id so a
+    // caller cannot read another user's documents.
+    const documentIds: string[] = Array.isArray(body.document_ids)
+      ? body.document_ids.filter(
+          (d: any) => typeof d === 'string' && d.trim().length > 0,
+        )
+      : [];
 
     if (
       !message ||
@@ -1011,9 +1230,42 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
             ? `\n\nUser tier: ${tier}. Adjust depth and breadth accordingly — higher tiers get more sophisticated frameworks and deeper analysis.`
             : '');
 
+    // P1-2: fetch + inject RAG document context when document_ids are
+    // attached. We use the service role (bypasses RLS) but filter by
+    // authUser.id so a caller can never pull another user's chunks. Cap at
+    // 40 chunks to keep the prompt bounded (~20k chars ≈ 5k tokens).
+    let docContextBlock = '';
+    if (documentIds.length > 0) {
+      const inList = documentIds.join(',');
+      const dcRes = await supabaseServiceFetch(
+        `/chat_document_chunks?select=filename,chunk_index,content` +
+          `&user_id=eq.${encodeURIComponent(authUser.id)}` +
+          `&document_id=in.(${inList})` +
+          `&order=chunk_index.asc&limit=40`,
+      );
+      if (Array.isArray(dcRes.data) && dcRes.data.length > 0) {
+        const byDoc = new Map<string, string[]>();
+        for (const row of dcRes.data) {
+          const key = String(row.filename || 'Document');
+          if (!byDoc.has(key)) byDoc.set(key, []);
+          byDoc.get(key)!.push(String(row.content));
+        }
+        const blocks: string[] = [];
+        for (const [filename, chunks] of byDoc) {
+          blocks.push(
+            `### ${filename}\n` +
+              chunks.map((c) => c.trim()).join('\n\n'),
+          );
+        }
+        docContextBlock =
+          `\n\n--- Attached document context (user-supplied; verify before relying on specifics) ---\n` +
+          blocks.join('\n\n');
+      }
+    }
+
     // Build messages
     const messages: Array<{ role: string; content: string }> = [
-      { role: 'system', content: sysPrompt },
+      { role: 'system', content: sysPrompt + docContextBlock },
     ];
 
     // Add recent history (last 10 turns)
