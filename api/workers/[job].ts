@@ -110,7 +110,7 @@ function requireWorkerSecret(req: VercelRequest): boolean {
 }
 
 function normalizeJobParam(j: unknown): string | null {
-  const valid = ['ai-trigger', 'email-send', 'email-webhook', 'template-render', 'chat'];
+  const valid = ['ai-trigger', 'email-send', 'email-webhook', 'template-render', 'chat', 'monthly-summary'];
   if (typeof j === 'string' && valid.includes(j)) return j;
   return null;
 }
@@ -129,7 +129,7 @@ export default async function handler(
     return res.status(400).json({
       ok: false,
       error:
-        'job param must be one of: ai-trigger, email-send, email-webhook, template-render, chat',
+        'job param must be one of: ai-trigger, email-send, email-webhook, template-render, chat, monthly-summary',
     });
   }
 
@@ -160,11 +160,15 @@ export default async function handler(
     return handleChat(req, res);
   }
 
-  // ai-trigger or email-send — both need worker secret
+  // All remaining job kinds need worker secret
   if (!requireWorkerSecret(req)) {
     return res
       .status(403)
       .json({ ok: false, error: 'worker-secret required' });
+  }
+
+  if (jobKind === 'monthly-summary') {
+    return handleMonthlySummary(req, res);
   }
 
   if (jobKind === 'ai-trigger') {
@@ -205,6 +209,40 @@ async function handleGet(
       model: DEEPSEEK_MODEL,
       auth_required: true,
     });
+  }
+
+  if (jobKind === 'monthly-summary') {
+    // Pipeline status counters: recent email:monthly_summary jobs + delivery log counts
+    try {
+      const [jobsRes, logRes, templatesRes] = await Promise.all([
+        supabaseFetch('/ai_job_queue?select=status,kind&kind=like.email%3Amonthly_summary&limit=1000'),
+        supabaseFetch('/email_delivery_log?select=status,created_at&template_code=eq.monthly_summary&order=created_at.desc&limit=500'),
+        supabaseFetch('/email_template_registry?select=template_code,active,subject_default&template_code=eq.monthly_summary'),
+      ]);
+      const jobCounters: Record<string, number> = {};
+      for (const row of jobsRes.data || []) {
+        const s = String(row.status);
+        jobCounters[s] = (jobCounters[s] || 0) + 1;
+      }
+      const logCounters: Record<string, number> = {};
+      for (const row of logRes.data || []) {
+        const s = String(row.status);
+        logCounters[s] = (logCounters[s] || 0) + 1;
+      }
+      return res.json({
+        ok: true,
+        worker: 'monthly-summary',
+        pipeline: 'cron-first-of-month-9am-local',
+        ai_job_queue_counters: jobCounters,
+        email_delivery_log_counters_last500: logCounters,
+        template: Array.isArray(templatesRes.data) ? templatesRes.data[0] : null,
+      });
+    } catch (e: any) {
+      return res.status(500).json({
+        ok: false,
+        error: e?.message || 'failed to fetch monthly summary status',
+      });
+    }
   }
 
   // ai-trigger or email-send — show queue counters
@@ -370,6 +408,10 @@ const TEMPLATE_REGISTRY: Record<string, { defaultSubject: string; defaultPrehead
   nexus_conversation_summary: {
     defaultSubject: 'Your NEXUS conversation summary',
     defaultPreheader: 'Here\'s what we covered.',
+  },
+  monthly_summary: {
+    defaultSubject: 'Your LYC Partners monthly summary for {month_label}',
+    defaultPreheader: 'This month\'s assessments, NEXUS conversations, and insights at a glance.',
   },
 };
 
@@ -636,6 +678,7 @@ function emailKindFromJob(kind: string): string | null {
   if (kind === 'email:upgrade_confirmation') return 'upgrade_confirmation';
   if (kind === 'email:nexus_conversation_summary')
     return 'nexus_conversation_summary';
+  if (kind === 'email:monthly_summary') return 'monthly_summary';
   return null;
 }
 
@@ -1172,4 +1215,314 @@ function escapeHtml(str: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+
+// ── Monthly Summary Cron Handler (HTTP trigger) ─────────────────────
+// Serverless-friendly bounded batch runner. For full-pipeline runs use
+// the standalone CLI: scripts/monthly_summary_cron.ts with DATABASE_URL.
+//
+// POST body options:
+//   single_user_id?: uuid — process only this user (for testing)
+//   max_users?:     number — cap to N users (default 20)
+//   dry_run?:       0|1 — compute only, skip writes (default 0)
+//
+// This handler uses the service-role Supabase client to bypass RLS.
+// Complex aggregations are issued as direct RPC-style calls via
+// supabaseServiceFetch with SQL rendered through query-string filters.
+// For production full runs, prefer the pg-based CLI script.
+async function handleMonthlySummary(
+  req: VercelRequest,
+  res: VercelResponse,
+) {
+  let body: any = {};
+  try {
+    body = await parseJsonBody(req);
+  } catch {
+    body = {};
+  }
+  const singleUserId = body?.single_user_id || null;
+  const maxUsers = Math.min(Number(body?.max_users || 20), 200);
+  const dryRun = body?.dry_run === 1 || body?.dry_run === '1' || body?.dry_run === true;
+  const APP_URL =
+    process.env.APP_URL ||
+    process.env.VITE_APP_URL ||
+    (process.env.VITE_SUPABASE_URL ? new URL(process.env.VITE_SUPABASE_URL).origin.replace('.supabase.co', '.lyc.partners') : '') ||
+    'https://app.lyc.partners';
+
+  if (!SUPABASE_SERVICE_ROLE_KEY) {
+    return res.status(500).json({
+      ok: false,
+      error:
+        'SUPABASE_SERVICE_ROLE_KEY not configured. Use scripts/monthly_summary_cron.ts CLI with DATABASE_URL for full runs.',
+    });
+  }
+
+  // Step 1: load eligible users. We ask for tier via profiles + tiers.
+  // Since the Supabase REST client can't join arbitrary tables easily,
+  // we query tiers first to get eligible tier_keys, then filter profiles.
+  const tierRes = await supabaseServiceFetch(
+    '/tiers?select=tier_key,display_name,tier_order&tier_order=gte.2&order=tier_order.asc',
+  );
+  if (tierRes.error) {
+    return res.status(502).json({ ok: false, error: `failed to load tiers: ${JSON.stringify(tierRes.error)}` });
+  }
+  const eligibleTierKeys: string[] = (tierRes.data || [])
+    .filter((t: any) => String(t.tier_key) !== 'executive_introduction')
+    .map((t: any) => String(t.tier_key));
+  if (eligibleTierKeys.length === 0) {
+    return res.status(500).json({ ok: false, error: 'no eligible tier_keys found' });
+  }
+
+  // Build filter: tier_key IN (...eligible)
+  const tierIn = eligibleTierKeys.map((k) => `(${k})`).join(',');
+  let profilesQuery = `/profiles?select=id,full_name,email,timezone,tier_key&tier_key=in.(${eligibleTierKeys.join(',')})&order=created_at.asc&limit=${maxUsers}`;
+  if (singleUserId) {
+    profilesQuery = `/profiles?select=id,full_name,email,timezone,tier_key&id=eq.${encodeURIComponent(singleUserId)}&limit=1`;
+  }
+  const profRes = await supabaseServiceFetch(profilesQuery);
+  if (profRes.error) {
+    return res.status(502).json({ ok: false, error: `failed to load profiles: ${JSON.stringify(profRes.error)}` });
+  }
+
+  type UserRow = { id: string; full_name: string | null; email: string | null; timezone: string | null; tier_key: string };
+  const users: UserRow[] = (profRes.data || []).filter((u: UserRow) => !!u.email);
+  const tierDisplayMap: Record<string, string> = {};
+  for (const t of tierRes.data || []) tierDisplayMap[String(t.tier_key)] = String(t.display_name);
+
+  // Shared helpers: windowing + tz (same logic as CLI)
+  const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DIAGNOSTIC_SLUGS = ['prism','spark','forge','bridge','mosaic','drive'];
+
+  function normalizeTz(raw: any): string {
+    if (!raw) return 'UTC';
+    try { new Intl.DateTimeFormat('en-US', { timeZone: String(raw) }); return String(raw); }
+    catch { return 'UTC'; }
+  }
+  function localToUTC(y: number, m0: number, d: number, h: number, mi: number, s: number, tz: string): Date {
+    const target = Date.UTC(y, m0, d, h, mi, s);
+    let guess = target;
+    for (let i = 0; i < 6; i++) {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz, hourCycle: 'h23', year: 'numeric', month: '2-digit',
+        day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
+      }).formatToParts(new Date(guess));
+      const p = (t: string) => parseInt(parts.find((x: any) => x.type === t)!.value, 10);
+      const got = Date.UTC(p('year'), p('month') - 1, p('day'), p('hour'), p('minute'), p('second'));
+      const diff = target - got;
+      if (diff === 0) break;
+      guess += diff;
+    }
+    return new Date(guess);
+  }
+  function buildWindow(tzInput: any, ref: Date = new Date()) {
+    const tz = normalizeTz(tzInput);
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz, hourCycle: 'h23', year: 'numeric', month: '2-digit',
+      day: '2-digit', hour: '2-digit', minute: '2-digit',
+    }).formatToParts(ref);
+    const p = (t: string) => parseInt(parts.find((x: any) => x.type === t)!.value, 10);
+    let ly = p('year'); let lm = p('month') - 1; // 0-based prev-month target
+    if (lm <= 0) { lm = 11; ly -= 1; }
+    const ws = localToUTC(ly, lm, 1, 0, 0, 0, tz);
+    let ny = ly; let nm = lm + 1;
+    if (nm > 11) { nm = 0; ny += 1; }
+    const we = localToUTC(ny, nm, 1, 0, 0, 0, tz);
+    return {
+      window_start: ws, window_end: we,
+      month_label: `${MONTH_NAMES[lm]} ${ly}`,
+      local_year: ly, local_month: lm + 1,
+    };
+  }
+
+  const results: any[] = [];
+  let jobs_enqueued = 0;
+  let skipped = 0;
+  const skippedReasons: Record<string, number> = {};
+  let failures = 0;
+
+  for (const u of users) {
+    const ctx = { user_id: u.id, email: u.email, tier: u.tier_key };
+    if (!u.email) { skipped++; skippedReasons['no_email'] = (skippedReasons['no_email'] || 0) + 1; continue; }
+    try {
+      const win = buildWindow(u.timezone);
+      const uidEnc = encodeURIComponent(u.id);
+      const wsEnc = win.window_start.toISOString();
+      const weEnc = win.window_end.toISOString();
+
+      // Parallel fetch per metric
+      const [
+        arRes, ncRes, shRes, aiRes,
+      ] = await Promise.all([
+        supabaseServiceFetch(
+          `/assessment_results?select=overall_score,assessment_id,completed_at&user_id=eq.${uidEnc}&completed_at=gte.${encodeURIComponent(wsEnc)}&completed_at=lt.${encodeURIComponent(weEnc)}&limit=1000`,
+        ),
+        supabaseServiceFetch(
+          `/nexus_conversations?select=id&user_id=eq.${uidEnc}&created_at=gte.${encodeURIComponent(wsEnc)}&created_at=lt.${encodeURIComponent(weEnc)}&deleted_at=is.null&limit=1000`,
+        ),
+        supabaseServiceFetch(
+          `/assessment_shares?select=id&owner_id=eq.${uidEnc}&created_at=gte.${encodeURIComponent(wsEnc)}&created_at=lt.${encodeURIComponent(weEnc)}&limit=1000`,
+        ),
+        supabaseServiceFetch(
+          `/ai_job_queue?select=job_id&or=(tenant_user_id.eq.${uidEnc},created_by_user.eq.${uidEnc})&status=eq.completed&created_at=gte.${encodeURIComponent(wsEnc)}&created_at=lt.${encodeURIComponent(weEnc)}&limit=1000`,
+        ).then(async (r) => {
+          // ai_job_queue REST API has no LIKE filter for kind=ai:* via the basic querystring
+          // pattern easily. Post-filter locally is fine given the small batch.
+          return r;
+        }),
+      ]);
+
+      const assessments = Array.isArray(arRes.data) ? arRes.data : [];
+      const assessments_completed = assessments.length;
+      const scores = assessments
+        .map((x: any) => Number(x.overall_score))
+        .filter((n: number) => Number.isFinite(n));
+      const highest_single_score = scores.length ? Math.max(...scores) : null;
+      const per_diag: Record<string, number> = {};
+      for (const s of DIAGNOSTIC_SLUGS) per_diag[s] = 0;
+      for (const a of assessments) {
+        const id = String(a.assessment_id || '').toLowerCase();
+        if (per_diag.hasOwnProperty(id)) per_diag[id] += 1;
+      }
+
+      const nexus_sessions = Array.isArray(ncRes.data) ? ncRes.data.length : 0;
+      const shares_sent = Array.isArray(shRes.data) ? shRes.data.length : 0;
+      const allAiJobs = Array.isArray(aiRes.data) ? aiRes.data : [];
+      // Need kind info too — re-query with select=kind. This is why the CLI
+      // is preferred; but we keep HTTP handler simple and small-batch only.
+      const insights_generated_res = await supabaseServiceFetch(
+        `/ai_job_queue?select=job_id,kind&or=(tenant_user_id.eq.${uidEnc},created_by_user.eq.${uidEnc})&status=eq.completed&created_at=gte.${encodeURIComponent(wsEnc)}&created_at=lt.${encodeURIComponent(weEnc)}&limit=1000`,
+      );
+      const aiRows = Array.isArray(insights_generated_res.data) ? insights_generated_res.data : [];
+      const insights_generated = aiRows.filter((r: any) => String(r.kind || '').startsWith('ai:')).length;
+
+      // 3-month comparison (best-effort via single aggregated query by date ranges)
+      let three_month_comparison: any = undefined;
+      try {
+        const entries: any[] = [];
+        for (let off = 2; off >= 0; off--) {
+          let y = win.local_year; let m = win.local_month - off;
+          while (m <= 0) { m += 12; y -= 1; }
+          const nextRef = (() => {
+            let ny = y; let nm = m + 1;
+            if (nm > 12) { nm = 1; ny += 1; }
+            return localToUTC(ny, nm - 1, 5, 12, 0, 0, normalizeTz(u.timezone));
+          })();
+          const w = buildWindow(u.timezone, nextRef);
+          entries.push({ offset: 2 - off, year: w.local_year, month: w.local_month, ws: w.window_start, we: w.window_end });
+        }
+        const perMonthPromises = entries.map(async (e) => {
+          const res = await supabaseServiceFetch(
+            `/assessment_results?select=overall_score&user_id=eq.${uidEnc}&completed_at=gte.${encodeURIComponent(e.ws.toISOString())}&completed_at=lt.${encodeURIComponent(e.we.toISOString())}&limit=500`,
+          );
+          const rows = Array.isArray(res.data) ? res.data : [];
+          const scores = rows.map((x: any) => Number(x.overall_score)).filter((n: number) => Number.isFinite(n));
+          return {
+            month: `${MONTH_NAMES[e.month - 1]} ${e.year}`,
+            assessments_completed: rows.length,
+            avg_score: scores.length ? Number((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)) : null,
+          };
+        });
+        const comp = await Promise.all(perMonthPromises);
+        if (comp[0].assessments_completed + comp[1].assessments_completed > 0) {
+          three_month_comparison = comp;
+        }
+      } catch {
+        three_month_comparison = undefined;
+      }
+
+      const trend: any = { highest_single_score, assessments_per_diagnostic: per_diag };
+      if (three_month_comparison) trend.three_month_comparison = three_month_comparison;
+
+      const payload = {
+        recipient_name: u.full_name,
+        recipient_email: u.email,
+        user_tier: tierDisplayMap[u.tier_key] || u.tier_key,
+        month_label: win.month_label,
+        summary_counts: { assessments_completed, nexus_sessions, shares_sent, insights_generated },
+        trend,
+        account_url: `${APP_URL.replace(/\/$/, '')}/settings/account`,
+      };
+
+      let job_id: string | null = null;
+      let delivery_id: string | null = null;
+      if (!dryRun) {
+        // Enqueue job
+        const jobRes = await supabaseServiceFetch('/ai_job_queue', {
+          method: 'POST',
+          body: JSON.stringify({
+            kind: 'email:monthly_summary',
+            payload,
+            priority: 100,
+            available_at: new Date().toISOString(),
+            tenant_user_id: u.id,
+            created_by_user: null,
+            status: 'queued',
+            max_attempts: 5,
+          }),
+        });
+        if (jobRes.error) throw new Error(`enqueue job failed: ${JSON.stringify(jobRes.error)}`);
+        job_id = Array.isArray(jobRes.data) ? jobRes.data[0]?.job_id : null;
+
+        // Delivery log
+        const dlRes = await supabaseServiceFetch('/email_delivery_log', {
+          method: 'POST',
+          body: JSON.stringify({
+            tenant_user_id: u.id,
+            template_code: 'monthly_summary',
+            from_name: 'LYC Partners',
+            reply_to: 'no-reply@lyc.partners',
+            to_addresses: [u.email],
+            subject: `Your LYC Partners monthly summary for ${win.month_label}`,
+            preheader: 'This month\'s assessments, NEXUS conversations, and insights at a glance.',
+            provider: 'console',
+            status: 'queued',
+            miles_debited: 0,
+            tier_at_send: u.tier_key,
+            brand_pass: true,
+            scheduled_at: new Date().toISOString(),
+          }),
+        });
+        if (dlRes.error) throw new Error(`delivery log failed: ${JSON.stringify(dlRes.error)}`);
+        delivery_id = Array.isArray(dlRes.data) ? dlRes.data[0]?.delivery_id : null;
+        jobs_enqueued += 1;
+      }
+
+      results.push({
+        user_id: u.id,
+        email: u.email,
+        month_label: win.month_label,
+        counts: payload.summary_counts,
+        highest_single_score,
+        assessments_per_diagnostic: per_diag,
+        has_3m: !!three_month_comparison,
+        job_id,
+        delivery_id,
+      });
+    } catch (e: any) {
+      failures += 1;
+      skipped += 1;
+      skippedReasons['error'] = (skippedReasons['error'] || 0) + 1;
+      results.push({
+        user_id: u.id,
+        email: u.email,
+        error: e?.message || String(e),
+      });
+    }
+  }
+
+  return res.json({
+    ok: true,
+    worker: 'monthly-summary',
+    note: dryRun ? 'DRY RUN — no rows written' : 'writes applied',
+    eligible_tier_keys: eligibleTierKeys,
+    total_users_processed: users.length,
+    jobs_enqueued,
+    skipped,
+    failures,
+    skipped_reasons: skippedReasons,
+    results,
+    serverless_batch_limit_note:
+      'For full pipeline runs (all users, 3-month trend for real), use CLI: DATABASE_URL=... npx tsx scripts/monthly_summary_cron.ts',
+  });
+}
+
 
