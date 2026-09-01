@@ -93,6 +93,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const supabase = createClient();
 
+  // P1-1: hoisted OUTSIDE the try block so the catch handler can refund a
+  // deduction that happened inside the try if anything throws afterwards.
+  // `milesDebited` flips true only after a balance decrement commits;
+  // `deductionRefund` captures the params needed to issue the refund.
+  let milesDebited = false;
+  let deductionRefund: { userId: string; cost: number; code: string; idem: string | null } | null = null;
+
   try {
     // #1314: reject oversized URLs before processing.
     assertUrlLength(req);
@@ -246,11 +253,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Admins + internal staff are exempted from paying (operational/QA).
     const chargeMiles = !isAnonymous && !isAdminRole(ctx.role);
     let remainingBalance = 0;
-    // P1-1: tracks whether a mile deduction has occurred so any failure
-    // after this point (scoring throw, insert error, unhandled exception)
-    // can refund the debited miles — users are never charged for a run
-    // that didn't persist a result.
-    let milesDebited = false;
+    // P1-1: `milesDebited` + `deductionRefund` are hoisted above the try
+    // so the catch handler can refund if anything throws after a decrement.
 
     if (chargeMiles) {
       // 1) Fetch current balance row, fail if < cost.
@@ -313,6 +317,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // here on, any failure must trigger a refund (see insert-error block
       // below + the handler's top-level catch).
       milesDebited = true;
+      deductionRefund = { userId: ctx.userId, cost, code, idem };
 
       // 3) Append to credit_transactions so the audit trail exists.
       try {
@@ -412,11 +417,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // deduction (e.g. a scoring throw before the insert), refund the
     // debited miles before erroring out so the user is never charged for
     // a run that didn't persist. Idempotent: milesDebited is cleared by
-    // the insert-error block above after its own refund.
-    if (milesDebited) {
+    // the insert-error block above after its own refund. Reads the
+    // hoisted deductionRefund (set inside try) — never the in-try vars.
+    if (milesDebited && deductionRefund) {
+      const { userId, cost, code, idem } = deductionRefund;
       try {
         const { error: refundErr } = await supabase.rpc('refund_miles_balanced', {
-          p_user_id: ctx.userId,
+          p_user_id: userId,
           p_amount: cost,
           p_instrument_code: code,
           p_assessment_id: idem || null,
@@ -424,7 +431,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
         if (refundErr) {
           await supabase.rpc('increment_credits_balanced', {
-            p_user_id: ctx.userId,
+            p_user_id: userId,
             p_amount: cost,
           });
         }

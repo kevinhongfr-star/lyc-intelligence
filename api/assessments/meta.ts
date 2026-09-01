@@ -37,6 +37,8 @@ import {
   setRateLimitHeaders,
 } from '../lib/validate.js';
 import { z } from 'zod';
+import { getAssessmentRequiredTier } from '../../src/config/miles';
+import { normalizeTier, tierMeets, DEFAULT_TIER } from '../../src/config/tiers';
 
 // ================================================================
 // ACTION: catalog (public, GET only)
@@ -48,6 +50,31 @@ async function runCatalog(req: VercelRequest, res: VercelResponse) {
 
   const supabase = createClient();
   const code = (req.query.code as string)?.toUpperCase();
+
+  // P1-1: resolve the viewer OPTIONALLY so the public catalog stays
+  // browsable without login (no 401). When a bearer token is present we
+  // compute per-assessment `can_access` against the viewer's tier;
+  // otherwise we use the explorer floor so locked/unlocked states render
+  // sensibly for anonymous visitors.
+  let viewerTier: string = DEFAULT_TIER;
+  try {
+    const ctx = await getAuthorizedContext(req, true);
+    if (ctx?.tier) viewerTier = ctx.tier;
+  } catch {
+    // Malformed/expired token — treat as anonymous explorer (not a 401).
+  }
+  const canonicalViewer = normalizeTier(viewerTier) ?? DEFAULT_TIER;
+
+  // Annotate a catalog row with server-side access metadata.
+  const annotate = (row: any) => {
+    if (!row) return row;
+    const requiredTier = getAssessmentRequiredTier(String(row.code ?? ''));
+    return {
+      ...row,
+      required_tier: requiredTier,
+      can_access: tierMeets(canonicalViewer, requiredTier),
+    };
+  };
 
   try {
     if (code) {
@@ -62,7 +89,7 @@ async function runCatalog(req: VercelRequest, res: VercelResponse) {
       if (!data) {
         return res.status(404).json({ ok: false, error: 'Assessment not found' });
       }
-      return res.status(200).json({ ok: true, data });
+      return res.status(200).json({ ok: true, data: annotate(data) });
     }
 
     const { data, error } = await supabase
@@ -72,7 +99,7 @@ async function runCatalog(req: VercelRequest, res: VercelResponse) {
       .order('sort_order', { ascending: true });
 
     if (error) throw error;
-    return res.status(200).json({ ok: true, data: data || [] });
+    return res.status(200).json({ ok: true, data: (data || []).map(annotate) });
   } catch (err: any) {
     logServerError('api/assessments/meta?action=catalog', err, req);
     return res.status(500).json({ ok: false, error: 'Failed to fetch assessment catalog' });
