@@ -998,6 +998,531 @@ async function handleProcessDoc(
   });
 }
 
+// ── P3-1: Milestone actions ────────────────────────────────────────
+// All reads + writes filter by authUser.id even when using the service
+// role (service bypasses RLS, so we MUST scope WHEREs server-side).
+// Returns mirror the existing run.ts convention of machine-readable
+// `code` fields — OWNER_MISMATCH / FINALIZATION_EVIDENCE / etc.
+
+function isValidUUID(s: unknown): boolean {
+  return (
+    typeof s === 'string' &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s)
+  );
+}
+
+async function handleListMilestones(
+  _req: VercelRequest,
+  res: VercelResponse,
+  authUser: { id: string },
+  _body: any,
+) {
+  // status enum order: completed < active < queued isn't meaningful — use
+  // a CASE ordering so "active" ranks first, then queued, then completed.
+  const qs =
+    `/milestones?select=id,name,description,tags,progress,status,` +
+    `source_assessment_code,dependency_ids,required_lens_score,created_at,` +
+    `completed_at,updated_at` +
+    `&user_id=eq.${encodeURIComponent(authUser.id)}` +
+    `&order=(status.eq.active).desc,` +
+    `(status.eq.queued).desc,` +
+    `(status.eq.completed).desc,` +
+    `updated_at.desc`;
+
+  const r = await supabaseServiceFetch(qs);
+  if (r.error) {
+    return res
+      .status(500)
+      .json({ ok: false, error: r.error.message || 'Failed to fetch milestones' });
+  }
+  return res.status(200).json({ ok: true, data: Array.isArray(r.data) ? r.data : [] });
+}
+
+async function handleValidateMilestone(
+  _req: VercelRequest,
+  res: VercelResponse,
+  authUser: { id: string },
+  body: any,
+) {
+  const milestoneId = body?.milestone_id;
+  const newProgress = Number(body?.new_progress);
+  const evidence: unknown = body?.evidence ?? null;
+
+  if (!isValidUUID(milestoneId)) {
+    return res.status(400).json({
+      ok: false,
+      code: 'INVALID_MILESTONE_ID',
+      error: 'milestone_id must be a valid UUID.',
+    });
+  }
+  if (!Number.isFinite(newProgress)) {
+    return res.status(400).json({
+      ok: false,
+      code: 'INVALID_PROGRESS',
+      error: 'new_progress must be an integer 0–100.',
+    });
+  }
+  const clampedProgress = Math.max(0, Math.min(100, Math.round(newProgress)));
+  if (evidence !== null && evidence !== undefined && typeof evidence !== 'object') {
+    return res.status(400).json({
+      ok: false,
+      code: 'INVALID_EVIDENCE',
+      error: 'evidence must be a JSON object or null.',
+    });
+  }
+
+  // Call the database RPC via PostgREST. /rpc/validate_and_set_milestone_progress
+  // accepts positional params through request body JSON.
+  const rpcRes = await supabaseServiceFetch('/rpc/validate_and_set_milestone_progress', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      Prefer: 'return=representation',
+    },
+    body: JSON.stringify({
+      p_milestone_id: milestoneId,
+      p_new_progress: clampedProgress,
+      p_user_id: authUser.id,
+      p_evidence: evidence,
+    }),
+  });
+
+  if (rpcRes.error) {
+    return res.status(500).json({
+      ok: false,
+      code: 'RPC_ERROR',
+      error: rpcRes.error.message || 'Milestone RPC failed.',
+    });
+  }
+
+  // RPC returns TABLE(ok, code, message, previous_progress, new_progress)
+  // → PostgREST returns an array of one row.
+  const row =
+    Array.isArray(rpcRes.data) && rpcRes.data.length > 0 ? rpcRes.data[0] : null;
+  if (!row) {
+    return res.status(500).json({
+      ok: false,
+      code: 'RPC_NO_ROW',
+      error: 'Milestone validation RPC returned no rows.',
+    });
+  }
+
+  const code: string = String(row.code || '');
+  const ok: boolean = Boolean(row.ok);
+  const status = !ok
+    ? code === 'OWNER_MISMATCH'
+      ? 403
+      : code === 'MILESTONE_NOT_FOUND'
+      ? 404
+      : 422
+    : 200;
+
+  return res.status(status).json({
+    ok,
+    code,
+    message: row.message || '',
+    previous_progress:
+      typeof row.previous_progress === 'number' ? row.previous_progress : null,
+    new_progress: typeof row.new_progress === 'number' ? row.new_progress : null,
+  });
+}
+
+// ── P2-2: Cross-session memory (extraction, storage, injection) ────
+//
+// Design notes:
+//  • All reads + writes filter by user_id explicitly even though the service
+//    role bypasses RLS — no cross-user data leakage possible.
+//  • extraction uses keyword heuristics (no extra LLM call → ~$0 + ~0ms).
+//    Precision beats recall: false negatives are fine (just don't remember
+//    that specific item), false positives are very unlikely with the tight
+//    trigger regex list.
+//  • Memory feature has a master kill-switch: profile_settings.enable_nexus_memory
+//    = false skips reads AND writes entirely. Default true (opt-out).
+//  • Writes fail open — if any memory INSERT fails, chat response is still
+//    200 — memory is a best-effort enrichment, never block the turn.
+
+type NexusMemoryType =
+  | 'decision'
+  | 'action_item'
+  | 'emotion'
+  | 'fact'
+  | 'preference'
+  | 'summary';
+
+interface MemoryCandidate {
+  content: string;
+  memory_type: NexusMemoryType;
+  importance_score?: number;
+}
+
+// Map each memory type to a list of case-insensitive trigger regexes.
+// Capture the whole sentence (split on .!? followed by space) so a single
+// message can produce multiple items per class if it has multiple sentences
+// matching any trigger.
+const MEMORY_PATTERNS: Record<NexusMemoryType, RegExp[]> = {
+  decision: [
+    /\b(I decided|we chose|my final decision|decision was|agree to|agreed to|settle on|settled on|made up my mind)\b/i,
+  ],
+  action_item: [
+    /\b(I will|I'll|we will|we'll|next step|need to|plan to|going to|must|should|have to) .{10,300}/i,
+    /\b(by (Friday|Monday|Tuesday|Wednesday|Thursday|Saturday|Sunday|week|end of week|month|quarter|end of|tomorrow|tonight))\b/i,
+  ],
+  preference: [
+    /\b(I prefer|I like|I (really )?love|I don'?t like|I hate|I dislike|works best when|better when|best when|ideally|I would rather|please don'?t|I want you to (use|apply|format|write))\b/i,
+  ],
+  emotion: [
+    /\b(I feel|I'?m feeling|I am feeling|excited|frustrated|worried|stressed|happy|anxious|grateful|surprised|nervous|proud|disappointed|hopeful|overwhelmed)\b/i,
+  ],
+  fact: [
+    /\b(I work at|my role is|I'?m the|I manage|my team (has|is) |I report to|I'?m based in|I live in|company size|industry is|we are |my organization|I'?m in charge of|I lead|I oversee)\b/i,
+  ],
+  summary: [/\b\/summary\b/],
+};
+
+function splitSentences(text: string): string[] {
+  if (!text) return [];
+  // Split on sentence terminators + newline, drop empties, trim.
+  return text
+    .split(/(?<=[.!?])\s+|\n+|(?<=。)\s*/)
+    .map((s) => s.trim())
+    .filter((s) => s.length >= 10);
+}
+
+function extractMemories(
+  userMessage: string,
+  assistantReply: string,
+): MemoryCandidate[] {
+  const combined = `${userMessage}\n${assistantReply}`;
+  const sentences = splitSentences(combined);
+  const seenHashes = new Set<string>();
+  const out: MemoryCandidate[] = [];
+
+  for (const sent of sentences) {
+    for (const [rawType, patterns] of Object.entries(MEMORY_PATTERNS) as Array<
+      [NexusMemoryType, RegExp[]]
+    >) {
+      if (patterns.some((re) => re.test(sent))) {
+        // Deduplicate: sha1-ish 40-char fingerprint is overkill; short hash
+        // of first 80 chars is enough because memory writes within 5 minutes
+        // with the same content prefix are dropped anyway.
+        const key = rawType + ':' + sent.slice(0, 80).toLowerCase();
+        if (seenHashes.has(key)) continue;
+        seenHashes.add(key);
+        // Length-cap stored content to keep text fields bounded
+        const content = sent.length > 480 ? sent.slice(0, 477) + '…' : sent;
+        // Default importance: higher for preferences + decisions (core to
+        // long-term persona), lower for emotions (transient). Facts are
+        // medium. Summary row gets max.
+        let score = 0.5;
+        if (rawType === 'preference' || rawType === 'decision') score = 0.85;
+        else if (rawType === 'summary') score = 0.95;
+        else if (rawType === 'fact') score = 0.7;
+        else if (rawType === 'action_item') score = 0.7;
+        else if (rawType === 'emotion') score = 0.4;
+        out.push({ content, memory_type: rawType, importance_score: score });
+      }
+      if (out.length >= 5) break;
+    }
+    if (out.length >= 5) break;
+  }
+  return out;
+}
+
+// Returns null when memory is disabled; otherwise the trimmed boolean flag.
+async function isMemoryEnabled(userId: string): Promise<boolean> {
+  try {
+    const r = await supabaseServiceFetch(
+      `/profile_settings?select=enable_nexus_memory&user_id=eq.${encodeURIComponent(userId)}&limit=1`,
+    );
+    if (r.error || !Array.isArray(r.data) || r.data.length === 0) return true; // default opt-in if row absent
+    const val = r.data[0]?.enable_nexus_memory;
+    if (val === false || val === 'false') return false;
+    return true;
+  } catch {
+    return true; // fail open
+  }
+}
+
+// Count user's chat_sessions rows with user_id = userId — used to trigger
+// semantic upsert on every 5th session boundary.
+async function estimateSessionCount(userId: string): Promise<number> {
+  try {
+    const r = await supabaseServiceFetch(
+      `/chat_sessions?user_id=eq.${encodeURIComponent(userId)}&select=id`,
+    );
+    if (r.error || !Array.isArray(r.data)) return 0;
+    return r.data.length;
+  } catch {
+    return 0;
+  }
+}
+
+async function insertEpisodicMemories(
+  userId: string,
+  sessionId: string | null,
+  candidates: MemoryCandidate[],
+): Promise<void> {
+  if (candidates.length === 0) return;
+  const rows: unknown[] = candidates.map((c) => ({
+    user_id: userId,
+    source_conversation_id: sessionId,
+    content: c.content,
+    memory_type: c.memory_type,
+    importance_score: c.importance_score ?? 0.5,
+    ts: new Date().toISOString(),
+  }));
+
+  try {
+    // BULK INSERT /nexus_episodic_memory via PostgREST service-role.
+    await supabaseServiceFetch('/nexus_episodic_memory', {
+      method: 'POST',
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify(rows),
+    });
+    // Audit entries — one per inserted row. We don't hold memory_ids back
+    // since the audit trail doesn't need them (source='auto_extraction' and
+    // ts/user_id correlation is sufficient for admin review). Content
+    // snapshot in `new_value` gives admins a readable diff if needed.
+    const audits = candidates.map((c) => ({
+      user_id: userId,
+      change_type: 'created',
+      new_value: `${c.memory_type}: ${c.content.slice(0, 500)}`,
+      source: 'auto_extraction',
+      ts: new Date().toISOString(),
+    }));
+    await supabaseServiceFetch('/nexus_memory_audit', {
+      method: 'POST',
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify(audits),
+    });
+  } catch (e: any) {
+    console.warn(
+      `[chat-memory] episodic insert failed (user=${userId}):`,
+      e?.message || e,
+    );
+  }
+}
+
+// Called on session-boundary (≥5 sessions) or explicit /summary. Aggregates
+// 10 latest fact/decision/action_item memories into the user_model JSONB
+// document in nexus_semantic_memory.
+async function updateSemanticMemoryIfDue(
+  userId: string,
+  userMessage: string,
+  sessionId: string | null,
+  force: boolean = false,
+): Promise<void> {
+  const summaryTriggered = force || /(^|\s)\/summary(\s|$)/.test(userMessage);
+  if (!summaryTriggered) {
+    const n = await estimateSessionCount(userId);
+    if (n < 5 || n % 5 !== 0) return; // only every 5th session boundary
+  }
+
+  // Pull 10 latest decision/fact/action_item from episodic.
+  let memories: any[] = [];
+  try {
+    const r = await supabaseServiceFetch(
+      `/nexus_episodic_memory?select=content,memory_type` +
+        `&user_id=eq.${encodeURIComponent(userId)}` +
+        `&memory_type=in.(decision,fact,action_item)` +
+        `&order=ts.desc&limit=10`,
+    );
+    memories = Array.isArray(r.data) ? r.data : [];
+  } catch (e) {
+    console.warn(`[chat-memory] episodic fetch for semantic:`, e);
+    return;
+  }
+
+  const goals: string[] = [];
+  const focusAreas: string[] = [];
+  const careerCtx: Record<string, string> = {};
+
+  for (const m of memories) {
+    const txt: string = String(m.content || '');
+    const t: string = String(m.memory_type || 'fact');
+    if (t === 'decision' && txt.length > 15) goals.push(txt);
+    if (t === 'action_item' && txt.length > 15) focusAreas.push(txt);
+    if (t === 'fact') {
+      const mRole = txt.match(/my role is ([\w\s,]{2,60})/i);
+      if (mRole) careerCtx.role = mRole[1].trim();
+      const mInd = txt.match(/industry is ([\w\s,]{2,60})/i);
+      if (mInd) careerCtx.industry = mInd[1].trim();
+      const mLoc = txt.match(/I'?m based in ([\w\s,]{2,60})/i);
+      if (mLoc) careerCtx.location = mLoc[1].trim();
+      const mWork = txt.match(/I work at ([\w\s,]{2,60})/i);
+      if (mWork) careerCtx.company = mWork[1].trim();
+    }
+  }
+
+  // Build an incremental patch JSONB.
+  const patch = JSON.stringify({
+    goals: goals.slice(0, 10),
+    preferences: { focus_areas: focusAreas.slice(0, 10) },
+    career_context: careerCtx,
+  });
+
+  try {
+    // UPSERT into nexus_semantic_memory using the service role.
+    // If row exists → JSONB_SET merge goals/preferences.focus_areas/career_context
+    // with jsonb_concat-style (keep old keys, overwrite arrays). We don't do
+    // field-level merge today — just replace the 3 fields atomically.
+    await supabaseServiceFetch(
+      `/rpc/upsert_nexus_semantic_memory_patch`,
+      {
+        method: 'POST',
+        headers: { Prefer: 'return=minimal' },
+        body: JSON.stringify({ p_user_id: userId, p_patch: patch }),
+      },
+    ).then((r) => {
+      // If the RPC doesn't exist (pre-apply of its SQL companion in the
+      // migration), fall back to a plain upsert of the full document shape.
+      if (r.error && /function.*upsert_nexus_semantic_memory_patch/.test(r.error?.message || '')) {
+        const fallbackDoc = {
+          user_id: userId,
+          user_model: JSON.parse(patch),
+          update_count: 1,
+          last_updated: new Date().toISOString(),
+        };
+        return supabaseServiceFetch('/nexus_semantic_memory', {
+          method: 'POST',
+          headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+          body: JSON.stringify(fallbackDoc),
+        });
+      }
+      return r;
+    });
+
+    // Audit row for the semantic update.
+    await supabaseServiceFetch('/nexus_memory_audit', {
+      method: 'POST',
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify({
+        user_id: userId,
+        change_type: 'updated',
+        new_value: `semantic upsert; goals=${goals.length} focus=${focusAreas.length}`,
+        source: 'auto_extraction',
+        ts: new Date().toISOString(),
+      }),
+    });
+  } catch (e: any) {
+    console.warn(
+      `[chat-memory] semantic upsert failed (user=${userId}):`,
+      e?.message || e,
+    );
+  }
+}
+
+// Builds the "Recall (from prior sessions):" markdown preamble block.
+//
+// 1. Get semantic summary if any → rendered as top-level bullet about
+//    goals/preferences/career-context.
+// 2. Get 6 most relevant episodic memories (importance ≥0.75 OR ILIKE of
+//    2+ tokens from currentMessage), last 90 days.
+//
+// Returns '' if memory disabled or nothing relevant found.
+async function fetchContextMemories(
+  userId: string,
+  currentMessage: string,
+  enabled: boolean,
+): Promise<string> {
+  if (!enabled) return '';
+
+  let semanticRow: any = null;
+  let episodicRows: any[] = [];
+  try {
+    const semRes = await supabaseServiceFetch(
+      `/nexus_semantic_memory?select=user_model&user_id=eq.${encodeURIComponent(userId)}&limit=1`,
+    );
+    semanticRow = Array.isArray(semRes.data) && semRes.data.length > 0 ? semRes.data[0] : null;
+
+    // Build ILIKE OR tokens from currentMessage.
+    const tokens = String(currentMessage || '')
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((t) => t.length >= 5 && t.length <= 16)
+      .slice(0, 10);
+    // Use importance>=0.75 as the primary signal, OR fall back to any
+    // memory younger than 2 weeks if nothing matches strongly.
+    // (ILIKE is handled in-code to avoid tricky URL-encode of % chars — we
+    //  pull all rows with ts >= 90d ago, importance >= 0.5, then filter.)
+    const cutoff = new Date(Date.now() - 90 * 86_400_000).toISOString();
+    const epRes = await supabaseServiceFetch(
+      `/nexus_episodic_memory?select=content,memory_type,importance_score,ts` +
+        `&user_id=eq.${encodeURIComponent(userId)}` +
+        `&ts=gte.${encodeURIComponent(cutoff)}` +
+        `&order=importance_score.desc,ts.desc&limit=12`,
+    );
+    episodicRows = Array.isArray(epRes.data) ? epRes.data : [];
+  } catch (e) {
+    console.warn(`[chat-memory] fetch context failed (user=${userId}):`, e);
+    return '';
+  }
+
+  const sections: string[] = [];
+
+  // Semantic summary first (it's structured).
+  if (semanticRow?.user_model) {
+    const model = semanticRow.user_model as Record<string, any>;
+    const goals: string[] = Array.isArray(model.goals) ? model.goals : [];
+    const focus: string[] =
+      Array.isArray(model.preferences?.focus_areas)
+        ? model.preferences.focus_areas
+        : [];
+    const career: Record<string, string> | null =
+      model.career_context && typeof model.career_context === 'object'
+        ? model.career_context
+        : null;
+    const lines: string[] = [];
+    if (goals.length) lines.push(`- Goals: ${goals.slice(0, 4).join('; ')}`);
+    if (focus.length) lines.push(`- Focus areas: ${focus.slice(0, 4).join('; ')}`);
+    if (career) {
+      const cc = Object.entries(career)
+        .filter(([_, v]) => v && String(v).trim())
+        .map(([k, v]) => `${k}=${v}`)
+        .join(', ');
+      if (cc) lines.push(`- Career context: ${cc}`);
+    }
+    if (lines.length) sections.push('**You know about them (aggregate):**\n' + lines.join('\n'));
+  }
+
+  // Filter episodic — importance>=0.75 OR content ILIKEs any of tokens
+  let pickedRows = episodicRows.filter(
+    (r) => Number(r.importance_score) >= 0.75,
+  );
+  if (pickedRows.length < 3 && tokens.length >= 2) {
+    const extras = episodicRows.filter(
+      (r) =>
+        Number(r.importance_score) < 0.75 &&
+        tokens.some((tok) =>
+          String(r.content || '')
+            .toLowerCase()
+            .includes(tok),
+        ),
+    );
+    pickedRows = pickedRows.concat(extras);
+  }
+  if (pickedRows.length === 0 && episodicRows.length <= 6) pickedRows = episodicRows;
+
+  pickedRows = pickedRows.slice(0, 6);
+  if (pickedRows.length) {
+    const bullets = pickedRows.map(
+      (r) =>
+        `- [${String(r.memory_type).slice(0, 4)}] ${String(r.content).slice(0, 200)}`,
+    );
+    sections.push(
+      '**Snippets from prior conversations (verify before relying):**\n' +
+        bullets.join('\n'),
+    );
+  }
+
+  if (sections.length === 0) return '';
+
+  return (
+    `\n\n--- Recall (from prior sessions; label-based — not guaranteed accurate) ---\n` +
+    sections.join('\n\n')
+  );
+}
+
 async function handleChat(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET') {
     return res.status(200).json({
@@ -1047,6 +1572,17 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
     // the document context (the normal flow below).
     if (body.action === 'process_doc') {
       return handleProcessDoc(req, res, authUser, body);
+    }
+
+    // P3-1: Milestone list / validate actions (reuse [job].ts dispatch — no
+    // new serverless function file, stays within the 12-function Hobby cap).
+    // Milestone reads + writes are free; the 1-credit charge only applies
+    // to real chat turns further below.
+    if (body.action === 'list_milestones') {
+      return handleListMilestones(req, res, authUser, body);
+    }
+    if (body.action === 'validate_milestone') {
+      return handleValidateMilestone(req, res, authUser, body);
     }
 
     const message: string = body.message || '';
@@ -1263,9 +1799,15 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       }
     }
 
+    // P2-2: memory reads (best-effort, fail-open to empty string).
+    const memoryEnabled = await isMemoryEnabled(authUser.id);
+    const memoryContextBlock = memoryEnabled
+      ? await fetchContextMemories(authUser.id, message, true)
+      : '';
+
     // Build messages
     const messages: Array<{ role: string; content: string }> = [
-      { role: 'system', content: sysPrompt + docContextBlock },
+      { role: 'system', content: sysPrompt + docContextBlock + memoryContextBlock },
     ];
 
     // Add recent history (last 10 turns)
@@ -1346,6 +1888,36 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
 
     const data = await apiResponse.json();
     const responseText = data.choices?.[0]?.message?.content || '';
+
+    // P2-2: Memory writebacks (all fail-open, never block response). We guard
+    // EVERYTHING with a single try/catch so an unexpected error in the
+    // extraction path can never swallow a valid user chat response.
+    try {
+      if (memoryEnabled) {
+        const candidates = extractMemories(message, responseText);
+        if (candidates.length > 0) {
+          await insertEpisodicMemories(authUser.id, sessionId, candidates);
+        }
+        // Semantic upsert fires on /summary, 5-session boundary, OR on any
+        // turn where we just wrote a decision/preference (high-signal writes).
+        const highSignal = candidates.some(
+          (c) => c.memory_type === 'decision' || c.memory_type === 'preference',
+        );
+        if (
+          candidates.length > 0 &&
+          (/(^|\s)\/summary(\s|$)/.test(message) || highSignal)
+        ) {
+          void updateSemanticMemoryIfDue(authUser.id, message, sessionId, true);
+        } else {
+          void updateSemanticMemoryIfDue(authUser.id, message, sessionId, false);
+        }
+      }
+    } catch (memErr: any) {
+      console.warn(
+        `[chat-memory] post-turn extraction skipped (user=${authUser.id}):`,
+        memErr?.message || memErr,
+      );
+    }
 
     return res.status(200).json({
       ok: true,
