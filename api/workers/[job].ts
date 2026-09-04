@@ -1560,6 +1560,22 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       .json({ ok: false, error: 'Invalid or expired session. Please sign in again.' });
   }
 
+  // ── Look up user's real tier from profiles (server-side SSOT) ──────
+  // The client sends a `tier` field for convenience, but we never trust it
+  // for depth gating — always read from the database. This prevents a
+  // client from spoofing a higher tier to get deeper analysis.
+  let userTier: string = 'explorer';
+  {
+    const uid = encodeURIComponent(authUser.id);
+    const tierRes = await supabaseFetch(
+      `/profiles?select=tier&id=eq.${uid}&limit=1`,
+    );
+    const tierRow = Array.isArray(tierRes.data) ? tierRes.data[0] : null;
+    if (!tierRes.error && tierRow?.tier) {
+      userTier = String(tierRow.tier);
+    }
+  }
+
   // P0-1: track whether a credit was deducted so we can refund on any
   // failure path (DeepSeek error or unhandled throw).
   let creditDeducted = false;
@@ -1593,7 +1609,11 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
     )
       ? body.history
       : [];
-    const tier: string = body.tier || 'explorer';
+    // NOTE: body.tier is NOT used for tier gating. userTier (fetched
+    // server-side from profiles above) is the canonical source.
+    // body.tier is silently ignored — kept only for backward compat with
+    // older clients that still send it.
+    const tier = userTier;
     const systemPrompt: string | undefined = body.systemPrompt;
 
     // P1-2: optional list of document_ids the client attached to this
@@ -1998,4 +2018,5 @@ function escapeHtml(str: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+
 
