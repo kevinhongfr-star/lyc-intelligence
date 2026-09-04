@@ -55,8 +55,8 @@ import { z } from 'zod';
 // Matches src/config/miles.ts INSTRUMENT_MILE_COST — the single source of truth.
 // COACH is not an assessment (0 cost). CANVAS is future (2, same as Standard).
 // ═══════════════════════════════════════════════════════════════════════════
-import { INSTRUMENT_MILE_COST, getAssessmentRequiredTier } from '../../src/config/miles';
-import { normalizeTier, tierMeets } from '../../src/config/tiers';
+import { INSTRUMENT_MILE_COST, getAssessmentRequiredTier } from "../_lib/tierConfig.js";
+import { normalizeTier, tierMeets } from "../_lib/tierConfig.js";
 
 const ASSESSMENT_COSTS: Record<string, number> = INSTRUMENT_MILE_COST;
 
@@ -488,4 +488,5 @@ function computeScoreSummary(code: string, answers: Record<string, any>) {
     duration_seconds_reference: Object.keys(answers).length * 42,
   };
 }
+
 
