@@ -37,8 +37,8 @@ import {
   setRateLimitHeaders,
 } from '../_lib/validate.js';
 import { z } from 'zod';
-import { getAssessmentRequiredTier } from '../../src/config/miles';
-import { normalizeTier, tierMeets, DEFAULT_TIER } from '../../src/config/tiers';
+import { getAssessmentRequiredTier } from "../_lib/tierConfig.js";
+import { normalizeTier, tierMeets, DEFAULT_TIER } from "../_lib/tierConfig.js";
 
 // ================================================================
 // ACTION: catalog (public, GET only)
@@ -512,3 +512,4 @@ function generateShareToken(): string {
   }
   return token;
 }
+
