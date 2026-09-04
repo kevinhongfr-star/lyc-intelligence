@@ -1,6 +1,5 @@
 import React from 'react';
 import { DS } from '@/tokens';
-import { Logo } from '@/components/ui/Logo';
 
 /**
  * #1377 — Footer redesign (premium, B2C-focused).
@@ -53,8 +52,17 @@ export function UnifiedFooter() {
       >
         {/* Brand */}
         <div>
-          {/* V1.1 FIX 2: Footer bg is DS.bg (light mist) → light variant = dark wordmark */}
-          <Logo variant="light" size="lg" />
+          {/* LYC Partners wordmark — canonical brand mark */}
+          <div style={{
+            fontFamily: "'Crimson Pro', Georgia, serif",
+            fontSize: '22px',
+            fontWeight: 400,
+            letterSpacing: '-0.01em',
+            color: DS.text,
+            lineHeight: 1,
+          }}>
+            LYC<span style={{ color: DS.accent }}>.</span> Partners
+          </div>
           <p
             style={{
               fontSize: '13px',
@@ -64,8 +72,8 @@ export function UnifiedFooter() {
               maxWidth: '260px',
             }}
           >
-            Assessment-driven leadership intelligence for executives navigating
-            cross-border careers and senior transitions.
+            Assessment-driven leadership intelligence —
+            by LYC Partners.
           </p>
           <div
             style={{
@@ -220,7 +228,7 @@ export function UnifiedFooter() {
         }}
       >
         <div style={{ fontSize: '12px', color: DS.muted }}>
-          &copy; {new Date().getFullYear()} LYC Intelligence by LYC Partners.
+          &copy; {new Date().getFullYear()} LYC Partners.
         </div>
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
           <a
@@ -254,3 +262,4 @@ export function UnifiedFooter() {
     </footer>
   );
 }
+
