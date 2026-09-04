@@ -264,27 +264,28 @@ function nextUpgradeTierPdf(rawTier: string | null | undefined): string | null {
  */
 function applyTierRedactionsPdf(data: PdfData): PdfData {
   const order = tierOrderPdf(data.viewerTier);
-  if (order >= 3) return data; // Executive+ → full data passes through
+  if (order >= 5) return data; // Enterprise → full unrestricted
 
   const next: PdfData = JSON.parse(JSON.stringify(data));
 
-  // EI (order 1): most restrictive
-  if (order < 2) {
-    if (Array.isArray(next.dimensions) && next.dimensions.length > 3) {
-      next.dimensions = next.dimensions.slice(0, 3);
-    }
+  // Council (order 4): Executive + next-steps + full archetype narrative
+  // Executive (order 3): all dims + full AI insights + archetype with traits (no next-steps, no description)
+  if (order < 4) {
     if (next.aiInsights) {
       next.aiInsights = {
         ...next.aiInsights,
-        strengths: (next.aiInsights.strengths || []).slice(0, 1),
-        growthAreas: [],
         nextSteps: [],
       };
     }
-    next.archetype = null; // no archetype details at EI
+    if (next.archetype) {
+      next.archetype = {
+        ...next.archetype,
+        description: null,
+      };
+    }
   }
 
-  // Professional (order 2): no next-steps, archetype name only
+  // Professional (order 2): all dims + full strengths + growth areas. No next-steps, archetype name only.
   if (order < 3) {
     if (next.aiInsights) {
       next.aiInsights = {
@@ -299,6 +300,22 @@ function applyTierRedactionsPdf(data: PdfData): PdfData {
         key_traits: null,
       };
     }
+  }
+
+  // EI (order 1): most restrictive — 3 dims + 1 strength, no growth areas, no archetype
+  if (order < 2) {
+    if (Array.isArray(next.dimensions) && next.dimensions.length > 3) {
+      next.dimensions = next.dimensions.slice(0, 3);
+    }
+    if (next.aiInsights) {
+      next.aiInsights = {
+        ...next.aiInsights,
+        strengths: (next.aiInsights.strengths || []).slice(0, 1),
+        growthAreas: [],
+        nextSteps: [],
+      };
+    }
+    next.archetype = null;
   }
 
   return next;
@@ -508,7 +525,7 @@ function buildPdfBuffer(
         .rect(0, 0, (geom.W * 72) / 25.4, (4 * 72) / 25.4)
         .fill(ACCENT_INK);
 
-      doc.font('Helvetica-Bold');
+      doc.font(FONT.META_MED);
       textLine('LYC PARTNERS — EXECUTIVE ASSESSMENT', {
         x: geom.left + 4, y: 22, size: 7, color: ACCENT_INK,
         font: FONT.META_MED, gapAfter: 10,
@@ -572,7 +589,7 @@ function buildPdfBuffer(
       );
       doc.font(FONT.META).fontSize(8).fillColor(INK_MUTED);
       doc.text('/100', (heroCX * 72) / 25.4 + scoreW / 2 - 6, (heroCY * 72) / 25.4 + 5);
-      doc.font('Helvetica-Bold').fontSize(11).fillColor(ACCENT_INK);
+      doc.font(FONT.BODY_SEMI).fontSize(11).fillColor(ACCENT_INK);
       const levelText = data.result.overall_level || lvl.label;
       doc.text(levelText, (heroCX * 72) / 25.4 - 18, (heroCY * 72) / 25.4 + 26);
 
@@ -642,9 +659,9 @@ function buildPdfBuffer(
             (cellH * 72) / 25.4,
           )
           .fillAndStroke();
-        doc.fillColor(ACCENT_INK).font('Helvetica-Bold').fontSize(7);
+        doc.fillColor(ACCENT_INK).font(FONT.BODY_SEMI).fontSize(7);
         doc.text(header, (x * 72) / 25.4 + 4, (kpiY * 72) / 25.4 + 4);
-        doc.fillColor(accent).font('Helvetica-Bold').fontSize(16);
+        doc.fillColor(accent).font(FONT.HEADING).fontSize(16);
         const valW = doc.widthOfString(value);
         const centerX = x + cellW / 2;
         doc.text(
@@ -664,7 +681,7 @@ function buildPdfBuffer(
           lvl.description
         } Cross-reference your dimension breakdown below for specific areas.`;
       textLine('Key insight', {
-        size: 11, font: 'Helvetica-Bold', color: ACCENT_INK, gapAfter: 1.5,
+        size: 11, font: FONT.BODY_SEMI, color: ACCENT_INK, gapAfter: 1.5,
       });
       textLine(summary.slice(0, 800), {
         size: 10.5, color: INK, width: cW, gapAfter: 6,
@@ -676,7 +693,7 @@ function buildPdfBuffer(
         .slice(0, 3);
       if (top3Dim.length > 0) {
         textLine('Top dimensions', {
-          size: 11, font: 'Helvetica-Bold', color: ACCENT_INK, gapAfter: 2,
+          size: 11, font: FONT.BODY_SEMI, color: ACCENT_INK, gapAfter: 2,
         });
         const kCellW = (cW - 8) / 3;
         const kY = cY;
@@ -695,13 +712,13 @@ function buildPdfBuffer(
               (kH * 72) / 25.4,
             )
             .fillAndStroke();
-          doc.fillColor(dLevel.color).font('Helvetica-Bold').fontSize(13);
+          doc.fillColor(dLevel.color).font(FONT.BODY_BOLD).fontSize(13);
           doc.text(
             `${Math.round(d.score ?? 0)}`,
             (x * 72) / 25.4 + 3,
             (kY * 72) / 25.4 + 3,
           );
-          doc.fillColor(INK).font('Helvetica-Bold').fontSize(8.5);
+          doc.fillColor(INK).font(FONT.BODY_MED).fontSize(8.5);
           doc.text(d.dimension_name.slice(0, 34), (x * 72) / 25.4 + 14, (kY * 72) / 25.4 + 5);
           doc.fillColor(INK_MUTED).font(FONT.META).fontSize(7);
           doc.text(dLevel.label, (x * 72) / 25.4 + 14, (kY * 72) / 25.4 + 14);
@@ -726,7 +743,7 @@ function buildPdfBuffer(
         const d = dims[i];
         const lvl2 = scoreLevel(d.score ?? 0);
         textLine(`${i + 1}. ${d.dimension_name}`, {
-          size: 11, font: 'Helvetica-Bold', color: INK, gapAfter: 0.5,
+          size: 11, font: FONT.BODY_BOLD, color: INK, gapAfter: 0.5,
         });
         // Bar: track = full cW, fill = score% * cW
         const barX = geom.left;
@@ -770,7 +787,7 @@ function buildPdfBuffer(
       if (data.aiInsights) {
         if (data.aiInsights.summary) {
           textLine('Summary', {
-            size: 11, font: 'Helvetica-Bold', color: ACCENT_INK, gapAfter: 1,
+            size: 11, font: FONT.BODY_SEMI, color: ACCENT_INK, gapAfter: 1,
           });
           textLine(data.aiInsights.summary.slice(0, 1200), {
             size: 10, color: INK, width: cW, gapAfter: 5,
@@ -779,7 +796,7 @@ function buildPdfBuffer(
         const bulletList = (title: string, items: string[], accent: string) => {
           if (!items.length) return;
           textLine(title, {
-            size: 11, font: 'Helvetica-Bold', color: accent, gapAfter: 1,
+            size: 11, font: FONT.HEADING, color: accent, gapAfter: 1,
           });
           items.slice(0, 6).forEach((t) => {
             textLine(`•  ${t.slice(0, 250)}`, {
@@ -804,7 +821,7 @@ function buildPdfBuffer(
           size: 18, font: FONT.HEADING, color: ACCENT, gapAfter: 3,
         });
         textLine(data.archetype.name, {
-          size: 14, font: 'Helvetica-Bold', color: ACCENT_INK, gapAfter: 1.5,
+          size: 14, font: FONT.HEADING, color: ACCENT_INK, gapAfter: 1.5,
         });
         if (data.archetype.description) {
           textLine(data.archetype.description.slice(0, 3000), {
@@ -813,7 +830,7 @@ function buildPdfBuffer(
         }
         if (Array.isArray(data.archetype.key_traits) && data.archetype.key_traits.length) {
           textLine('Key traits', {
-            size: 11, font: 'Helvetica-Bold', color: ACCENT_INK, gapAfter: 1,
+            size: 11, font: FONT.BODY_SEMI, color: ACCENT_INK, gapAfter: 1,
           });
           data.archetype.key_traits.slice(0, 10).forEach((t) => {
             textLine(`•  ${t.slice(0, 250)}`, {
@@ -842,7 +859,7 @@ function buildPdfBuffer(
           )
           .fillAndStroke();
         textLine('Upgrade to Professional — unlock the full report', {
-          size: 13, font: 'Helvetica-Bold', color: ACCENT, gapAfter: 2,
+          size: 13, font: FONT.HEADING, color: ACCENT, gapAfter: 2,
         });
         textLine(
           '• All 6+ diagnostic dimensions with text\n' +
@@ -863,12 +880,12 @@ function buildPdfBuffer(
         textLine(
           'Book a 30-minute debrief with a LYC consultant to walk through your results, ' +
           'validate any milestone you have in motion, and turn the AI insight list into ' +
-          'a concrete 90-day plan. 1 credit per debrief slot.',
+          'a concrete 90-day plan. 1 mile per debrief slot.',
           { size: 9.5, color: INK_SOFT, width: cW, gapAfter: 4 },
         );
         textLine(
           '→ lyc.partners/coaching  •  message your consultant directly in NEXUS app.',
-          { size: 9, color: ACCENT, font: 'Helvetica-Bold' },
+          { size: 9, color: ACCENT, font: FONT.BODY_SEMI },
         );
       }
 
