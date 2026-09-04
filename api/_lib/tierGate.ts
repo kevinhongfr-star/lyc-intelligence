@@ -7,7 +7,7 @@
  *
  * Usage in an API route:
  *
- *   import { withTierGate } from '@/lib/tierGate';
+ *   import { withTierGate } from '../_lib/tierGate';
  *   export default withTierGate('professional', async (req, res, ctx) => {
  *     // handler only runs if user's tier >= professional
  *   });
@@ -15,16 +15,21 @@
  * Soft gate behavior: Explorer-tier users get a 403 with a structured
  * body containing `upgrade_to` + `pricing_url` so the frontend can
  * show a SoftGate / UpgradeCTA instead of a hard error.
+ *
+ * NOTE: Imports ONLY from ../_lib/tierConfig.js — no cross-boundary
+ * src/ imports that would break Vercel serverless bundling.
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import {
-  type TierKey,
   TIERS,
   normalizeTier,
   tierMeets,
   DEFAULT_TIER,
-} from '../../src/config/tiers';
-import { getAuthorizedContext, type AuthorizedContext } from '../_lib/auth';
+} from './tierConfig.js';
+import { getAuthorizedContext, type AuthorizedContext } from './auth.js';
+
+// TierKey type — mirror of src/config/tiers.ts TierKey for TS consumers.
+export type TierKey = 'explorer' | 'starter' | 'professional' | 'executive' | 'council';
 
 export interface TierGateOptions {
   /** If true, unauthenticated requests are allowed (guest access). */
@@ -63,18 +68,19 @@ export function withTierGate(
       return;
     }
 
-    const userTier = normalizeTier(ctx.userId ? (ctx as any).tier : null) ?? DEFAULT_TIER;
+    const userTier = (normalizeTier(ctx.userId ? (ctx as any).tier : null) ?? DEFAULT_TIER) as TierKey;
 
     if (!tierMeets(userTier, requiredTier)) {
       const requiredMeta = TIERS[requiredTier];
+      const userMeta = TIERS[userTier];
       if (softDeny) {
         res.status(200).json({
           ok: false,
           soft_gate: true,
           required_tier: requiredTier,
-          required_tier_display: requiredMeta.displayName,
+          required_tier_display: requiredMeta?.displayName ?? requiredTier,
           current_tier: userTier,
-          message: `[Soft gate: ${requiredMeta.displayName} tier required. You're on ${TIERS[userTier].displayName}.]`,
+          message: `[Soft gate: ${requiredMeta?.displayName ?? requiredTier} tier required. You're on ${userMeta?.displayName ?? userTier}.]`,
           upgrade_url: '/pricing',
         });
       } else {
@@ -82,10 +88,10 @@ export function withTierGate(
           ok: false,
           error: 'TIER_REQUIRED',
           required_tier: requiredTier,
-          required_tier_display: requiredMeta.displayName,
+          required_tier_display: requiredMeta?.displayName ?? requiredTier,
           current_tier: userTier,
           upgrade_url: '/pricing',
-          message: `This feature requires the ${requiredMeta.displayName} tier or above.`,
+          message: `This feature requires the ${requiredMeta?.displayName ?? requiredTier} tier or above.`,
         });
       }
       return;
@@ -105,7 +111,7 @@ export function checkFeature(
   feature: string,
 ): boolean {
   if (!ctx) return false;
-  const tier = normalizeTier((ctx as any).tier) ?? DEFAULT_TIER;
-  const features = TIERS[tier].features;
-  return Boolean((features as any)[feature]);
+  const tier = (normalizeTier((ctx as any).tier) ?? DEFAULT_TIER) as TierKey;
+  const features = (TIERS[tier] as any)?.features ?? {};
+  return Boolean(features[feature]);
 }
