@@ -2,16 +2,21 @@
  * components/report/ExportPdfButton.tsx — #89 Export PDF trigger button
  *
  * Wires the PdfReport ref + export service together.
- * Shows in-line progress + error states. Intended to render below the result
- * share controls (web result layout ticket #62/#1343 uses it via renderReport).
+ * P2-1: On click, first try the server /api/reports/pdf pipeline with a short
+ * 2-second timeout. On success → opens the signed Storage URL in a new tab.
+ * On ANY failure (501/4xx/5xx/timeout/network) → silent fallback to the
+ * existing html2canvas + jsPDF client pipeline. Users get the same PDF they
+ * would have gotten pre-P2-1, never an error.
  */
 
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import type { AssessmentResultData } from '@/types/reportTemplates';
 import type { PdfPageSize } from './PdfReport';
 import { PdfReport } from './PdfReport';
 import { exportPdfWithErrorBoundary } from '@/services/pdfExport';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/lib/supabase';
+import { toast } from '@/stores/toastStore';
 
 export interface ExportPdfButtonProps {
   data: AssessmentResultData;
@@ -32,42 +37,118 @@ export const ExportPdfButton: React.FC<ExportPdfButtonProps> = ({
   const [phase, setPhase] = useState<'fonts' | 'capture' | 'write'>('capture');
   const [error, setError] = useState<string | null>(null);
 
+  // P2-1 debounce: if the server pipeline failed once within a session, don't
+  // re-try for 30 seconds — keeps the second click instant (no 2s wait
+  // for nothing). Reset to zero on 30s timer.
+  const [serverFailedUntil, setServerFailedUntil] = useState<number>(0);
+  useEffect(() => {
+    if (!serverFailedUntil) return;
+    const ms = serverFailedUntil - Date.now();
+    if (ms <= 0) return;
+    const t = window.setTimeout(() => setServerFailedUntil(0), ms);
+    return () => window.clearTimeout(t);
+  }, [serverFailedUntil]);
+
   // We render the PdfReport off-screen while exporting. This way the button
   // itself can trigger capture even when no report preview is visible.
   const renderRef = useRef<HTMLDivElement | null>(null);
+
+  const runClientPipeline = useCallback(async () => {
+    setPhase('capture');
+    setProgress(0);
+    const node = renderRef.current;
+    if (!node) {
+      throw new Error('Report render node is not ready. Please retry.');
+    }
+    const res = await exportPdfWithErrorBoundary({
+      reportNode: node,
+      data,
+      pageSize,
+      onProgress: (ratio, ph) => {
+        setProgress(Math.round(ratio * 100));
+        setPhase(ph);
+      },
+    });
+    if (!res.ok) throw res.error;
+  }, [data, pageSize]);
 
   const doExport = useCallback(async () => {
     setError(null);
     setExporting(true);
     setProgress(0);
+    setPhase('capture');
 
     try {
       // Force a re-render of the report node to ensure it's attached to DOM
       // at capture time. Let browser settle layout (one frame).
       await new Promise((r) => requestAnimationFrame(() => r(undefined)));
 
-      const node = renderRef.current;
-      if (!node) {
-        throw new Error('Report render node is not ready. Please retry.');
+      // P2-1: server-first attempt (2s timeout). Skipped if server pipeline
+      // already failed in the last 30 seconds.
+      let serverSucceeded = false;
+      if (Date.now() >= serverFailedUntil) {
+        try {
+          const { data: sessionData } = await supabase.auth.getSession();
+          const accessToken = sessionData.session?.access_token || '';
+          if (!accessToken) throw new Error('NO_TOKEN');
+
+          const ctrl = new AbortController();
+          const to = window.setTimeout(() => ctrl.abort(), 2000);
+          const res = await fetch('/api/reports/pdf', {
+            method: 'POST',
+            signal: ctrl.signal,
+            headers: {
+              'Content-Type': 'application/json',
+              ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+            },
+            body: JSON.stringify({
+              data,
+              pageSize,
+              response_mode: 'url',
+            } satisfies {
+              data: typeof data;
+              pageSize: PdfPageSize;
+              response_mode: 'url';
+            }),
+          });
+          clearTimeout(to);
+          const payload = await res.json().catch(() => ({} as any));
+          if (res.ok && payload?.ok && typeof payload.download_url === 'string') {
+            window.open(payload.download_url, '_blank', 'noopener');
+            toast.success('Opening PDF in a new tab…');
+            serverSucceeded = true;
+          } else {
+            // Server said 501/4xx/5xx: fall through to client pipeline.
+            if (res.status === 401 || res.status === 403) {
+              // Auth-level failures don't count as "server pipeline broken"
+              // (may be transient — expired token, etc.).
+              toast.info('Re-authenticating… using browser PDF export.');
+            } else {
+              setServerFailedUntil(Date.now() + 30_000);
+              toast.info('Using browser PDF export.');
+            }
+          }
+        } catch (_e: any) {
+          // NetworkError / AbortError / JSON parse / NO_TOKEN
+          setServerFailedUntil(Date.now() + 30_000);
+          toast.info('Using browser PDF export.');
+        }
       }
 
-      const res = await exportPdfWithErrorBoundary({
-        reportNode: node,
-        data,
-        pageSize,
-        onProgress: (ratio, ph) => {
-          setProgress(Math.round(ratio * 100));
-          setPhase(ph);
-        },
-      });
-      if (!res.ok) throw res.error;
+      if (!serverSucceeded) {
+        // Client pipeline fallback — existing html2canvas + jsPDF flow.
+        // Re-force layout settle since 2 seconds may have elapsed and the
+        // hidden renderRef node could be detached.
+        await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+        await runClientPipeline();
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'PDF export failed. Retry.');
     } finally {
       setExporting(false);
       setProgress(100);
     }
-  }, [data, pageSize]);
+  }, [data, pageSize, serverFailedUntil, runClientPipeline]);
 
   return (
     <div className={cn('flex items-center gap-3 flex-wrap', className)}>

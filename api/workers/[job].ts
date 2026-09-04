@@ -1517,10 +1517,12 @@ async function fetchContextMemories(
 
   if (sections.length === 0) return '';
 
-  return (
-    `\n\n--- Recall (from prior sessions; label-based — not guaranteed accurate) ---\n` +
+  const MAX_MEMORY_CONTEXT_CHARS = 2000; // ~500 tokens, keeps context bounded
+  const fullContext =
+    `\n\n--- Recall (from prior sessions; label-based — not guaranteed accurate) ---\n` + +
     sections.join('\n\n')
-  );
+  if (fullContext.length <= MAX_MEMORY_CONTEXT_CHARS) return fullContext;
+  return fullContext.slice(0, MAX_MEMORY_CONTEXT_CHARS) + '\n… (truncated)';
 }
 
 async function handleChat(req: VercelRequest, res: VercelResponse) {
@@ -1645,7 +1647,7 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       if (balRes.error || !balRow || currentBalance < 1) {
         return res.status(402).json({
           ok: false,
-          error: 'Insufficient credits. Upgrade or wait for daily reset.',
+          error: 'Insufficient miles. Upgrade or wait for daily reset.',
           code: 'INSUFFICIENT_CREDITS',
         });
       }
@@ -1669,7 +1671,7 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       if (deductRes.error || !deductRow) {
         return res.status(402).json({
           ok: false,
-          error: 'Failed to deduct credit. Please retry.',
+          error: 'Failed to deduct mile. Please retry.',
           code: 'CREDIT_DEDUCTION_FAILED',
         });
       }
@@ -1925,7 +1927,7 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       model: data.model || DEEPSEEK_MODEL,
       usage: data.usage || null,
       user_id: authUser.id,
-      credit_balance: creditBalance,
+      mile_balance: creditBalance,
     });
   } catch (error: any) {
     // P0-1: safety net — if anything threw after a successful deduction
