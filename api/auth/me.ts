@@ -14,8 +14,8 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '../lib/supabase-rest.js';
-import { getAuthorizedContext, RequestAuthError } from '../lib/auth.js';
+import { createClient } from '../_lib/supabase-rest.js';
+import { getAuthorizedContext, RequestAuthError } from '../_lib/auth.js';
 import {
   assertUrlLength,
   getClientIp,
@@ -23,7 +23,7 @@ import {
   logServerError,
   RateLimiter,
   setRateLimitHeaders,
-} from '../lib/validate.js';
+} from '../_lib/validate.js';
 
 // #1314: Rate limit — 60 requests per minute per IP.
 // Prevents user enumeration and brute-force token probing.

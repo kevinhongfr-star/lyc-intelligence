@@ -24,7 +24,7 @@ import {
   tierMeets,
   DEFAULT_TIER,
 } from '../../src/config/tiers';
-import { getAuthorizedContext, type AuthorizedContext } from '../lib/auth';
+import { getAuthorizedContext, type AuthorizedContext } from '../_lib/auth';
 
 export interface TierGateOptions {
   /** If true, unauthenticated requests are allowed (guest access). */

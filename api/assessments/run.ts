@@ -29,13 +29,13 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '../lib/supabase-rest.js';
+import { createClient } from '../_lib/supabase-rest.js';
 import {
   enforceScope,
   getAuthorizedContext,
   isAdminRole,
   RequestAuthError,
-} from '../lib/auth.js';
+} from '../_lib/auth.js';
 import {
   assertBodySize,
   assertUrlLength,
@@ -47,7 +47,7 @@ import {
   DEFAULT_BODY_LIMIT,
   rateLimit,
   setRateLimitHeaders,
-} from '../lib/validate.js';
+} from '../_lib/validate.js';
 import { z } from 'zod';
 
 // ═══════════════════════════════════════════════════════════════════════════

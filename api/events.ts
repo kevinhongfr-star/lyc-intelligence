@@ -28,7 +28,7 @@ import {
   setRateLimitHeaders,
   DEFAULT_BODY_LIMIT,
   DEFAULT_ARRAY_LIMIT,
-} from './lib/validate.js';
+} from './_lib/validate.js';
 
 interface EventShape {
   name: string;

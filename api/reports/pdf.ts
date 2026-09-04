@@ -47,12 +47,12 @@ import {
   parseJsonBody,
   rateLimit,
   setRateLimitHeaders,
-} from '../lib/validate.js';
+} from '../_lib/validate.js';
 import {
   getAuthorizedContext,
   isAdminRole,
   RequestAuthError,
-} from '../lib/auth.js';
+} from '../_lib/auth.js';
 
 /* ── Zod input schema ─────────────────────── (unchanged from original stub) */
 
