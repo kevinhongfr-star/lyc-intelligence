@@ -38,11 +38,18 @@ export const TIER_LEGACY_MAP = {
 
 // ── TIERS metadata object (order is the only field used by tierMeets) ──
 
+// Display name overrides — keep in sync with src/config/tiers.ts
+const TIER_DISPLAY_NAME_OVERRIDES = {
+  // If any tier needs a non-capitalized display name, add here
+};
+
 const TIERS = (() => {
   const result = {};
   TIER_KEYS.forEach((key, i) => {
+    const override = TIER_DISPLAY_NAME_OVERRIDES[key];
     result[key] = {
       key,
+      displayName: override ?? (key.charAt(0).toUpperCase() + key.slice(1)),
       order: i + 1,
     };
   });
