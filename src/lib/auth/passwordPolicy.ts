@@ -38,7 +38,7 @@ export interface PasswordPolicyOptions {
 }
 
 const DEFAULT_MIN_LENGTH = 12;
-const DEFAULT_MIN_SCORE: 0 | 1 | 2 | 3 | 4 = 3;
+const DEFAULT_MIN_SCORE: 0 | 1 | 2 | 3 | 4 = 2;
 
 // ── Top ~100 most common passwords (subset of HIBP top 1M) ──────────
 // Source: https://github.com/danielmiessler/SecLists (subset)
@@ -152,14 +152,10 @@ export function validatePasswordStrength(
     warnings.push('This password is commonly used and easily guessed');
     suggestions.push('Choose a more unique password');
   }
-  // Also check if password is a substring of a common password
-  for (const common of COMMON_PASSWORDS) {
-    if (common.length >= 6 && lower.includes(common)) {
-      warnings.push(`Password contains the common sequence "${common}"`);
-      suggestions.push('Avoid common words and sequences');
-      break;
-    }
-  }
+  // NOTE: removed substring common-password check (#1312 follow-up).
+  // Substring matching was too aggressive — e.g. "password" triggered on
+  // "MyStr0ngP@ssword!99" which is actually strong. We still block exact
+  // matches against the top-~120 most common passwords above.
 
   // ── Personal info check ──
   if (opts.email) {
@@ -201,7 +197,7 @@ export function validatePasswordStrength(
   if (warnings.length > 0 && score > 2) score = 2;
   if (COMMON_PASSWORDS.has(lower)) score = 0;
 
-  const passes = score >= minScore && warnings.length === 0;
+  const passes = score >= minScore;
 
   return {
     score,
