@@ -1,4 +1,4 @@
-import { createClient } from "../lib/supabase-rest.js";
+import { createClient } from "./supabase-rest.js";
 class RequestAuthError extends Error {
   status;
   constructor(message, status = 401) {
