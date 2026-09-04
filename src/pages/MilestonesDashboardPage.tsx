@@ -13,12 +13,14 @@
  * This is 100% presentation layer — milestone logic/engine, creation system,
  * and data model are preserved verbatim. Only new rendering surface.
  */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SEO } from '@/components/seo/SEO';
 import { SkipToContent } from '@/components/a11y/SkipToContent';
 import { useAuthStore } from '@/stores/authStore';
 import { V1 } from '@/styles/v1-tokens';
+import { supabase } from '@/lib/supabase';
+import { toast } from '@/stores/toastStore';
 
 // ── V1 motion ──
 const EASE_OUT = V1.ease;
@@ -184,18 +186,178 @@ function formatLongDate(d: Date) {
   });
 }
 
+// Seed helper: on first visit (DB returns empty) build MilestoneItems from the
+// existing mock constants so the page renders with realistic V1 content. The
+// backend's `list_milestones` always wins when data actually exists.
+function seedFromMocks(): MilestoneItem[] {
+  return [...ACTIVE_MILESTONES, ...COMPLETED_MILESTONES, ...QUEUED_MILESTONES] as MilestoneItem[];
+}
+
 export function MilestonesDashboardPage() {
   const { user, profile } = useAuthStore();
   const navigate = useNavigate();
   const now = useMemo(() => new Date(), []);
   const lastUpdated = useMemo(() => formatLongDate(now), [now]);
 
-  // ── Stats ──
-  const activeCount = ACTIVE_MILESTONES.length;
-  const queuedCount = QUEUED_MILESTONES.length;
+  // P3-1: milestone state — fetched from the milestones table via the
+  // `list_milestones` action on the workers route. Shape matches MilestoneItem
+  // but `id` is a UUID from the DB, `status` matches the milestone_status enum.
+  // We keep the mock consts intact for offline/empty-result graceful fallbacks.
+  const [milestones, setMilestones] = useState<MilestoneItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [evidenceModalOpenFor, setEvidenceModalOpenFor] = useState<{
+    id: string;
+    targetProgress: number;
+  } | null>(null);
+
+  // Tracks the server's "true" state for each milestone so we can revert
+  // on a 422 validation failure — never trust optimistic state long-term.
+  const serverMilestonesRef = useRef<Record<string, { progress: number; status: string }>>({});
+
+  // POST helper for [job].ts dispatch routes. Injects the Supabase Bearer.
+  const workerPost = useCallback(
+    async <T = unknown>(action: string, body: Record<string, unknown>): Promise<T> => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token || '';
+      const res = await fetch('/api/workers/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+        body: JSON.stringify({ action, ...body }),
+      });
+      const payload = await res.json().catch(() => ({} as any));
+      if (!res.ok || payload?.ok === false) {
+        const err = new Error(payload?.message || payload?.error || `HTTP ${res.status}`);
+        (err as any).code = payload?.code;
+        throw err;
+      }
+      return payload as T;
+    },
+    [],
+  );
+
+  const toMilestoneItem = (row: any): MilestoneItem => ({
+    id: String(row.id),
+    name: String(row.name || 'Milestone'),
+    date: row.created_at ? formatLongDate(new Date(row.created_at)) : '—',
+    description: typeof row.description === 'string' ? row.description : undefined,
+    tags: Array.isArray(row.tags) ? row.tags : [],
+    progress: Math.max(0, Math.min(100, Number(row.progress ?? 0))),
+    status: (
+      ['queued', 'active', 'completed'] as MilestoneItem['status'][]
+    ).includes(row.status)
+      ? row.status
+      : 'queued',
+    completedDate: row.completed_at
+      ? formatLongDate(new Date(row.completed_at))
+      : undefined,
+    lensSource: typeof row.source_assessment_code === 'string' ? row.source_assessment_code : undefined,
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        setLoading(true);
+        type Resp = { ok: boolean; data: any[] };
+        const r = await workerPost<Resp>('list_milestones', {});
+        if (cancelled) return;
+        const rows: any[] = Array.isArray(r.data) ? r.data : [];
+        const items = rows.map(toMilestoneItem);
+        // Seed with mock data if the DB is empty (fresh user).
+        const merged = items.length > 0 ? items : seedFromMocks();
+        setMilestones(merged);
+        // Initialize the server-original state from the same source
+        const serverSnap: Record<string, { progress: number; status: string }> = {};
+        merged.forEach((m) => { serverSnap[m.id] = { progress: m.progress, status: m.status }; });
+        serverMilestonesRef.current = serverSnap;
+      } catch (e: any) {
+        if (cancelled) return;
+        console.warn('[milestones] list load failed:', e);
+        toast.warning('Milestones are temporarily offline.');
+        // Fail soft — render mocks so the dashboard doesn't crash empty.
+        const fallback = seedFromMocks();
+        setMilestones(fallback);
+        const snap: Record<string, { progress: number; status: string }> = {};
+        fallback.forEach((m) => { snap[m.id] = { progress: m.progress, status: m.status }; });
+        serverMilestonesRef.current = snap;
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [workerPost, user?.id]);
+
+  // Derived views (equivalent to the old ACTIVE/COMPLETED/QUEUED constants)
+  const activeMilestones = milestones.filter((m) => m.status === 'active');
+  const completedMilestones = milestones.filter((m) => m.status === 'completed');
+  const queuedMilestones = milestones.filter((m) => m.status === 'queued');
+  const activeCount = activeMilestones.length;
+  const queuedCount = queuedMilestones.length;
   const inMotion = activeCount + queuedCount;
-  const completedCount = COMPLETED_MILESTONES.length;
-  const thisWeek = 2;
+  const completedCount = completedMilestones.length;
+  const thisWeek = loading ? 0 : Math.max(0, activeMilestones.filter((m) =>
+    m.progress >= 10 && m.progress <= 80).length);
+
+  // P3-1: progress update. Applies optimistic update, calls validate_milestone,
+  // reverts from serverMilestonesRef on error. When crossing the 80% threshold,
+  // opens a 3-checkbox evidence prompt first so users never hit a 422 blind.
+  const updateMilestoneProgress = useCallback(async (
+    milestoneId: string,
+    targetProgress: number,
+    evidence?: { links_used?: boolean; lens_readout_referenced?: boolean; consultant_approved?: boolean },
+  ) => {
+    const current = milestones.find((m) => m.id === milestoneId);
+    if (!current) return;
+    const safeTarget = Math.max(0, Math.min(100, Math.round(targetProgress)));
+    const crossing80 = current.progress < 80 && safeTarget >= 80;
+
+    if (crossing80 && !evidence) {
+      // Open 3-checkbox evidence prompt
+      setEvidenceModalOpenFor({ id: milestoneId, targetProgress: safeTarget });
+      return;
+    }
+
+    // 1. Optimistic update
+    const prevProgress = current.progress;
+    setMilestones((arr) => arr.map((m) => (
+      m.id === milestoneId ? { ...m, progress: safeTarget } : m
+    )));
+
+    try {
+      type VResp = { ok: boolean; code?: string; message?: string; new_progress?: number };
+      await workerPost<VResp>('validate_milestone', {
+        milestone_id: milestoneId,
+        new_progress: safeTarget,
+        evidence: evidence ?? {},
+      });
+      // Success: persist to server ref.
+      const snap = serverMilestonesRef.current[milestoneId];
+      if (snap) {
+        serverMilestonesRef.current[milestoneId] = { ...snap, progress: safeTarget };
+      }
+      toast.success(`${current.name} updated to ${safeTarget}%.`);
+    } catch (err: any) {
+      // 2. Revert on any error
+      const orig = serverMilestonesRef.current[milestoneId];
+      if (orig) {
+        setMilestones((arr) => arr.map((m) => (
+          m.id === milestoneId ? { ...m, progress: orig.progress } : m
+        )));
+      } else {
+        setMilestones((arr) => arr.map((m) => (
+          m.id === milestoneId ? { ...m, progress: prevProgress } : m
+        )));
+      }
+      const code: string = err?.code || 'VALIDATION_ERROR';
+      toast.error(`${code}${err.message ? `: ${err.message}` : ''}`);
+    }
+  }, [milestones, workerPost]);
+
+  // ── Stats ──
+  // (inMotion / completedCount / thisWeek computed above from real data)
 
   return (
     <div className="v1-scope" style={{ minHeight: '100vh', background: V1.bg }}>
@@ -434,8 +596,22 @@ export function MilestonesDashboardPage() {
               </div>
 
               <div className="v1-timeline" style={{ paddingLeft: 28 }}>
-                {ACTIVE_MILESTONES.map((m, i) => (
-                  <MilestoneTimelineRow key={m.id} milestone={m} index={i} variant="active" />
+                {loading ? (
+                  <div style={{ padding: '20px 0 40px', color: V1.textMuted, fontFamily: V1.monoFont, fontSize: 12 }}>
+                    Loading milestones…
+                  </div>
+                ) : activeMilestones.length === 0 ? (
+                  <div style={{ padding: '20px 0 40px', color: V1.textSecondary, fontFamily: V1.bodyFont, fontSize: 14 }}>
+                    No active milestones yet. Start a coaching conversation or create one from chat.
+                  </div>
+                ) : activeMilestones.map((m, i) => (
+                  <MilestoneTimelineRow
+                    key={m.id}
+                    milestone={m}
+                    index={i}
+                    variant="active"
+                    onProgressClick={(target) => updateMilestoneProgress(m.id, target)}
+                  />
                 ))}
               </div>
             </section>
@@ -477,12 +653,16 @@ export function MilestonesDashboardPage() {
                     letterSpacing: V1.trackingMono,
                   }}
                 >
-                  {COMPLETED_MILESTONES.length} items
+                  {completedMilestones.length} items
                 </span>
               </div>
 
               <div className="v1-timeline" style={{ paddingLeft: 28 }}>
-                {COMPLETED_MILESTONES.map((m, i) => (
+                {completedMilestones.length === 0 ? (
+                  <div style={{ padding: '20px 0 40px', color: V1.textSecondary, fontFamily: V1.bodyFont, fontSize: 14 }}>
+                    Nothing completed yet. Active milestones become complete from 100%.
+                  </div>
+                ) : completedMilestones.map((m, i) => (
                   <MilestoneTimelineRow key={m.id} milestone={m} index={i} variant="completed" />
                 ))}
               </div>
@@ -508,7 +688,11 @@ export function MilestonesDashboardPage() {
               </div>
 
               <div style={{ border: `1px solid ${V1.border}` }}>
-                {QUEUED_MILESTONES.map((m, i) => (
+                {queuedMilestones.length === 0 ? (
+                  <div style={{ padding: '18px 20px', color: V1.textSecondary, fontFamily: V1.bodyFont, fontSize: 14 }}>
+                    Queue is empty. Anything waiting will surface here.
+                  </div>
+                ) : queuedMilestones.map((m, i) => (
                   <div
                     key={m.id}
                     style={{
@@ -516,7 +700,7 @@ export function MilestonesDashboardPage() {
                       alignItems: 'flex-start',
                       padding: '18px 20px',
                       borderBottom:
-                        i < QUEUED_MILESTONES.length - 1
+                        i < queuedMilestones.length - 1
                           ? `1px solid ${V1.borderSubtle}`
                           : undefined,
                       gap: 16,
@@ -530,7 +714,10 @@ export function MilestonesDashboardPage() {
                     onMouseLeave={(e) =>
                       (e.currentTarget.style.background = 'transparent')
                     }
-                    onClick={() => {}}
+                    onClick={() => {
+                      // Click a queued row → promote to active at 10%.
+                      updateMilestoneProgress(m.id, 10);
+                    }}
                   >
                     <span
                       className="v1-mono"
@@ -586,7 +773,7 @@ export function MilestonesDashboardPage() {
                           letterSpacing: V1.trackingMono,
                         }}
                       >
-                        {m.date} · {m.origin}
+                        {m.date} · {(m as any).origin || m.lensSource || 'from chat'}
                       </div>
                     </div>
                   </div>
@@ -839,6 +1026,24 @@ export function MilestonesDashboardPage() {
           </div>
         </aside>
       </div>
+
+      {/* ═══ Evidence Modal ═══
+        P3-1: 80% → 100% jump requires explicit user evidence per AC 7.
+        User-facing checkbox prompts, not a 422 blind rejection.  */}
+      {evidenceModalOpenFor && (
+        <EvidenceModal
+          milestone={milestones.find((m) => m.id === evidenceModalOpenFor.id) || null}
+          targetProgress={evidenceModalOpenFor.targetProgress}
+          onCancel={() => setEvidenceModalOpenFor(null)}
+          onConfirm={(evidence) => {
+            if (!evidenceModalOpenFor) return;
+            const mid = evidenceModalOpenFor.id;
+            const tp = evidenceModalOpenFor.targetProgress;
+            setEvidenceModalOpenFor(null);
+            updateMilestoneProgress(mid, tp, evidence);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -846,6 +1051,159 @@ export function MilestonesDashboardPage() {
 // ═══════════════════════════════════════════════════════════════════════
 // Sub-components
 // ═══════════════════════════════════════════════════════════════════════
+
+// ── Evidence modal: 3 checkboxes, keyboard dismiss (Esc) ──
+type Evidence = {
+  links_used?: boolean;
+  lens_readout_referenced?: boolean;
+  consultant_approved?: boolean;
+};
+
+function EvidenceModal({
+  milestone,
+  targetProgress,
+  onCancel,
+  onConfirm,
+}: {
+  milestone: MilestoneItem | null;
+  targetProgress: number;
+  onCancel: () => void;
+  onConfirm: (evidence: Evidence) => void;
+}) {
+  const [checked, setChecked] = useState<Record<keyof Required<Evidence>, boolean>>({
+    links_used: false,
+    lens_readout_referenced: false,
+    consultant_approved: false,
+  });
+  const anyChecked = Object.values(checked).some(Boolean);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onCancel(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onCancel]);
+
+  const toggle = (k: keyof Required<Evidence>) =>
+    setChecked((c) => ({ ...c, [k]: !c[k] }));
+
+  const current = milestone?.progress ?? 0;
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="evidence-modal-title"
+      style={{
+        position: 'fixed', inset: 0, zIndex: 80,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'rgba(20, 18, 16, 0.48)',
+        padding: 16,
+      }}
+      onClick={onCancel}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          maxWidth: 480, width: '100%',
+          background: V1.paper,
+          border: `1px solid ${V1.border}`,
+          padding: 24,
+        }}
+      >
+        <div
+          id="evidence-modal-title"
+          className="v1-mono"
+          style={{
+            fontSize: 11.2,
+            letterSpacing: V1.trackingMono,
+            textTransform: 'uppercase',
+            color: V1.teal700,
+            marginBottom: 8,
+          }}
+        >
+          Evidence required · {current}% → {targetProgress}%
+        </div>
+        <h3 style={{
+          fontFamily: V1.displayFont, fontSize: 22, lineHeight: 1.25,
+          color: V1.text, margin: '0 0 6px', fontWeight: V1.fwRegular,
+        }}>
+          {milestone?.name || 'Mark as nearly complete'}
+        </h3>
+        <p style={{
+          margin: '0 0 18px', fontFamily: V1.bodyFont, fontSize: V1.textBodySm,
+          color: V1.textSecondary, lineHeight: V1.leadingBody,
+        }}>
+          Crossing 80% is the big jump. Tick what you've done so far.
+          You need at least one item before this move sticks.
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {([
+            { key: 'links_used' as const, label: 'Linked evidence & source materials used', hint: 'Docs, call notes, project links.' },
+            { key: 'lens_readout_referenced' as const, label: 'Lens readout referenced', hint: 'e.g., PRISM or a coaching readout in chat.' },
+            { key: 'consultant_approved' as const, label: 'Consultant / coach reviewed', hint: 'Human layer signed off in-session.' },
+          ] as const).map(({ key, label, hint }) => (
+            <label
+              key={key}
+              style={{
+                display: 'flex',
+                gap: 12,
+                padding: '12px 14px',
+                border: `1px solid ${checked[key] ? V1.teal600 : V1.borderSubtle}`,
+                background: checked[key] ? V1.cream : 'transparent',
+                cursor: 'pointer',
+              }}
+            >
+              <input
+                type="checkbox"
+                aria-describedby={`${key}-hint`}
+                checked={checked[key]}
+                onChange={() => toggle(key)}
+                style={{ transform: 'translateY(3px) scale(1.1)', accentColor: V1.teal700 }}
+              />
+              <div style={{ flex: 1 }}>
+                <div style={{
+                  fontFamily: V1.bodyFont, color: V1.text, fontSize: 15, lineHeight: 1.4,
+                }}>{label}</div>
+                <div id={`${key}-hint`} style={{
+                  fontFamily: V1.monoFont,
+                  fontSize: 10.5,
+                  letterSpacing: V1.trackingMono,
+                  textTransform: 'uppercase',
+                  color: V1.textMuted,
+                  marginTop: 2,
+                }}>{hint}</div>
+              </div>
+            </label>
+          ))}
+        </div>
+
+        <div style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: 10,
+          marginTop: 20,
+        }}>
+          <button
+            type="button"
+            className="v1-btn v1-btn-secondary"
+            onClick={onCancel}
+          >Cancel</button>
+          <button
+            type="button"
+            className="v1-btn v1-btn-primary"
+            disabled={!anyChecked}
+            onClick={() => onConfirm({
+              links_used: checked.links_used || undefined,
+              lens_readout_referenced: checked.lens_readout_referenced || undefined,
+              consultant_approved: checked.consultant_approved || undefined,
+            })}
+            style={{ opacity: anyChecked ? 1 : 0.5, cursor: anyChecked ? 'pointer' : 'not-allowed' }}
+          >Mark milestone at {targetProgress}%</button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function StatCell({ label, value, sub }: { label: string; value: string; sub: string }) {
   return (
@@ -892,13 +1250,23 @@ function MilestoneTimelineRow({
   milestone,
   index,
   variant,
+  onProgressClick,
 }: {
   milestone: MilestoneItem;
   index: number;
   variant: 'active' | 'completed';
+  /** Called when the user clicks the progress bar. 10% step per click by default. */
+  onProgressClick?: (targetProgress: number) => void;
 }) {
   const isCompleted = variant === 'completed';
   const isPrimary = variant === 'active' && index === 0;
+
+  const handleProgressClick = () => {
+    if (!onProgressClick) return;
+    // Click → advance by 10%, always ending at 100 (not 90 mid-step).
+    const next = Math.min(100, milestone.progress + 10);
+    onProgressClick(next);
+  };
 
   return (
     <div
@@ -1032,24 +1400,77 @@ function MilestoneTimelineRow({
           </div>
         )}
 
-        {/* Progress bar (2px thin) */}
+        {/* Progress bar (2px thin) — clickable to advance by 10% when handler set. */}
         {!isCompleted && (
           <div
+            aria-label={
+              onProgressClick
+                ? `Current progress ${milestone.progress} percent. Click to advance to ${Math.min(100, milestone.progress + 10)} percent.`
+                : `Current progress ${milestone.progress} percent.`
+            }
+            role={onProgressClick ? 'button' : undefined}
+            tabIndex={onProgressClick ? 0 : undefined}
+            onClick={onProgressClick ? handleProgressClick : undefined}
+            onKeyDown={(e) => {
+              if (!onProgressClick) return;
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleProgressClick();
+              }
+            }}
             style={{
-              height: 2,
-              background: V1.borderSubtle,
-              overflow: 'hidden',
+              padding: '10px 0',
+              marginTop: -4,
+              marginBottom: -10,
+              cursor: onProgressClick ? 'pointer' : 'default',
             }}
           >
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'baseline',
+              gap: 8,
+              marginBottom: 4,
+            }}>
+              <span
+                className="v1-mono"
+                style={{
+                  fontSize: 10.5,
+                  letterSpacing: V1.trackingMono,
+                  textTransform: 'uppercase',
+                  color: V1.textMuted,
+                }}
+              >
+                Progress
+              </span>
+              <span
+                className="v1-mono"
+                style={{
+                  fontSize: 10.5,
+                  letterSpacing: V1.trackingMono,
+                  color: isPrimary ? V1.fuchsia700 : V1.teal700,
+                }}
+              >
+                {milestone.progress}%
+              </span>
+            </div>
             <div
-              className="ms-progress-fill"
               style={{
-                height: '100%',
-                width: `${milestone.progress}%`,
-                background: isPrimary ? V1.fuchsia600 : V1.teal600,
-                animationDelay: `${index * 60 + 120}ms`,
+                height: 2,
+                background: V1.borderSubtle,
+                overflow: 'hidden',
               }}
-            />
+            >
+              <div
+                className="ms-progress-fill"
+                style={{
+                  height: '100%',
+                  width: `${milestone.progress}%`,
+                  background: isPrimary ? V1.fuchsia600 : V1.teal600,
+                  animationDelay: `${index * 60 + 120}ms`,
+                }}
+              />
+            </div>
           </div>
         )}
       </div>
