@@ -8,6 +8,7 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import MarketingNav from '@/components/navigation/MarketingNav';
+import { Logo } from '@/components/ui/Logo';
 import { SkipToContent } from '@/components/a11y/SkipToContent';
 
 const DS = {
@@ -39,7 +40,7 @@ function MarketingFooter(): React.ReactElement {
       title: 'Company',
       links: [
         { label: 'About', href: '/#about' },
-        { label: 'Contact', href: 'mailto:hello@lycintelligence.com' },
+        { label: 'Contact', href: 'mailto:hello@lyc-partners.ai' },
       ],
     },
     {
@@ -62,15 +63,8 @@ function MarketingFooter(): React.ReactElement {
           gridTemplateColumns: 'minmax(0,1.2fr) repeat(3,minmax(0,1fr))',
         }} className="marketing-footer-grid">
           <div>
-            <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', marginBottom: 16 }}>
-              <span style={{
-                width: 32, height: 32, background: DS.accent, color: '#fff',
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                fontFamily: DS.headingFont, fontWeight: 700, fontSize: 15,
-              }}>L</span>
-              <span style={{ fontFamily: DS.headingFont, fontSize: 17, fontWeight: 700, color: DS.text }}>
-                NEXUS
-              </span>
+            <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none', marginBottom: 16 }} aria-label="LYC Partners home">
+              <Logo size="lg" variant="light" as="span" />
             </Link>
             <p style={{ fontSize: 14, color: DS.muted, lineHeight: 1.6, maxWidth: 320, margin: 0 }}>
               Executive intelligence for high-achieving leaders. Advisory, assessments, and talent search in one private service.
@@ -108,7 +102,7 @@ function MarketingFooter(): React.ReactElement {
           flexWrap: 'wrap',
         }}>
           <div style={{ fontSize: 12.5, color: DS.muted }}>
-            © {year} NEXUS. All rights reserved.
+            © {year} LYC Partners. All rights reserved.
           </div>
           <div style={{ fontSize: 12.5, color: DS.muted }}>
             Made for leaders.

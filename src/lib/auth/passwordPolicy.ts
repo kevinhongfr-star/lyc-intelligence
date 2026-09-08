@@ -185,17 +185,25 @@ export function validatePasswordStrength(
   }
 
   // ── Score calculation ──
+  // Tiered LADDER: assign from weakest to strongest so a password that meets
+  // a higher tier keeps that score (the previous implementation used
+  // independent `if`s in descending order, so every strong password was
+  // overwritten down to score <= 1 — meaning the minScore-2 gate could never
+  // pass. See signup-blocking bug, 2026-09-08.)
   const entropyBits = estimateEntropy(password);
   let score: 0 | 1 | 2 | 3 | 4 = 0;
+  if (password.length >= Math.max(8, minLength - 4) && entropyBits >= 20) score = 1;
+  if (password.length >= minLength && classCount >= 2 && entropyBits >= 35) score = 2;
   if (password.length >= minLength && classCount >= 3 && entropyBits >= 50) score = 3;
   if (password.length >= minLength + 4 && classCount >= 4 && entropyBits >= 70) score = 4;
-  if (password.length >= minLength && classCount >= 2 && entropyBits >= 35) score = 2;
-  if (password.length >= Math.max(8, minLength - 4) && entropyBits >= 20) score = 1;
-  if (entropyBits < 20 || COMMON_PASSWORDS.has(lower)) score = 0;
 
-  // Cap score if there are blocking warnings
+  // Warnings are advisory: cap a Strong password to Fair when there are
+  // warnings (length/class/repetition/sequence heuristics), but never cap
+  // below the passing floor — the score itself reflects real entropy.
   if (warnings.length > 0 && score > 2) score = 2;
-  if (COMMON_PASSWORDS.has(lower)) score = 0;
+
+  // Hard blocks override every tier above.
+  if (entropyBits < 20 || COMMON_PASSWORDS.has(lower)) score = 0;
 
   const passes = score >= minScore;
 
