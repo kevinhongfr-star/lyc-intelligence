@@ -22,7 +22,7 @@ import {
 } from '@/lib/auth/passwordPolicy';
 import { captureUTMParams, captureAndStoreUTM } from '@/utils/utmTracking';
 import { V1 } from '@/styles/v1-tokens';
-import { V3 } from '@/styles/v3-tokens';
+import { PublicTopBar, publicNavTextAction } from '@/components/navigation/PublicTopBar';
 
 export function SignupPage() {
   const navigate = useNavigate();
@@ -97,33 +97,15 @@ export function SignupPage() {
         @keyframes v1-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}</style>
 
-      {/* ── Nav: minimal, wordmark + back link ── */}
-      <nav style={{
-        position: 'fixed', top: 0, left: 0, right: 0,
-        height: V3.navHeight,
-        background: 'rgba(10, 10, 10, 0.72)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
-        zIndex: 100,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '0 32px',
-      }}>
-        <Link to="/" aria-label="NEXUS home" style={{ textDecoration: 'none' }}>
-          <span style={{
-            fontFamily: V3.displayFont, fontWeight: V3.fwBold, fontSize: '1.4rem',
-            letterSpacing: '-0.01em', color: V3.cream,
-          }}>
-            NEXUS<span style={{ color: V3.fuchsia600 }}>.</span>
-          </span>
-        </Link>
-        <Link to="/login" style={{
-          fontFamily: V3.bodyFont, fontSize: '0.875rem',
-          color: V3.cream, opacity: 0.82, textDecoration: 'none',
-        }}>
-          Have an account? Sign in
-        </Link>
-      </nav>
+      {/* ── Nav: shared dark translucent top bar (single source of truth) ── */}
+      <PublicTopBar
+        variant="auth"
+        right={
+          <Link to="/login" style={publicNavTextAction}>
+            Have an account? Sign in
+          </Link>
+        }
+      />
 
       {/* ── Centered card ── */}
       <div style={{

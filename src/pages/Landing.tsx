@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { PublicTopBar, NexusWordmark, publicNavLink, publicNavOutlineCta } from '@/components/navigation/PublicTopBar';
 import { initScrollReveal } from '@/lib/utils';
 import { V3 } from '@/styles/v3-tokens';
 import { SEO } from '@/components/seo/SEO';
@@ -156,94 +157,8 @@ const bodySerifStyle: React.CSSProperties = {
   color: V3.ink700,
 };
 
-// ═══════════════════════════════════════════════════════════════════════
-// V6.0-2a — Fixed Nav
-// ═══════════════════════════════════════════════════════════════════════
-
-function NexusWordmark({ onDark = false }: { onDark?: boolean }): React.ReactElement {
-  return (
-    <span
-      style={{
-        fontFamily: V3.displayFont,
-        fontWeight: V3.fwBold,
-        fontSize: '1.4rem',
-        letterSpacing: '-0.01em',
-        color: onDark ? V3.cream : V3.ink900,
-      }}
-    >
-      NEXUS
-      <span style={{ color: V3.fuchsia600 }}>.</span>
-    </span>
-  );
-}
-
-function MarketingNav(): React.ReactElement {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 80);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  const navLinkStyle: React.CSSProperties = {
-    fontFamily: V3.bodyFont,
-    fontSize: '0.875rem',
-    color: V3.cream,
-    textDecoration: 'none',
-    opacity: 0.82,
-    transition: `opacity ${V3.durNormal}ms ${V3.ease}`,
-  };
-
-  return (
-    <header
-      className={scrolled ? 'v3-fixed-nav v3-nav-scrolled' : 'v3-fixed-nav'}
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 100,
-        height: V3.navHeight,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 32px',
-        background: 'rgba(10, 10, 10, 0.5)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderBottom: '1px solid transparent',
-        transition: `border-color ${V3.durNormal}ms ${V3.ease}`,
-      }}
-    >
-      <Link to="/" style={{ textDecoration: 'none' }} aria-label="NEXUS home">
-        <NexusWordmark onDark />
-      </Link>
-
-      <nav style={{ display: 'flex', gap: 40 }} className="v3-nav-links">
-        <a href="#what-it-is" style={navLinkStyle}>What it is</a>
-        <a href="#capabilities" style={navLinkStyle}>Capabilities</a>
-        <a href="#membership" style={navLinkStyle}>Membership</a>
-      </nav>
-
-      <Link
-        to={SIGNUP}
-        onClick={() => trackCTA({ location: 'nav', label: 'Experience NEXUS', destination: SIGNUP })}
-        style={{
-          fontFamily: V3.bodyFont,
-          fontSize: '0.8rem',
-          color: V3.cream,
-          textDecoration: 'none',
-          padding: '10px 20px',
-          border: `1px solid ${V3.cream}`,
-          transition: `background ${V3.durNormal}ms ${V3.ease}, color ${V3.durNormal}ms ${V3.ease}`,
-        }}
-        className="v3-nav-cta"
-      >
-        Experience NEXUS
-      </Link>
-    </header>
-  );
-}
+// V6.0-2a nav + NEXUS wordmark moved to @/components/navigation/PublicTopBar
+// (shared with signup/login/reset — single source of truth).
 
 // ═══════════════════════════════════════════════════════════════════════
 // V6.0-2b — Hero (full viewport, video bg, 60% SOLID black overlay)
@@ -967,7 +882,24 @@ export function Landing(): React.ReactElement {
   return (
     <>
       <SEO page="landing" />
-      <MarketingNav />
+      <PublicTopBar
+        variant="home"
+        centerLinks={[
+          { href: '#what-it-is', label: 'What it is' },
+          { href: '#capabilities', label: 'Capabilities' },
+          { href: '#membership', label: 'Membership' },
+        ]}
+        right={
+          <Link
+            to={SIGNUP}
+            onClick={() => trackCTA({ location: 'nav', label: 'Experience NEXUS', destination: SIGNUP })}
+            className="v3-nav-cta"
+            style={publicNavOutlineCta}
+          >
+            Experience NEXUS
+          </Link>
+        }
+      />
       <main>
         <Hero />
         <WhatItIs />

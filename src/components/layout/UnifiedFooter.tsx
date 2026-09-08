@@ -1,5 +1,7 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { DS } from '@/tokens';
+import { Logo } from '@/components/ui/Logo';
 
 /**
  * #1377 — Footer redesign (premium, B2C-focused).
@@ -52,17 +54,10 @@ export function UnifiedFooter() {
       >
         {/* Brand */}
         <div>
-          {/* LYC Partners wordmark — canonical brand mark */}
-          <div style={{
-            fontFamily: "'Crimson Pro', Georgia, serif",
-            fontSize: '22px',
-            fontWeight: 400,
-            letterSpacing: '-0.01em',
-            color: DS.text,
-            lineHeight: 1,
-          }}>
-            LYC<span style={{ color: DS.accent }}>.</span> Partners
-          </div>
+          {/* LYC Partners wordmark — official image mark (brand rule: no text lockups) */}
+          <Link to="/" aria-label="LYC Partners home" style={{ display: 'inline-flex' }}>
+            <Logo size="md" variant="light" as="span" />
+          </Link>
           <p
             style={{
               fontSize: '13px',
