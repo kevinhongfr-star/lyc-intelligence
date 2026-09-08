@@ -69,7 +69,7 @@ function MarketingFooter(): React.ReactElement {
                 fontFamily: DS.headingFont, fontWeight: 700, fontSize: 15,
               }}>L</span>
               <span style={{ fontFamily: DS.headingFont, fontSize: 17, fontWeight: 700, color: DS.text }}>
-                LYC Intelligence
+                NEXUS
               </span>
             </Link>
             <p style={{ fontSize: 14, color: DS.muted, lineHeight: 1.6, maxWidth: 320, margin: 0 }}>
@@ -108,7 +108,7 @@ function MarketingFooter(): React.ReactElement {
           flexWrap: 'wrap',
         }}>
           <div style={{ fontSize: 12.5, color: DS.muted }}>
-            © {year} LYC Intelligence. All rights reserved.
+            © {year} NEXUS. All rights reserved.
           </div>
           <div style={{ fontSize: 12.5, color: DS.muted }}>
             Made for leaders.

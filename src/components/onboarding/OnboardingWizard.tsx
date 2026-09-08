@@ -123,7 +123,7 @@ export function OnboardingWizard() {
             <div className="w-7 h-7 bg-fuchsia/10 text-fuchsia flex items-center justify-center">
               <Sparkles className="w-4 h-4" />
             </div>
-            <span className="font-serif font-bold text-[#1A1A2E]">Welcome to LYC Intelligence</span>
+            <span className="font-serif font-bold text-[#1A1A2E]">Welcome to NEXUS</span>
           </div>
           <button
             type="button"
@@ -161,7 +161,7 @@ export function OnboardingWizard() {
                 Strategic intelligence for executive career decisions
               </h2>
               <p className="text-sm text-gray-500 leading-relaxed mb-5 max-w-sm mx-auto">
-                LYC Intelligence connects senior talent with the right opportunities through
+                NEXUS connects senior talent with the right opportunities through
                 data-driven assessment, DEX AI advisory, and a curated mandate pipeline.
               </p>
               <div className="border border-gray-100 bg-gray-50 p-4 text-left space-y-2.5">
@@ -193,7 +193,7 @@ export function OnboardingWizard() {
           {/* Step 1: Role selection */}
           {step === 1 && (
             <div>
-              <h2 className="font-serif text-lg font-bold text-[#1A1A2E] mb-1">How will you use LYC Intelligence?</h2>
+              <h2 className="font-serif text-lg font-bold text-[#1A1A2E] mb-1">How will you use NEXUS?</h2>
               <p className="text-sm text-gray-500 mb-4">Pick the option that fits you best — you can change this later.</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {ROLES.map(r => (

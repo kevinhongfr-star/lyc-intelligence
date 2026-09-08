@@ -50,7 +50,7 @@ export async function generatePDF(assessmentType: AssessmentType, result: { scor
   doc.setTextColor(255, 255, 255); 
   doc.setFont('helvetica', 'bold'); 
   doc.setFontSize(22);
-  doc.text('LYC Intelligence', margin, y + 10);
+  doc.text('NEXUS', margin, y + 10);
   
   doc.setFontSize(10); 
   doc.setTextColor(136, 136, 136);

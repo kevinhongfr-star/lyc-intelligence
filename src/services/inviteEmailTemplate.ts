@@ -107,7 +107,7 @@ export function generateAssessmentInviteHTML(
 
   <!-- Preheader (hidden preview text) -->
   <div style="display:none; max-height:0; overflow:hidden; opacity:0; mso-hide:all; font-size:1px; line-height:1px; color:#FFFFFF;">
-    ${safeConsultant} at LYC Intelligence has selected you for a complimentary ${safeAssessment} assessment.
+    ${safeConsultant} at LYC Partners has selected you for a complimentary ${safeAssessment} assessment.
   </div>
 
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#FFFFFF;">
@@ -123,7 +123,7 @@ export function generateAssessmentInviteHTML(
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td style="font-family:${FONT_HEADING}; font-size:20px; font-weight:700; color:${INK}; letter-spacing:-0.01em;">
-                    LYC Intelligence
+                    LYC Partners
                   </td>
                   <td align="right" class="mono" style="font-family:${FONT_MONO}; font-size:10px; font-weight:600; color:${MUTED}; letter-spacing:0.24em; text-transform:uppercase;">
                     Personal Invitation
@@ -163,7 +163,7 @@ export function generateAssessmentInviteHTML(
                 ${greeting}
               </p>
               <p style="margin:0 0 16px 0; font-family:${FONT_BODY}; font-size:15px; line-height:1.65; color:${TEXT_SECONDARY};">
-                I&rsquo;m ${safeConsultant}, and I work with executive leaders at LYC Intelligence. Based on your trajectory, I&rsquo;d like to extend a complimentary invitation to complete <strong style="color:${INK}; font-weight:600;">${safeAssessment}</strong> &mdash; one of the instruments in our eleven-part leadership catalog.
+                I&rsquo;m ${safeConsultant}, and I work with executive leaders at LYC Partners. Based on your trajectory, I&rsquo;d like to extend a complimentary invitation to complete <strong style="color:${INK}; font-weight:600;">${safeAssessment}</strong> &mdash; one of the instruments in our eleven-part leadership catalog.
               </p>
             </td>
           </tr>
@@ -233,7 +233,7 @@ export function generateAssessmentInviteHTML(
                 ${safeConsultant}
               </p>
               <p style="margin:0; font-family:${FONT_MONO}; font-size:10px; color:${MUTED}; letter-spacing:0.16em; text-transform:uppercase;">
-                LYC Intelligence &middot; Executive Advisory
+                LYC Partners &middot; Executive Advisory
               </p>
             </td>
           </tr>
@@ -257,7 +257,7 @@ export function generateAssessmentInviteHTML(
           <tr>
             <td align="center" style="padding:20px 16px 0 16px;">
               <p style="margin:0; font-family:${FONT_MONO}; font-size:9px; color:${MUTED}; letter-spacing:0.16em; text-transform:uppercase;">
-                &copy; LYC Intelligence
+                &copy; LYC Partners
               </p>
             </td>
           </tr>
@@ -293,7 +293,7 @@ export function generateAssessmentInviteText(
   return [
     `Dear ${name},`,
     ``,
-    `I'm ${consultantName}, and I work with executive leaders at LYC Intelligence.`,
+    `I'm ${consultantName}, and I work with executive leaders at LYC Partners.`,
     `Based on your trajectory, I'd like to extend a complimentary invitation to`,
     `complete ${assessmentName} — one of the instruments in our eleven-part`,
     `leadership catalog.`,
@@ -311,7 +311,7 @@ export function generateAssessmentInviteText(
     ``,
     `Warm regards,`,
     `${consultantName}`,
-    `LYC Intelligence · Executive Advisory`,
+    `LYC Partners · Executive Advisory`,
   ].join('\n');
 }
 

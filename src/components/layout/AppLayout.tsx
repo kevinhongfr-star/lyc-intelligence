@@ -70,7 +70,7 @@ export function AppLayout() {
       <aside className={`${sidebarOpen ? 'w-56' : 'w-16'} bg-bg-secondary border-r border-bg-tertiary flex flex-col transition-all`}>
         <div className="p-4 border-b border-bg-tertiary">
           <Link to="/" className="font-serif font-bold text-lg text-text-primary hover:text-accent transition-colors no-underline block">
-            {sidebarOpen ? 'LYC Intelligence' : 'LYC'}
+            {sidebarOpen ? 'NEXUS' : 'N'}
           </Link>
         </div>
         

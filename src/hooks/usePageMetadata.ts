@@ -64,7 +64,7 @@ function apply(m: PageMetadata, fullUrl: string) {
   // 4. og:url
   upsertMeta('property', 'og:url', fullUrl);
   upsertMeta('property', 'og:type', m.ogType ?? DEFAULT_META.ogType);
-  upsertMeta('property', 'og:site_name', 'LYC Intelligence');
+  upsertMeta('property', 'og:site_name', 'NEXUS');
 
   // 5. keywords
   upsertMeta('name', 'keywords', m.keywords?.join(', '));

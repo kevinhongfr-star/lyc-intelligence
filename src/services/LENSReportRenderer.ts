@@ -65,7 +65,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
     doc.setFontSize(16);
     doc.text(title, MARGIN, 18);
     doc.setFontSize(10);
-    doc.text(`LYC Intelligence — LENS ${reportType} Report`, PAGE_WIDTH - MARGIN, 18, { align: 'right' });
+    doc.text(`NEXUS — LENS ${reportType} Report`, PAGE_WIDTH - MARGIN, 18, { align: 'right' });
     doc.setTextColor(0, 0, 0);
   };
 
@@ -168,7 +168,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
     
     doc.setFontSize(12);
     doc.setTextColor(193, 8, 171);
-    doc.text('LYC Intelligence', PAGE_WIDTH / 2, 220, { align: 'center' });
+    doc.text('NEXUS', PAGE_WIDTH / 2, 220, { align: 'center' });
     
     addFooter(1, totalPages);
 
@@ -407,7 +407,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
     
     doc.setFontSize(12);
     doc.setTextColor(193, 8, 171);
-    doc.text('LYC Intelligence | LENS T2', PAGE_WIDTH / 2, 220, { align: 'center' });
+    doc.text('NEXUS | LENS T2', PAGE_WIDTH / 2, 220, { align: 'center' });
     
     addFooter(1, totalPages);
 
@@ -608,7 +608,7 @@ export async function renderLENSReport(params: RenderParams): Promise<string> {
     
     doc.setFontSize(12);
     doc.setTextColor(193, 8, 171);
-    doc.text('LYC Intelligence | LENS T3', PAGE_WIDTH / 2, 220, { align: 'center' });
+    doc.text('NEXUS | LENS T3', PAGE_WIDTH / 2, 220, { align: 'center' });
     
     addFooter(1, totalPages);
 

@@ -28,7 +28,7 @@ export default function B2cPortalLayout(): React.ReactElement {
     <RoleGate user={user} loading={loading} userType="b2c">
       <PortalShell
         kind="b2c"
-        brand="LYC Intelligence"
+        brand="NEXUS"
         nav={NAV}
         user={user}
         onLogout={logout}

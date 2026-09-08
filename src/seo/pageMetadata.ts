@@ -12,7 +12,7 @@
  */
 
 export const SITE_URL = 'https://lyc-intelligence.app';
-export const SITE_NAME = 'LYC Intelligence';
+export const SITE_NAME = 'NEXUS';
 export const SITE_TAGLINE = 'Know where you stand. Know where to go.';
 // Static OG fallback kept at public/og-image.png for crawlers that don't hit the edge runtime
 
@@ -46,7 +46,7 @@ export function ogImageUrl(title: string, subtitle?: string): string {
 
 export const PAGE_META: Record<string, PageMeta> = {
   landing: {
-    title: 'LYC Intelligence — Executive Intelligence',
+    title: 'NEXUS — Executive Intelligence',
     description:
       'Know where you stand. Know where to go. Leadership intelligence for every stage — from career positioning to executive matching. 500+ placements across 47 markets.',
     path: '/',
@@ -54,7 +54,7 @@ export const PAGE_META: Record<string, PageMeta> = {
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: 'LYC Intelligence',
+      name: 'LYC Partners',
       url: SITE_URL,
       logo: `${SITE_URL}/apple-touch-icon.png`,
       description:
@@ -72,7 +72,7 @@ export const PAGE_META: Record<string, PageMeta> = {
   },
 
   pricing: {
-    title: 'Pricing — LYC Intelligence | Leadership Assessments',
+    title: 'Pricing — NEXUS | Leadership Assessments',
     description:
       'Three plans from Complimentary to Council. All 6 leadership assessments, NEXUS, and personalised reports. USD and CNY. Start complimentary.',
     path: '/pricing',
@@ -81,7 +81,7 @@ export const PAGE_META: Record<string, PageMeta> = {
   },
 
   nexus: {
-    title: 'NEXUS — Your Executive Advisor | LYC Intelligence',
+    title: 'NEXUS — Your Executive Advisor',
     description:
       'NEXUS is your executive advisor. It knows all 6 leadership assessments, interprets your results, and gives you personalised leadership advice. 3 complimentary messages.',
     path: '/nexus',
@@ -100,7 +100,7 @@ export const PAGE_META: Record<string, PageMeta> = {
       },
       publisher: {
         '@type': 'Organization',
-        name: 'LYC Intelligence',
+        name: 'LYC Partners',
         url: SITE_URL,
       },
     },
@@ -115,11 +115,11 @@ export const PAGE_META: Record<string, PageMeta> = {
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'Service',
-      name: 'LYC Intelligence for Firms',
+      name: 'NEXUS for Firms',
       serviceType: 'Executive Search & Talent Intelligence',
       provider: {
         '@type': 'Organization',
-        name: 'LYC Intelligence',
+        name: 'LYC Partners',
         url: SITE_URL,
       },
       areaServed: 'Asia-Pacific',
@@ -136,7 +136,7 @@ export const PAGE_META: Record<string, PageMeta> = {
   },
 
   assessments: {
-    title: '6 Leadership Assessments — LYC Intelligence',
+    title: '6 Leadership Assessments — NEXUS',
     description:
       'Six focused leadership assessments — PRISM, SPARK, FORGE, BRIDGE, MOSAIC, DRIVE. Career branding, AI readiness, sales, China leadership, cultural intelligence, execution. Validated against APAC placement data.',
     path: '/assessments',
@@ -145,27 +145,27 @@ export const PAGE_META: Record<string, PageMeta> = {
   },
 
   terms: {
-    title: 'Terms of Service — LYC Intelligence',
+    title: 'Terms of Service — NEXUS',
     description:
-      'Terms governing your use of the LYC Intelligence platform, including assessment usage, NEXUS interactions, subscription terms, and data processing agreements.',
+      'Terms governing your use of the NEXUS platform, including assessment usage, NEXUS interactions, subscription terms, and data processing agreements.',
     path: '/terms',
     type: 'website',
     structuredData: null,
   },
 
   privacy: {
-    title: 'Privacy Policy — LYC Intelligence',
+    title: 'Privacy Policy — NEXUS',
     description:
-      'How LYC Intelligence collects, uses, and protects your data. GDPR and PIPL compliant. Third-party processors: DeepSeek, Supabase, Stripe. PRC governing law.',
+      'How NEXUS collects, uses, and protects your data. GDPR and PIPL compliant. Third-party processors: DeepSeek, Supabase, Stripe. PRC governing law.',
     path: '/privacy',
     type: 'website',
     structuredData: null,
   },
 
   cookies: {
-    title: 'Cookie Policy — LYC Intelligence',
+    title: 'Cookie Policy — NEXUS',
     description:
-      'Cookie usage on the LYC Intelligence platform. Essential, analytics, and marketing cookies explained. Manage your consent preferences at any time.',
+      'Cookie usage on the NEXUS platform. Essential, analytics, and marketing cookies explained. Manage your consent preferences at any time.',
     path: '/cookies',
     type: 'website',
     structuredData: null,
@@ -193,7 +193,7 @@ export function getAssessmentMeta(
   durationMinutes: number,
   totalQuestions: number,
 ): AssessmentMeta {
-  const title = `${b2cName} Assessment | LYC Intelligence`;
+  const title = `${b2cName} Assessment | NEXUS`;
   const description = `${tagline || name}. ${durationMinutes} min · ${totalQuestions} questions. Validated against APAC placement data. Archetype classification and development roadmap.`;
 
   return {
@@ -215,7 +215,7 @@ export function getAssessmentMeta(
       description: tagline || name,
       brand: {
         '@type': 'Brand',
-        name: 'LYC Intelligence',
+        name: 'LYC Partners',
       },
       offers: {
         '@type': 'Offer',
@@ -246,9 +246,9 @@ export interface PageMetadata {
 const BASE_URL = SITE_URL;
 
 export const DEFAULT_META: PageMetadata = {
-  title: 'LYC Intelligence — Leadership Intelligence for China Operating Leaders',
+  title: 'NEXUS — Leadership Intelligence for China Operating Leaders',
   description:
-    'LYC Intelligence delivers data-driven leadership diagnostics, mobility mapping, and executive search intelligence — purpose-built for leaders operating in China.',
+    'NEXUS delivers data-driven leadership diagnostics, mobility mapping, and executive search intelligence — purpose-built for leaders operating in China.',
   ogType: 'website',
   ogImage: `${BASE_URL}/api/og`,
   keywords: [
@@ -268,7 +268,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/',
     meta: {
-      title: 'LYC Intelligence — Leadership Intelligence for China Operating Leaders',
+      title: 'NEXUS — Leadership Intelligence for China Operating Leaders',
       description:
         'The intelligence layer for China operating leaders. NEXUS advisory copilot, CPI diagnostics, and leader matching — in one seat.',
       canonical: u('/'),
@@ -286,12 +286,12 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/about',
     meta: {
-      title: 'About LYC Intelligence | Our Mission, Founder & Network',
+      title: 'About NEXUS | Our Mission, Founder & Network',
       description:
-        'LYC Intelligence was founded to close the leadership intelligence gap for global leaders operating in China. Meet the team and understand our method.',
+        'NEXUS was founded by LYC Partners to close the leadership intelligence gap for global leaders operating in China. Meet the team and understand our method.',
       canonical: u('/about'),
       keywords: [
-        'LYC Intelligence founder background',
+        'NEXUS leadership platform LYC Partners background',
         'executive search firm APAC heritage',
         'leadership assessment methodology 20-year data',
         'China leadership advisory team',
@@ -305,7 +305,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
     meta: {
       title: 'NEXUS | LYC Advisory Copilot for China Operating Leaders',
       description:
-        "NEXUS is LYC Intelligence's always-on advisory copilot. Ask for market context, executive profiles, and directional guidance — grounded in our data lake.",
+        "NEXUS is LYC Partners' always-on advisory copilot. Ask for market context, executive profiles, and directional guidance — grounded in our data lake.",
       canonical: u('/nexus/chat'),
       noindex: true,
       keywords: [
@@ -321,7 +321,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/b2b',
     meta: {
-      title: 'Executive Search Intelligence (B2B) | LYC Intelligence',
+      title: 'Executive Search Intelligence (B2B) | NEXUS',
       description:
         'Client and consultant portal for retained executive search, mandate pipeline, and organisational diagnostics — built on a decade of China market data.',
       canonical: u('/b2b'),
@@ -339,7 +339,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/pricing',
     meta: {
-      title: 'Pricing | LYC Intelligence — Explorer, Executive, Council Tiers',
+      title: 'Pricing | NEXUS — Explorer, Executive, Council Tiers',
       description:
         'Transparent pricing for every leader. Explorer (self-serve), Executive (diagnostics + matching), and Council (dedicated advisory) — annual billing, cancel anytime.',
       canonical: u('/pricing'),
@@ -357,12 +357,12 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/contact',
     meta: {
-      title: 'Contact LYC Intelligence | Talk to the Team',
+      title: 'Contact NEXUS | Talk to the Team',
       description:
-        'Questions about diagnostics, enterprise mandates, or NEXUS? Reach the LYC Intelligence team — average first response under one business day.',
+        'Questions about diagnostics, enterprise mandates, or NEXUS? Reach the LYC Partners team — average first response under one business day.',
       canonical: u('/contact'),
       keywords: [
-        'LYC Intelligence APAC contact sales',
+        'NEXUS APAC contact sales',
         'executive assessment inquiry Shanghai',
         'enterprise mandate consultation APAC',
         'NEXUS enterprise pricing contact',
@@ -400,7 +400,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/nexus/lenses/prism',
     meta: {
-      title: 'PRISM — Professional Branding Assessment | LYC Intelligence',
+      title: 'PRISM — Professional Branding Assessment | NEXUS',
       description:
         'PRISM maps how the world sees your professional brand across positioning, influence, and executive presence. Validated against 500+ APAC placements.',
       canonical: u('/nexus/lenses/prism'),
@@ -414,7 +414,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/nexus/lenses/spark',
     meta: {
-      title: 'SPARK — AI Leadership Readiness | LYC Intelligence',
+      title: 'SPARK — AI Leadership Readiness | NEXUS',
       description:
         'SPARK benchmarks your AI leadership readiness: strategy fluency, change management, and governance maturity. 15-minute diagnostic.',
       canonical: u('/nexus/lenses/spark'),
@@ -428,7 +428,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/nexus/lenses/leap',
     meta: {
-      title: 'LEAP — Competitive Positioning | LYC Intelligence',
+      title: 'LEAP — Competitive Positioning | NEXUS',
       description:
         'LEAP maps your adjacent career moves across industry, function, and stage — 5 ranked paths with likelihood scores. 12 minutes, data-driven.',
       canonical: u('/nexus/lenses/leap'),
@@ -441,7 +441,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/nexus/lenses/impact',
     meta: {
-      title: 'IMPACT — Board & Stakeholder Impact | LYC Intelligence',
+      title: 'IMPACT — Board & Stakeholder Impact | NEXUS',
       description:
         'IMPACT measures your influence at the highest levels: boardroom credibility, stakeholder communication, and governance fluency.',
       canonical: u('/nexus/lenses/impact'),
@@ -454,7 +454,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/nexus/lenses/quest',
     meta: {
-      title: 'QUEST — Strategic Market Positioning | LYC Intelligence',
+      title: 'QUEST — Strategic Market Positioning | NEXUS',
       description:
         'QUEST benchmarks strategic market positioning: where you stand and where to play. Market segment fit, adjacency scoring, and 18-month roadmap.',
       canonical: u('/nexus/lenses/quest'),
@@ -467,7 +467,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/nexus/lenses/bridge',
     meta: {
-      title: 'BRIDGE — Cross-Cultural Relational Intelligence | LYC Intelligence',
+      title: 'BRIDGE — Cross-Cultural Relational Intelligence | NEXUS',
       description:
         'BRIDGE measures cross-cultural relational intelligence for cross-border mandates. Built on 20 years of APAC placement data.',
       canonical: u('/nexus/lenses/bridge'),
@@ -480,7 +480,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/nexus/lenses/drive',
     meta: {
-      title: 'DRIVE — Motivational Alignment | LYC Intelligence',
+      title: 'DRIVE — Motivational Alignment | NEXUS',
       description:
         'DRIVE maps what fuels you and what fades you. Motivational archetypes, demotivator mapping, and role-fit scoring.',
       canonical: u('/nexus/lenses/drive'),
@@ -493,7 +493,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/nexus/lenses/forge',
     meta: {
-      title: 'FORGE — Sales Excellence Capability | LYC Intelligence',
+      title: 'FORGE — Sales Excellence Capability | NEXUS',
       description:
         'FORGE builds the sales leader your market needs. Pipeline discipline, deal strategy, and team enablement scoring across 6 dimensions.',
       canonical: u('/nexus/lenses/forge'),
@@ -506,7 +506,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/nexus/lenses/coach',
     meta: {
-      title: 'COACH — Executive Coaching Fit | LYC Intelligence',
+      title: 'COACH — Executive Coaching Fit | NEXUS',
       description:
         'COACH calibrates executive coaching fit: chemistry, focus area match, and 1–3 recommended coaches from the LYC network.',
       canonical: u('/nexus/lenses/coach'),
@@ -519,7 +519,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/nexus/lenses/mosaic',
     meta: {
-      title: 'MOSAIC — Institutional Trust & Relationship Velocity | LYC Intelligence',
+      title: 'MOSAIC — Institutional Trust & Relationship Velocity | NEXUS',
       description:
         'MOSAIC accelerates partnership velocity: institutional trust levers, relationship capital map, and 90-day activation plan.',
       canonical: u('/nexus/lenses/mosaic'),
@@ -534,7 +534,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/nexus/lenses',
     meta: {
-      title: 'Diagnostic Lenses Library | LYC Intelligence',
+      title: 'Diagnostic Lenses Library | NEXUS',
       description:
         'Eleven leadership diagnostics in one place. PRISM, CPI, SPARK, LEAP, IMPACT, BRIDGE, MOSAIC, DRIVE, QUEST, COACH, FORGE — start in under 60 seconds.',
       canonical: u('/nexus/lenses'),
@@ -549,7 +549,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/nexus',
     meta: {
-      title: 'NEXUS — Your Executive Advisor | LYC Intelligence',
+      title: 'NEXUS — Your Executive Advisor',
       description:
         'NEXUS is your executive advisor. It knows all 11 leadership diagnostics, interprets your results, and builds milestones. Complimentary entry tier.',
       canonical: u('/nexus'),
@@ -577,7 +577,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/assessment',
     meta: {
-      title: '6 Leadership Assessments | LYC Intelligence',
+      title: '6 Leadership Assessments | NEXUS',
       description:
         'Every LYC leadership assessment in one place. PRISM, SPARK, FORGE, BRIDGE, MOSAIC, DRIVE — start in under 60 seconds, get a personalised report.',
       canonical: u('/nexus/lenses'),
@@ -590,7 +590,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/assessments',
     meta: {
-      title: '6 Leadership Assessments | LYC Intelligence',
+      title: '6 Leadership Assessments | NEXUS',
       description:
         'Every LYC leadership assessment in one place. PRISM, SPARK, FORGE, BRIDGE, MOSAIC, DRIVE — start in under 60 seconds, get a personalised report.',
       canonical: u('/nexus/lenses'),
@@ -605,11 +605,11 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/login',
     meta: {
-      title: 'Log in | LYC Intelligence',
-      description: 'Sign in to LYC Intelligence to access diagnostics, NEXUS, and your matched leaders.',
+      title: 'Log in | NEXUS',
+      description: 'Sign in to NEXUS to access diagnostics, advisory conversations, and your matched leaders.',
       noindex: true,
       keywords: [
-        'LYC Intelligence sign in executive',
+        'NEXUS sign in executive',
         'leadership assessment dashboard login',
         'NEXUS chat portal access',
       ],
@@ -618,11 +618,11 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/signup',
     meta: {
-      title: 'Create account | LYC Intelligence',
-      description: 'Create a LYC Intelligence account. 45-second signup, no card until you run your first paid diagnostic.',
+      title: 'Create account | NEXUS',
+      description: 'Create a NEXUS account. 45-second signup, no card until you run your first paid diagnostic.',
       noindex: true,
       keywords: [
-        'LYC Intelligence executive account register',
+        'NEXUS executive account register',
         'leadership assessment free sign up APAC',
         'NEXUS complimentary account create',
       ],
@@ -631,11 +631,11 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/reset-password',
     meta: {
-      title: 'Reset password | LYC Intelligence',
-      description: 'Reset your LYC Intelligence password. Secure email link sent in under 30 seconds.',
+      title: 'Reset password | NEXUS',
+      description: 'Reset your NEXUS password. Secure email link sent in under 30 seconds.',
       noindex: true,
       keywords: [
-        'LYC Intelligence password recovery executive',
+        'NEXUS password recovery executive',
         'leadership assessment account reset APAC',
         'executive diagnostic portal forgot password',
       ],
@@ -646,7 +646,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/member',
     meta: {
-      title: 'Leader Portal | LYC Intelligence',
+      title: 'Leader Portal | NEXUS',
       description: 'Your executive dashboard: saved diagnostics, matched mandates, NEXUS history, and referral miles.',
       noindex: true,
       keywords: [
@@ -659,7 +659,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/consultant',
     meta: {
-      title: 'Consultant Portal | LYC Intelligence',
+      title: 'Consultant Portal | NEXUS',
       description: 'Retained-search consultant workspace: mandates, candidate pipeline, leader matches, and client billing.',
       noindex: true,
       keywords: [
@@ -672,7 +672,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/client',
     meta: {
-      title: 'Client Portal | LYC Intelligence',
+      title: 'Client Portal | NEXUS',
       description: 'Client command centre — open mandates, shortlists, pipeline diagnostics, and organisation health.',
       noindex: true,
       keywords: [
@@ -685,7 +685,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/candidate',
     meta: {
-      title: 'Candidate Portal | LYC Intelligence',
+      title: 'Candidate Portal | NEXUS',
       description: 'Candidate workspace: active mandates, NDA history, shortlist status, and assessment results.',
       noindex: true,
       keywords: [
@@ -698,11 +698,11 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/admin',
     meta: {
-      title: 'Admin | LYC Intelligence Control',
+      title: 'Admin | NEXUS Control',
       description: 'Internal LYC admin — diagnostics usage, user support, billing, and compliance.',
       noindex: true,
       keywords: [
-        'LYC Intelligence admin diagnostic usage reporting',
+        'NEXUS admin diagnostic usage reporting',
         'admin user support billing compliance',
         'internal LYC admin portal operations dashboard',
       ],
@@ -713,9 +713,9 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/referral',
     meta: {
-      title: 'Refer Leaders, Earn Miles | LYC Intelligence',
+      title: 'Refer Leaders, Earn Miles | NEXUS',
       description:
-        'Refer China operating leaders to LYC Intelligence and earn miles redeemable against diagnostics, leader matches, and Council membership.',
+        'Refer China operating leaders to NEXUS and earn miles redeemable against diagnostics, leader matches, and Council membership.',
       canonical: u('/referral'),
       keywords: [
         'LYC referral miles redeem diagnostics leader matching',
@@ -729,12 +729,12 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/share',
     meta: {
-      title: 'Shared Insight Card | LYC Intelligence',
-      description: 'A shared insight, assessment result, or leader card from LYC Intelligence. Log in to see the full context.',
+      title: 'Shared Insight Card | NEXUS',
+      description: 'A shared insight, assessment result, or leader card from NEXUS. Log in to see the full context.',
       noindex: true,
       keywords: [
         'LYC shared insight card executive assessment',
-        'shared leader card LYC Intelligence dashboard',
+        'shared leader card NEXUS dashboard',
         'executive assessment result share link APAC',
       ],
     },

@@ -268,7 +268,7 @@ function getMockReport(id: string): ReportData {
       { id: 'c1', type: 'radar', title: 'Score Profile', data: { scores: [85, 92, 78] } },
     ],
     header: { title: 'Assessment Report', subtitle: 'Candidate Evaluation', reportDate: new Date().toISOString().split('T')[0], classification: 'confidential' },
-    footer: { text: 'LYC Intelligence — Confidential', pageNumbers: true, companyName: 'LYC Partners' },
+    footer: { text: 'NEXUS — Confidential', pageNumbers: true, companyName: 'LYC Partners' },
     downloadUrl: '#',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

@@ -113,7 +113,7 @@ export function ExportPanel({ reportId, onExport }: ExportPanelProps) {
                 <Input
                   value={emailSubject}
                   onChange={(e) => setEmailSubject(e.target.value)}
-                  placeholder="LYC Intelligence Report"
+                  placeholder="NEXUS Report"
                 />
               </div>
               <div>

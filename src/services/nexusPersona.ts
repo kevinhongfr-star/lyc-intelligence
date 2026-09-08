@@ -1,6 +1,6 @@
 /**
  * NEXUS Persona Configuration
- * Unified system prompt for LYC Intelligence chatbot
+ * Unified system prompt for NEXUS (LYC Partners product)
  * 
  * Architecture: The NEXUS chatbot on /nexus and /b2c/chat use the same persona,
  * same parameterization, same DeepSeek system prompt.

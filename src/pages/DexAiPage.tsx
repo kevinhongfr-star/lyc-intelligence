@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import { DS } from '@/tokens';
 
 // ── DESIGN TOKENS — Phase 9 Batch 6 ticket #1356
-// DEX AI is the INTERNAL engine code name; publicly there is only LYC Intelligence (same brand family,
+// DEX AI is the INTERNAL engine code name; publicly the product is NEXUS (LYC Partners),
 // same accent fuchsia #C108AB as the rest of the site). No teal. Section labels use light gray #9CA3AF.
 
 const monoStyle: React.CSSProperties = {

@@ -63,7 +63,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
                 fontWeight: 700, 
                 fontSize: '14px' 
               }}>
-                LYC Intelligence
+                NEXUS
               </div>
             </div>
 
@@ -114,7 +114,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
 
           <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #222222', paddingTop: '24px' }}>
             <div style={{ fontSize: '14px', color: DS.textSecondary }}>
-              Powered by LYC Intelligence
+              Powered by NEXUS
             </div>
             <div style={{ fontSize: '14px', color: DS.text }}>
               lyc-intelligence.app
@@ -147,7 +147,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
                 fontWeight: 700, 
                 fontSize: '14px' 
               }}>
-                LYC Intelligence
+                NEXUS
               </div>
             </div>
 
@@ -186,7 +186,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
           </div>
 
           <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'center', borderTop: '1px solid #222222', paddingTop: '24px' }}>
-            <div style={{ fontSize: '14px', color: DS.textSecondary }}>Powered by LYC Intelligence</div>
+            <div style={{ fontSize: '14px', color: DS.textSecondary }}>Powered by NEXUS</div>
           </div>
         </div>
       );
@@ -212,7 +212,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
                 fontWeight: 700, 
                 fontSize: '14px' 
               }}>
-                LYC Intelligence
+                NEXUS
               </div>
             </div>
 
@@ -264,7 +264,7 @@ export function ShareCard({ type, data, className = '' }: Props) {
           </div>
 
           <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #222222', paddingTop: '24px' }}>
-            <div style={{ fontSize: '14px', color: DS.textSecondary }}>Powered by LYC Intelligence</div>
+            <div style={{ fontSize: '14px', color: DS.textSecondary }}>Powered by NEXUS</div>
             <div style={{ fontSize: '14px', color: DS.text }}>lyc-intelligence.app</div>
           </div>
         </div>

@@ -59,7 +59,7 @@ export function ResultMockup({ style }: { style?: React.CSSProperties }) {
     >
       {/* Header bar */}
       <div style={{ background: INK, padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ ...mono, color: WHITE, opacity: 0.7 }}>LYC Intelligence · Results</span>
+        <span style={{ ...mono, color: WHITE, opacity: 0.7 }}>NEXUS · Results</span>
         <div style={{ display: 'flex', gap: 4 }}>
           <div style={{ width: 8, height: 8, background: G400, opacity: 0.3 }} />
           <div style={{ width: 8, height: 8, background: G400, opacity: 0.3 }} />

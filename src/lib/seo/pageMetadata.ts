@@ -32,9 +32,9 @@ export interface PageMetadata {
 const BASE_URL = 'https://lyc-intelligence.app';
 
 export const DEFAULT_META: PageMetadata = {
-  title: 'LYC Intelligence — Leadership Intelligence for China Operating Leaders',
+  title: 'NEXUS — Leadership Intelligence for China Operating Leaders',
   description:
-    'LYC Intelligence delivers data-driven leadership diagnostics, mobility mapping, and executive search intelligence — purpose-built for leaders operating in China.',
+    'NEXUS delivers data-driven leadership diagnostics, mobility mapping, and executive search intelligence — purpose-built for leaders operating in China.',
   ogType: 'website',
   ogImage: `${BASE_URL}/og-image.png`,
   keywords: [
@@ -55,7 +55,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/',
     meta: {
-      title: 'LYC Intelligence — Leadership Intelligence for China Operating Leaders',
+      title: 'NEXUS — Leadership Intelligence for China Operating Leaders',
       description:
         'The intelligence layer for China operating leaders. NEXUS advisory copilot, CPI & Career Core diagnostics, and candidate matching — in one seat.',
       canonical: u('/'),
@@ -66,9 +66,9 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/about',
     meta: {
-      title: 'About LYC Intelligence | Our Mission, Founder & Network',
+      title: 'About NEXUS | Our Mission, Founder & Network',
       description:
-        'LYC Intelligence was founded to close the leadership intelligence gap for global leaders operating in China. Meet the team and understand our method.',
+        'NEXUS was founded by LYC Partners to close the leadership intelligence gap for global leaders operating in China. Meet the team and understand our method.',
       canonical: u('/about'),
       keywords: [...DEFAULT_META.keywords!, 'about us', 'founder', 'team'],
     },
@@ -79,7 +79,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
     meta: {
       title: 'NEXUS | LYC Advisory Copilot for China Operating Leaders',
       description:
-        'NEXUS is LYC Intelligence\'s always-on advisory copilot. Ask for market context, executive profiles, and directional guidance — grounded in our data lake.',
+        'NEXUS is LYC Partners\' always-on advisory copilot. Ask for market context, executive profiles, and directional guidance — grounded in our data lake.',
       canonical: u('/nexus/chat'),
       noindex: true,
       keywords: [...DEFAULT_META.keywords!, 'advisory copilot', 'AI chat', 'market intelligence'],
@@ -89,7 +89,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/b2b',
     meta: {
-      title: 'Executive Search Intelligence (B2B) | LYC Intelligence',
+      title: 'Executive Search Intelligence (B2B) | NEXUS',
       description:
         'Client and consultant portal for retained executive search, mandate pipeline, and organisational diagnostics — built on a decade of China market data.',
       canonical: u('/b2b'),
@@ -100,7 +100,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/pricing',
     meta: {
-      title: 'Pricing | LYC Intelligence — Explorer, Executive, Council Tiers',
+      title: 'Pricing | NEXUS — Explorer, Executive, Council Tiers',
       description:
         'Transparent pricing for every leader. Explorer (self-serve), Executive (diagnostics + matching), and Council (dedicated advisory) — annual billing, cancel anytime.',
       canonical: u('/pricing'),
@@ -111,9 +111,9 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/contact',
     meta: {
-      title: 'Contact LYC Intelligence | Talk to the Team',
+      title: 'Contact NEXUS | Talk to the Team',
       description:
-        'Questions about diagnostics, enterprise mandates, or NEXUS? Reach the LYC Intelligence team — average first response under one business day.',
+        'Questions about diagnostics, enterprise mandates, or NEXUS? Reach the LYC Partners team — average first response under one business day.',
       canonical: u('/contact'),
       keywords: [...DEFAULT_META.keywords!, 'contact', 'support', 'sales'],
     },
@@ -225,7 +225,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/assessment',
     meta: {
-      title: 'All 11 Leadership Diagnostics | LYC Intelligence',
+      title: 'All 11 Leadership Diagnostics | NEXUS',
       description:
         'Every LYC diagnostic in one place. CPI, Career Core, Comp Negotiation, Board Readiness and 8 more — start in under 60 seconds, pay only for the ones you run.',
       canonical: u('/assessment'),
@@ -237,24 +237,24 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/login',
     meta: {
-      title: 'Log in | LYC Intelligence',
-      description: 'Sign in to LYC Intelligence to access diagnostics, NEXUS, and your matched leaders.',
+      title: 'Log in | NEXUS',
+      description: 'Sign in to NEXUS to access diagnostics, advisory conversations, and your matched leaders.',
       noindex: true,
     },
   },
   {
     pattern: '/signup',
     meta: {
-      title: 'Create account | LYC Intelligence',
-      description: 'Create a LYC Intelligence account. 45-second signup, no card until you run your first paid diagnostic.',
+      title: 'Create account | NEXUS',
+      description: 'Create a NEXUS account. 45-second signup, no card until you run your first paid diagnostic.',
       noindex: true,
     },
   },
   {
     pattern: '/reset-password',
     meta: {
-      title: 'Reset password | LYC Intelligence',
-      description: 'Reset your LYC Intelligence password. Secure email link sent in under 30 seconds.',
+      title: 'Reset password | NEXUS',
+      description: 'Reset your NEXUS password. Secure email link sent in under 30 seconds.',
       noindex: true,
     },
   },
@@ -263,7 +263,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/member',
     meta: {
-      title: 'Leader Portal | LYC Intelligence',
+      title: 'Leader Portal | NEXUS',
       description: 'Your executive dashboard: saved diagnostics, matched mandates, NEXUS history, and referral credits.',
       noindex: true,
     },
@@ -271,7 +271,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/consultant',
     meta: {
-      title: 'Consultant Portal | LYC Intelligence',
+      title: 'Consultant Portal | NEXUS',
       description: 'Retained-search consultant workspace: mandates, candidate pipeline, scoring matches, and client billing.',
       noindex: true,
     },
@@ -279,7 +279,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/client',
     meta: {
-      title: 'Client Portal | LYC Intelligence',
+      title: 'Client Portal | NEXUS',
       description: 'Client command centre — open mandates, shortlists, pipeline diagnostics, and organisation health.',
       noindex: true,
     },
@@ -287,7 +287,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/candidate',
     meta: {
-      title: 'Candidate Portal | LYC Intelligence',
+      title: 'Candidate Portal | NEXUS',
       description: 'Candidate workspace: active mandates, NDA history, shortlist status, and assessment results.',
       noindex: true,
     },
@@ -295,7 +295,7 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/admin',
     meta: {
-      title: 'Admin | LYC Intelligence System Admin',
+      title: 'Admin | NEXUS System Admin',
       description: 'Internal LYC admin — diagnostics usage, user support, billing, and compliance.',
       noindex: true,
     },
@@ -305,9 +305,9 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/referral',
     meta: {
-      title: 'Refer Leaders, Earn Miles | LYC Intelligence',
+      title: 'Refer Leaders, Earn Miles | NEXUS',
       description:
-        'Refer China operating leaders to LYC Intelligence and earn miles redeemable against diagnostics, candidate matches, and Council membership.',
+        'Refer China operating leaders to NEXUS and earn miles redeemable against diagnostics, candidate matches, and Council membership.',
       canonical: u('/referral'),
       keywords: [...DEFAULT_META.keywords!, 'referral', 'miles', 'refer-a-leader'],
     },
@@ -315,8 +315,8 @@ export const PAGE_METADATA_REGISTRY: { pattern: string; meta: PageMetadata }[] =
   {
     pattern: '/share',
     meta: {
-      title: 'Shared Insight Card | LYC Intelligence',
-      description: 'A shared insight, assessment result, or leader card from LYC Intelligence. Log in to see the full context.',
+      title: 'Shared Insight Card | NEXUS',
+      description: 'A shared insight, assessment result, or leader card from NEXUS. Log in to see the full context.',
       noindex: true,
     },
   },

@@ -920,7 +920,7 @@ function StepReview({
             }}
           >
             Dear {candidateName}, I&rsquo;m {consultantName}, and I work with
-            executive leaders at LYC Intelligence. I&rsquo;d like to extend a
+            executive leaders at LYC Partners. I&rsquo;d like to extend a
             complimentary invitation to complete{' '}
             <strong style={{ color: DS.ink, fontWeight: 600 }}>
               {assessment.name}

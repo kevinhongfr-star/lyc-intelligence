@@ -106,7 +106,7 @@ export const BANNED_WORDS: Record<string, string> = {
   'buy now': '—',
   'add to cart': '—',
   // SaaS jargon
-  'platform': 'system',        // except in "LYC Intelligence platform" brand ref
+  'platform': 'system',        // product platform references use "NEXUS"; no legacy brand refs
   'dashboard': 'overview',      // except in technical admin contexts
   'users': 'members',
   'user account': 'profile',

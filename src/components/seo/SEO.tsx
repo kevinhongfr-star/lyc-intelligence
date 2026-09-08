@@ -116,7 +116,7 @@ export function SEO(props: SEOProps): null {
     upsertMeta('property', 'og:image', ogImage);
     upsertMeta('property', 'og:image:width', '1200');
     upsertMeta('property', 'og:image:height', '630');
-    upsertMeta('property', 'og:site_name', 'LYC Intelligence');
+    upsertMeta('property', 'og:site_name', 'NEXUS');
 
     // Twitter Card
     upsertMeta('name', 'twitter:card', 'summary_large_image');

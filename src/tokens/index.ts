@@ -2,7 +2,7 @@
  * #1351 — ECHO v1.2 Design System Foundation — Single Source of Truth.
  *
  * This module is the canonical TS source of truth for every design token on the
- * LYC Intelligence surface. It mirrors the CSS custom properties declared in
+ * NEXUS product surface. It mirrors the CSS custom properties declared in
  * `src/index.css` (`:root`) so that TS consumers and CSS consumers stay in sync.
  *
  * Brand hard rules enforced here:

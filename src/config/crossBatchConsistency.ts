@@ -479,7 +479,7 @@ export const LIGHTHOUSE_A11Y_CHECKLIST: LighthouseA11yCheck[] = [
     id: 'copy-page-titles',
     category: 'copy',
     check: 'Page <title> tags',
-    acceptanceCriteria: 'Every route has a descriptive title. Titles use canonical terms. No banned words. Format: "Page Name | LYC Intelligence".',
+    acceptanceCriteria: 'Every route has a descriptive title. Titles use canonical terms. No banned words. Format: "Page Name | NEXUS".',
     verifyMethod: 'Grep pageMetadata.ts for title fields; verify against routes.',
     status: 'pending',
   },

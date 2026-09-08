@@ -59,7 +59,7 @@ export default function InternalPortalLayout(): React.ReactElement {
     >
       <PortalShell
         kind="internal"
-        brand="LYC Intelligence"
+        brand="NEXUS"
         nav={NAV}
         user={user}
         onLogout={logout}

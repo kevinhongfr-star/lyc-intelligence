@@ -132,7 +132,7 @@ export function buildSoftGate(opts: {
     `${specificValue}`,
     `${alternative}`,
     isCpiGate
-      ? `This capability becomes available as your engagement with LYC Intelligence deepens. I can flag this for your account team.`
+      ? `This capability becomes available as your engagement with NEXUS deepens. I can flag this for your account team.`
       : `If you'd like to explore expanding your access, I can point you to the right place.`,
   ].join(' ');
 

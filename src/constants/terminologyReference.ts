@@ -273,9 +273,10 @@ export const BANNED_WORDS: readonly BannedWordRule[] = [
       "product suite",
       "offering",
     ],
+    // NOTE (2026-09): "LYC Intelligence" brand retired — use NEXUS (product) / LYC Partners (firm).
     example: {
       bad:  "LYC Intelligence — Executive Intelligence Platform",
-      good: "LYC Intelligence — Executive Intelligence",
+      good: "NEXUS — Executive Intelligence",
     },
   },
   {
@@ -386,7 +387,7 @@ export const NEXUS_POSITIONING = {
   positioningLine: "Executive Intelligence",
   /** 1-sentence product descriptor */
   oneLiner:
-    "NEXUS is the intelligent front door of LYC Intelligence — your private AI executive thinking partner.",
+    "NEXUS is the intelligent front door of LYC Partners — your private AI executive thinking partner.",
   /** What NEXUS is NOT (for prompt/system docs) */
   whatNexusIsNot: [
     "Not a chatbot.",

@@ -311,7 +311,7 @@ export async function renderReport(
 
   const footerHtml = brandOpts?.includeFooter === false ? '' : `
     <div style="text-align:center;padding:24px 0;font-size:12px;color:#999;border-top:2px solid ${accent};margin-top:40px;">
-      LYC Intelligence · ${instrumentName}<br>
+      NEXUS · ${instrumentName}<br>
       Confidential — Generated ${generatedAt.toISOString().split('T')[0]}
     </div>`;
 
