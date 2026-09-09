@@ -1962,7 +1962,7 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
     console.error('[chat] Unhandled error:', error?.message || error);
     return res
       .status(500)
-      .json({ ok: false, error: 'Internal server error' });
+      .json({ ok: false, error: 'Internal server error', debug_msg: String(error?.message || error), debug_name: String(error?.name || ''), debug_stack: String(error?.stack || '').split('\n').slice(0, 4).join(' || ') });
   }
 }
 
