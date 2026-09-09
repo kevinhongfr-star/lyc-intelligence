@@ -1429,6 +1429,7 @@ async function fetchContextMemories(
 
   let semanticRow: any = null;
   let episodicRows: any[] = [];
+  let tokens: string[] = [];
   try {
     const semRes = await supabaseServiceFetch(
       `/nexus_semantic_memory?select=user_model&user_id=eq.${encodeURIComponent(userId)}&limit=1`,
@@ -1436,7 +1437,7 @@ async function fetchContextMemories(
     semanticRow = Array.isArray(semRes.data) && semRes.data.length > 0 ? semRes.data[0] : null;
 
     // Build ILIKE OR tokens from currentMessage.
-    const tokens = String(currentMessage || '')
+    tokens = String(currentMessage || '')
       .toLowerCase()
       .split(/[^a-z0-9]+/)
       .filter((t) => t.length >= 5 && t.length <= 16)
@@ -1962,7 +1963,7 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
     console.error('[chat] Unhandled error:', error?.message || error);
     return res
       .status(500)
-      .json({ ok: false, error: 'Internal server error', debug_msg: String(error?.message || error), debug_name: String(error?.name || ''), debug_stack: String(error?.stack || '').split('\n').slice(0, 4).join(' || ') });
+      .json({ ok: false, error: 'Internal server error' });
   }
 }
 
