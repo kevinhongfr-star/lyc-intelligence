@@ -21,6 +21,7 @@ import {
   passwordScoreColor,
 } from '@/lib/auth/passwordPolicy';
 import { captureUTMParams, captureAndStoreUTM } from '@/utils/utmTracking';
+import { getDefaultRoute } from '@/components/auth/PostLoginRedirect';
 import { V1 } from '@/styles/v1-tokens';
 import { PublicTopBar, publicNavTextAction } from '@/components/navigation/PublicTopBar';
 
@@ -77,7 +78,11 @@ export function SignupPage() {
           reportError(e, { scope: 'utm:store', severity: 'warning', extra: { userId } });
         });
       }
-      navigate('/platform');
+      // Role/tier-aware destination (same logic as login): new B2C members
+      // land in the Leader portal; the old hardcoded '/platform' redirected to
+      // the CONSULTANT portal and showed 'Consultant access required'.
+      const freshProfile = useAuthStore.getState?.().profile;
+      navigate(getDefaultRoute(freshProfile?.role ?? 'member', freshProfile?.tier ?? 'executive_introduction'));
     } else {
       reportError(new Error(result.error || 'Signup failed'), { scope: 'auth:signup', severity: 'warning', extra: { email: email.trim() } });
       setError(result.error || 'Failed to create account');
