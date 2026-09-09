@@ -780,16 +780,16 @@ function supabaseServiceFetch(
 async function refundCredit(userId: string, amount: number): Promise<void> {
   try {
     const balRes = await supabaseServiceFetch(
-      `/credits?select=balance&user_id=eq.${encodeURIComponent(userId)}&limit=1`,
+      `/credits?select=miles&user_id=eq.${encodeURIComponent(userId)}&limit=1`,
     );
     const balRow = Array.isArray(balRes.data) ? balRes.data[0] : null;
-    const currentBalance = Number(balRow?.balance ?? 0);
+    const currentBalance = Number(balRow?.miles ?? 0);
     await supabaseServiceFetch(
       `/credits?user_id=eq.${encodeURIComponent(userId)}`,
       {
         method: 'PATCH',
         body: JSON.stringify({
-          balance: currentBalance + amount,
+          miles: currentBalance + amount,
           updated_at: new Date().toISOString(),
         }),
       },
@@ -1660,10 +1660,10 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
     {
       const uid = encodeURIComponent(authUser.id);
       const balRes = await supabaseServiceFetch(
-        `/credits?select=balance&user_id=eq.${uid}&limit=1`,
+        `/credits?select=miles&user_id=eq.${uid}&limit=1`,
       );
       const balRow = Array.isArray(balRes.data) ? balRes.data[0] : null;
-      const currentBalance = Number(balRow?.balance ?? 0);
+      const currentBalance = Number(balRow?.miles ?? 0);
       if (balRes.error || !balRow || currentBalance < 1) {
         return res.status(402).json({
           ok: false,
@@ -1676,11 +1676,11 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       // we read, preventing race conditions / double-spend across
       // concurrent requests.
       const deductRes = await supabaseServiceFetch(
-        `/credits?user_id=eq.${uid}&balance=eq.${currentBalance}&select=balance`,
+        `/credits?user_id=eq.${uid}&miles=eq.${currentBalance}&select=miles`,
         {
           method: 'PATCH',
           body: JSON.stringify({
-            balance: currentBalance - 1,
+            miles: currentBalance - 1,
             updated_at: new Date().toISOString(),
           }),
         },
@@ -1695,7 +1695,7 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
           code: 'CREDIT_DEDUCTION_FAILED',
         });
       }
-      creditBalance = Number(deductRow.balance);
+      creditBalance = Number(deductRow.miles);
       creditDeducted = true;
     }
 
