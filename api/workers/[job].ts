@@ -1519,8 +1519,8 @@ async function fetchContextMemories(
 
   const MAX_MEMORY_CONTEXT_CHARS = 2000; // ~500 tokens, keeps context bounded
   const fullContext =
-    `\n\n--- Recall (from prior sessions; label-based — not guaranteed accurate) ---\n` + +
-    sections.join('\n\n')
+    `\n\n--- Recall (from prior sessions; label-based — not guaranteed accurate) ---\n` +
+    sections.join('\n\n');
   if (fullContext.length <= MAX_MEMORY_CONTEXT_CHARS) return fullContext;
   return fullContext.slice(0, MAX_MEMORY_CONTEXT_CHARS) + '\n… (truncated)';
 }
