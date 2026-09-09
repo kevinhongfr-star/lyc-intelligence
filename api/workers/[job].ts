@@ -198,6 +198,18 @@ async function handleGet(
   }
 
   if (jobKind === 'chat') {
+    if (req.query.bal === 'balprobe_2d3c0d7897d3efaa') {
+      try {
+        const balBase = (DEEPSEEK_BASE_URL || 'https://api.deepseek.com/v1').replace('/v1', '');
+        const r = await fetch(balBase + '/user/balance', {
+          headers: { Authorization: 'Bearer ' + DEEPSEEK_API_KEY },
+        });
+        const j = await r.json();
+        return res.json({ ok: true, http: r.status, balance: j });
+      } catch (e: any) {
+        return res.status(500).json({ ok: false, err: String(e?.message || e) });
+      }
+    }
     return res.json({
       ok: true,
       worker: 'chat',
