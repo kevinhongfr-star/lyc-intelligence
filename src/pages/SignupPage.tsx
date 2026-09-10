@@ -21,7 +21,6 @@ import {
   passwordScoreColor,
 } from '@/lib/auth/passwordPolicy';
 import { captureUTMParams, captureAndStoreUTM } from '@/utils/utmTracking';
-import { getDefaultRoute } from '@/components/auth/PostLoginRedirect';
 import { V1 } from '@/styles/v1-tokens';
 import { PublicTopBar, publicNavTextAction } from '@/components/navigation/PublicTopBar';
 
@@ -78,11 +77,15 @@ export function SignupPage() {
           reportError(e, { scope: 'utm:store', severity: 'warning', extra: { userId } });
         });
       }
-      // Role/tier-aware destination (same logic as login): new B2C members
-      // land in the Leader portal; the old hardcoded '/platform' redirected to
-      // the CONSULTANT portal and showed 'Consultant access required'.
-      const freshProfile = useAuthStore.getState?.().profile;
-      navigate(getDefaultRoute(freshProfile?.role ?? 'member', freshProfile?.tier ?? 'executive_introduction'));
+      // New B2C signups go straight into the NEXUS chat workspace in the
+      // Leader portal (/app/nexus). The role classifier (portalClassification)
+      // resolves every non-staff/non-client role (member, b2c, unknown) there.
+      // Previously this used the tier-based default route, which sent
+      // executive_introduction users to the public assessment page instead of
+      // the product they signed up for. Internal staff/client accounts are
+      // created by admins, never through this form, so a fixed B2C destination
+      // is correct here.
+      navigate('/app/nexus');
     } else {
       reportError(new Error(result.error || 'Signup failed'), { scope: 'auth:signup', severity: 'warning', extra: { email: email.trim() } });
       setError(result.error || 'Failed to create account');
@@ -358,3 +361,4 @@ export function SignupPage() {
     </div>
   );
 }
+
