@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { V1 } from '@/styles/v1-tokens';
 
 const DOT_KEYFRAMES = `
@@ -198,19 +199,22 @@ export function EmailFlowPageBase({
 }
 
 export function EmailVerificationConfirmedPage() {
+  const navigate = useNavigate();
   return (
     <EmailFlowPageBase
       eyebrow="Email verified"
       eyebrowColor={V1.teal600}
       eyebrowBorderColor={V1.teal600}
       title="Your email is confirmed"
-      body="You can now sign in and start using NEXUS."
+      body="You can now sign in and start chatting with NEXUS."
       ctaLabel="Go to NEXUS →"
+      onCtaClick={() => navigate('/app/nexus')}
     />
   );
 }
 
 export function PasswordResetConfirmedPage() {
+  const navigate = useNavigate();
   return (
     <EmailFlowPageBase
       eyebrow="Password updated"
@@ -219,11 +223,13 @@ export function PasswordResetConfirmedPage() {
       title="Your password has been updated"
       body="Sign in with your new password to continue."
       ctaLabel="Sign in →"
+      onCtaClick={() => navigate('/login')}
     />
   );
 }
 
 export function PasswordExpiredPage() {
+  const navigate = useNavigate();
   return (
     <EmailFlowPageBase
       eyebrow="Action required"
@@ -232,6 +238,7 @@ export function PasswordExpiredPage() {
       title="Your password has expired"
       body="For your security, please set a new password to continue."
       ctaLabel="Reset password →"
+      onCtaClick={() => navigate('/reset-password')}
     />
   );
 }
@@ -293,3 +300,4 @@ export function MagicLinkLandingPage() {
     />
   );
 }
+
