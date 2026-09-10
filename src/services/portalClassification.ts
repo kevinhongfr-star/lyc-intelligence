@@ -47,6 +47,7 @@ export function classifyPortal(role: string | null | undefined): PortalIdentity 
     case 'executive':
     case 'enterprise':
     case 'leader':
+    case 'b2c':
     default:
       return 'leader';
   }
@@ -107,6 +108,7 @@ export function isLeaderRole(role: string | null | undefined): boolean {
     case 'basic':
     case 'pro':
     case 'enterprise':
+    case 'b2c':
       return true;
     default:
       // Internal staff also count as leaders (can view leader portal if they want)
@@ -144,6 +146,7 @@ export function getDefaultPortalRoute(role: string | null | undefined): string {
     case 'basic':
     case 'pro':
     case 'enterprise':
+    case 'b2c':
     default:
       return '/app/nexus';
   }
