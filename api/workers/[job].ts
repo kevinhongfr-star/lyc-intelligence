@@ -1546,19 +1546,21 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       .json({ ok: false, error: 'Chat service not configured' });
   }
 
-  // ── Auth: require valid Supabase JWT with confirmed email ────────
-  const token = extractBearerToken(req);
-  if (!token) {
-    return res
-      .status(401)
-      .json({ ok: false, error: 'Authentication required. Sign in to use NEXUS chat.' });
-  }
-
-  const authUser = await verifySupabaseToken(token);
-  if (!authUser) {
-    return res
-      .status(401)
-      .json({ ok: false, error: 'Invalid or expired session. Please sign in again.' });
+  // ── Demo mode: bypass auth for private no-login demo deployments ───
+  const IS_DEMO = process.env.DEMO_MODE === 'true';
+  let authUser: { id: string; email?: string };
+  if (IS_DEMO) {
+    authUser = { id: 'demo-user-nexus', email: 'demo@nexus.local' };
+  } else {
+    const token = extractBearerToken(req);
+    if (!token) {
+      return res.status(401).json({ ok: false, error: 'Authentication required. Sign in to use NEXUS chat.' });
+    }
+    const verified = await verifySupabaseToken(token);
+    if (!verified) {
+      return res.status(401).json({ ok: false, error: 'Invalid or expired session. Please sign in again.' });
+    }
+    authUser = verified;
   }
 
   // ── Look up user's real tier from profiles (server-side SSOT) ──────
@@ -1658,7 +1660,8 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
     // DeepSeek, and refund it if the DeepSeek call fails so users are never
     // charged for a failed response. Uses the service role key to bypass RLS
     // (the serverless function cannot rely on the caller's JWT for writes).
-    {
+    // (Skipped in DEMO_MODE — unlimited free demo chat.)
+    if (!IS_DEMO) {
       const uid = encodeURIComponent(authUser.id);
       const balRes = await supabaseServiceFetch(
         `/credits?select=miles&user_id=eq.${uid}&limit=1`,
@@ -1699,6 +1702,7 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
       creditBalance = Number(deductRow.miles);
       creditDeducted = true;
     }
+    } // end if (!IS_DEMO) credits gate
 
     // ── P0-2: Session ownership validation ───────────────────────────
     // The client sends a session_id; we must verify it belongs to the
@@ -1714,7 +1718,7 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
         ? body.session_id.trim()
         : null;
 
-    if (sessionId) {
+    if (sessionId && !IS_DEMO) {
       const sidEnc = encodeURIComponent(sessionId);
       const ownRes = await supabaseServiceFetch(
         `/chat_sessions?select=user_id&id=eq.${sidEnc}&limit=1`,
