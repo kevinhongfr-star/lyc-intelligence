@@ -46,7 +46,7 @@ interface Message {
   promptText?: string;
 }
 
-const GUEST_MESSAGE_LIMIT = 3;
+const GUEST_MESSAGE_LIMIT = 999;
 const GUEST_STORAGE_KEY = 'nexus_guest_messages';
 
 const QUICK_REPLIES = NEXUS_FIRST_RESPONSE_QUICK_REPLIES;
