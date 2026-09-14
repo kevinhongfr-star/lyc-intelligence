@@ -174,7 +174,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // If the bot returns valid JSON with this shape, extract and forward separately.
         let mainAnswer = answer;
         let insights: string[] = [];
-        const trimmed = answer.trim();
+        // Strip markdown code fences the model sometimes wraps around JSON: ```json ... ```
+        let trimmed = answer.trim();
+        const fence = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+        if (fence) trimmed = fence[1].trim();
         if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
           try {
             const parsed = JSON.parse(trimmed);
