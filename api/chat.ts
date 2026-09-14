@@ -126,6 +126,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     const chatId: string = created.data?.data?.id;
     const conversationId: string = created.data?.data?.conversation_id;
+    // Seconds-precision creation timestamp of THIS generation. With
+    // auto_save_history=true, replayed prior-turn messages are persisted into
+    // the conversation (assistant history is stored as type:"answer") and share
+    // this timestamp; the freshly generated answer is always strictly later.
+    const chatCreatedAt: number = Number(created.data?.data?.created_at) || 0;
     if (!chatId || !conversationId) {
       return json(res, 502, { error: 'Chat service returned an invalid response.' });
     }
@@ -144,16 +149,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           `/v3/chat/message/list?chat_id=${encodeURIComponent(chatId)}&conversation_id=${encodeURIComponent(conversationId)}`,
         );
         const items: any[] = listed.data?.data || [];
-        const answer = items
-          .filter(m => m.type === 'answer' && typeof m.content === 'string')
-          .map(m => m.content as string)
+        // CRITICAL: auto_save_history replays prior assistant turns into the
+        // conversation as type:"answer". Only the last answer message (or the
+        // answer(s) stamped strictly after chat creation) belongs to THIS turn —
+        // joining every answer would echo the entire transcript back to the user.
+        const allAnswers = items.filter(
+          m => m.type === 'answer' && typeof m.content === 'string' && m.content.trim(),
+        );
+        const freshAnswers = chatCreatedAt
+          ? allAnswers.filter(m => Number(m.created_at) > chatCreatedAt)
+          : [];
+        const answer = (freshAnswers.length ? freshAnswers : allAnswers.slice(-1))
+          .map(m => String(m.content).trim())
           .join('\n\n')
           .trim();
         if (!answer) return json(res, 502, { error: 'No answer returned by the chat service.' });
         const suggested = items
-          .filter(m => m.type === 'follow_up' && typeof m.content === 'string')
+          .filter(m => m.type === 'follow_up' && typeof m.content === 'string'
+            && (!chatCreatedAt || Number(m.created_at) > chatCreatedAt))
           .map(m => m.content as string)
-          .slice(0, 3);
+          .slice(-3);
         return json(res, 200, { response: answer, suggested_prompts: suggested });
       }
       if (d.status === 'failed' || d.status === 'requires_action') {
