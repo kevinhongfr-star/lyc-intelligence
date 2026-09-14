@@ -260,6 +260,7 @@ export function NEXUSPage() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const firstMessageSentRef = useRef(false);
+  const inFlightRef = useRef(false);
 
   useEffect(() => {
     const q = searchParams.get('q');
@@ -290,22 +291,26 @@ export function NEXUSPage() {
 
   const send = useCallback(async (text?: string) => {
     const msgText = (text ?? input).trim();
-    if (!msgText || loading) return;
+    // Synchronous ref guard: React state (`loading`) has not re-rendered yet
+    // between a double-click / Enter double-fire, so state alone lets a
+    // duplicate request through.
+    if (!msgText || inFlightRef.current) return;
+    inFlightRef.current = true;
     if (!firstMessageSentRef.current) {
       firstMessageSentRef.current = true;
       trackNexusFirstMessageSent({ tier: 'explorer', source: 'nexus_chat' });
     }
     const userMsg: Message = { role: 'user', content: msgText };
+    const historyForRequest = [...messages, userMsg].map(m => ({ role: m.role, content: m.content }));
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     if (inputRef.current) inputRef.current.style.height = 'auto';
     setLoading(true);
     try {
-      const fullHistory = [...messages, userMsg].map(m => ({ role: m.role, content: m.content }));
       const reply = await sendChatMessage(
         msgText,
         user?.id || demoUid,
-        fullHistory,
+        historyForRequest,
         { systemPrompt, tier: 'explorer' },
       );
       const isErr = /having trouble connecting/i.test(reply);
@@ -313,9 +318,11 @@ export function NEXUSPage() {
     } catch (e: any) {
       reportError(e, { context: 'nexus_chat_send' });
       setMessages(prev => [...prev, { role: 'assistant', content: "I'm having trouble connecting right now. Please try again in a moment.", isError: true }]);
+    } finally {
+      inFlightRef.current = false;
+      setLoading(false);
     }
-    setLoading(false);
-  }, [input, loading, messages, systemPrompt, user, demoUid]);
+  }, [input, messages, systemPrompt, user, demoUid]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.metaKey) {
@@ -331,6 +338,7 @@ export function NEXUSPage() {
   };
 
   const newChat = () => {
+    inFlightRef.current = false;
     setMessages([{ role: 'assistant', content: buildNexusFirstResponse(profile?.name) }]);
     setInput('');
     firstMessageSentRef.current = false;
