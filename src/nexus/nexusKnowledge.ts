@@ -593,25 +593,26 @@ What are you navigating right now?`;
  *  - Demonstrates assessment + framework awareness.
  *  - Premium, confident, slightly formal — not overly friendly.
  */
-export const NEXUS_FIRST_RESPONSE = `Welcome{NAME}. I'm NEXUS, your executive intelligence partner — built on two decades of LYC executive search methodology.
+export const NEXUS_FIRST_RESPONSE = `Welcome{NAME} — it's good to meet you. I'm NEXUS, a thinking partner from LYC Partners.
 
-I can help you with:
-- Navigate a career transition or cross-border move
-- Benchmark your leadership against APAC executives
-- Build a narrative for board, investors, or stakeholders
-- Take a complimentary leadership lens
+Whatever you share here stays between us. We'll go at your pace, one thing at a time. A few places people often begin:
 
-Where would you like to start?`;
+- Thinking through a career move or a cross-border transition
+- A challenge they're facing at work right now
+- Getting a clearer read on their own leadership
+- A structured way to look at a decision
+
+What's on your mind?`;
 
 /**
  * Quick-reply chips shown below the NEXUS first response (W4-2).
- * Specific, framework-aware options — not open-ended.
+ * Warm, human entry points — no jargon, no internal names.
  */
 export const NEXUS_FIRST_RESPONSE_QUICK_REPLIES: string[] = [
-  'Navigate a career transition',
-  'Benchmark my leadership',
-  'Help with a specific challenge',
-  'Add a complimentary lens',
+  "I'm thinking about a career move",
+  "I'm facing a challenge at work",
+  "I'd like to benchmark my leadership",
+  'A structured lens on a decision',
 ];
 
 /**
