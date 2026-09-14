@@ -169,7 +169,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             && (!chatCreatedAt || Number(m.created_at) > chatCreatedAt))
           .map(m => m.content as string)
           .slice(-3);
-        return json(res, 200, { response: answer, suggested_prompts: suggested });
+
+        // Parse structured JSON response: {"answer":"...","insights":[...]}
+        // If the bot returns valid JSON with this shape, extract and forward separately.
+        let mainAnswer = answer;
+        let insights: string[] = [];
+        const trimmed = answer.trim();
+        if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+          try {
+            const parsed = JSON.parse(trimmed);
+            if (typeof parsed.answer === 'string') {
+              mainAnswer = parsed.answer;
+              if (Array.isArray(parsed.insights)) {
+                insights = parsed.insights.filter((x: any) => typeof x === 'string').slice(0, 5);
+              }
+            }
+          } catch { /* not JSON, use raw answer */ }
+        }
+
+        return json(res, 200, { response: mainAnswer, insights, suggested_prompts: suggested });
       }
       if (d.status === 'failed' || d.status === 'requires_action') {
         lastError = d.last_error?.msg || `chat ${d.status}`;
