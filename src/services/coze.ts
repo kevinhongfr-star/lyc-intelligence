@@ -37,7 +37,7 @@ export async function sendChatMessageWithSuggestions(
   userId: string,
   history: Array<{ role: string; content: string }> = [],
   options?: { systemPrompt?: string; memoryContext?: any[]; documentContext?: string; tier?: string }
-): Promise<{ response: string; suggested_prompts: string[] }> {
+): Promise<{ response: string; suggested_prompts: string[]; insights?: string[] }> {
   try {
     const res = await fetch('/api/chat', {
       method: 'POST',
@@ -57,6 +57,7 @@ export async function sendChatMessageWithSuggestions(
     return {
       response: data.response || 'No response received.',
       suggested_prompts: data.suggested_prompts || [],
+      insights: Array.isArray(data.insights) ? data.insights : undefined,
     };
   } catch (e) {
     console.error('[sendChatMessageWithSuggestions] Failed:', e);
