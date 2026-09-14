@@ -341,6 +341,9 @@ export default function App() {
               Landing renders its own Fixed Nav (V6.0-2a) + Marketing Footer (V6.0-2h). */}
           <Route index element={<Landing />} />
 
+          {/* Full-immersion NEXUS chat — outside MarketingLayout (no site nav/footer). */}
+          <Route path="nexus/chat" element={<NexusChatPage />} />
+
           {/* ═══════════════════════════════════════════════════════════
               PHASE 16 · MARKETING LAYOUT — no auth, premium marketing chrome
               ═══════════════════════════════════════════════════════════ */}
@@ -359,7 +362,6 @@ export default function App() {
             {/* Public product pages */}
             {/* W4-1/W4-3 (#1295) — /nexus renders the NEXUS landing page (what is NEXUS?) */}
             <Route path="nexus" element={<NexusLandingPage />} />
-            <Route path="nexus/chat" element={<NexusChatPage />} />
             {/* V2 IA — canonical NEXUS workspace URLs. Sidebar links from /nexus/chat.
                 Lenses = assessment catalog (public). Milestones = dashboard (auth'd). */}
             <Route path="nexus/lenses" element={<LensesLibraryPage />} />
