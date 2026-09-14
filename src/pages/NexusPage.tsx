@@ -1,12 +1,16 @@
 /**
- * NEXUSPage — v8 DARK THEME REDESIGN
+ * NEXUSPage — v8.1 DARK THEME (full-immersion demo)
  *
- * Design: Dark, minimal, confident.
- *   LEFT  (250)  — Recent chats + New Chat + Ambient sounds
- *   MAIN        — Chat with SVG orbital avatar, dark bg, fuchsia accent
+ * Design: dark, minimal, confident.
+ *   LEFT  (250)  — New chat + recent + Ambient sounds
+ *   MAIN         — Chat thread with SVG orbital avatar, fuchsia accent
  *
- * All chat logic preserved from V2 foundation.
- * Visual: v8 prototype (dark theme, 3D orbital avatar, comet tails, minimal icons).
+ * v8.1 fixes:
+ *   - Route lives OUTSIDE MarketingLayout (no site nav/footer — full immersion)
+ *   - Readable message surfaces (high-contrast bubbles)
+ *   - Ambient icons properly stroked (were invisible on dark)
+ *   - No guest message limit (private demo)
+ *   - LLM calls go through /api/chat → Coze (NEXUS Demo bot, full persona)
  */
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { sendChatMessage } from '@/services/coze';
@@ -14,8 +18,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { SEO } from '@/components/seo/SEO';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { trackCTA, trackNexusFirstMessageSent, trackNexusChatInitiation } from '@/analytics/eventTracker';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { trackNexusFirstMessageSent, trackNexusChatInitiation } from '@/analytics/eventTracker';
 import { reportError } from '@/analytics/errorMonitor';
 import { buildNexusSystemPrompt, buildNexusFirstResponse, NEXUS_FIRST_RESPONSE_QUICK_REPLIES } from '@/nexus/nexusKnowledge';
 import { buildLocalAssessmentContextForNexus, getAssessmentProgress, recommendNextAssessment } from '@/nexus/resultContextBuilder';
@@ -25,54 +29,70 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   isError?: boolean;
-  promptText?: string;
 }
 
-const GUEST_MESSAGE_LIMIT = 999;
-const GUEST_STORAGE_KEY = 'nexus_guest_messages';
+const DEMO_UID_KEY = 'nexus_demo_uid';
 const QUICK_REPLIES = NEXUS_FIRST_RESPONSE_QUICK_REPLIES;
 
-/* ── Dark theme tokens ── */
+/* ── Dark theme tokens (v8.1 — contrast-tuned) ── */
 const T = {
-  bg: '#0e0e0e', bg2: '#111111', bg3: '#151515',
-  srf: '#171717', srf2: '#1c1c1c',
-  bdr: 'rgba(255,255,255,0.05)', bdr2: 'rgba(255,255,255,0.09)',
-  tx: '#d8d8d8', tx2: '#777777', tx3: '#444444',
-  wh: '#ffffff', wh2: '#aaaaaa', wh3: '#555555',
-  fus: '#C108AB', fusDim: 'rgba(193,8,171,0.10)',
-  teal: '#0EA5A0', ocean: '#2563EB',
+  bg: '#0e0e0e',
+  srf: '#171717',
+  srf2: '#1c1c1c',
+  aiBubble: '#191919',
+  bdr: 'rgba(255,255,255,0.10)',
+  bdr2: 'rgba(255,255,255,0.16)',
+  tx: '#ececec',        // primary text — high contrast on #0e0e0e
+  tx2: '#a8a8a8',       // secondary
+  tx3: '#7d7d7d',       // tertiary / labels
+  icon: '#c4c4c4',      // panel icons
+  wh: '#ffffff',
+  userBubble: '#efefef',
+  userTx: '#111111',
+  fus: '#C108AB',
+  fusDim: 'rgba(193,8,171,0.14)',
+  teal: '#2dd4bf',
+  ocean: '#3B82F6',
   r: 12, rs: 7,
   font: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif",
   logo: "'Crimson Pro', Georgia, 'Times New Roman', serif",
 };
 
-/* ── Dark markdown ── */
+/* ── Markdown rendering inside AI bubbles ── */
 const darkMd = {
   a: ({ href, children }: any) => <a href={href} style={{ color: T.teal, textDecoration: 'underline' }} target="_blank" rel="noopener noreferrer">{children}</a>,
-  p: ({ children }: any) => <p style={{ margin: '0 0 10px', lineHeight: 1.6, color: T.tx, fontFamily: T.font, fontSize: 14.5 }}>{children}</p>,
+  p: ({ children }: any) => <p style={{ margin: '0 0 10px', lineHeight: 1.65, color: T.tx, fontFamily: T.font, fontSize: 14.5 }}>{children}</p>,
   h1: ({ children }: any) => <h1 style={{ fontFamily: T.logo, color: T.wh, fontSize: 20, margin: '4px 0 10px', fontWeight: 700 }}>{children}</h1>,
   h2: ({ children }: any) => <h2 style={{ fontFamily: T.logo, color: T.wh, fontSize: 18, margin: '4px 0 8px', fontWeight: 700 }}>{children}</h2>,
   h3: ({ children }: any) => <h3 style={{ fontFamily: T.logo, color: T.wh, fontSize: 15, margin: '4px 0 6px', fontWeight: 700 }}>{children}</h3>,
   strong: ({ children }: any) => <strong style={{ color: T.wh, fontWeight: 600 }}>{children}</strong>,
   em: ({ children }: any) => <em style={{ color: T.tx2 }}>{children}</em>,
-  ul: ({ children }: any) => <ul style={{ margin: '0 0 10px', paddingLeft: 18 }}>{children}</ul>,
-  li: ({ children }: any) => <li style={{ color: T.tx, fontFamily: T.font, fontSize: 14.5, lineHeight: 1.6, marginBottom: 4 }}>{children}</li>,
+  ul: ({ children }: any) => <ul style={{ margin: '0 0 10px', paddingLeft: 20 }}>{children}</ul>,
+  ol: ({ children }: any) => <ol style={{ margin: '0 0 10px', paddingLeft: 20 }}>{children}</ol>,
+  li: ({ children }: any) => <li style={{ color: T.tx, fontFamily: T.font, fontSize: 14.5, lineHeight: 1.65, marginBottom: 5 }}>{children}</li>,
 };
 
-function getGuestCount(): number {
-  try { return parseInt(localStorage.getItem(GUEST_STORAGE_KEY) || '0', 10); } catch { return 0; }
-}
-function setGuestCount(count: number) {
-  try { localStorage.setItem(GUEST_STORAGE_KEY, String(count)); } catch {}
+function getDemoUid(): string {
+  try {
+    let uid = localStorage.getItem(DEMO_UID_KEY);
+    if (!uid) {
+      uid = `demo-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+      localStorage.setItem(DEMO_UID_KEY, uid);
+    }
+    return uid;
+  } catch {
+    return `demo-${Date.now().toString(36)}`;
+  }
 }
 
-/* ── Ambient sound icons (SVG line art) ── */
+/* ── Ambient sound icons (SVG line art, stroked for dark bg) ── */
+const svgAttrs = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"';
 const AMBIENT_ICONS: Record<string, string> = {
-  rain: '<svg viewBox="0 0 24 24"><path d="M16 13v8"/><path d="M8 13v8"/><path d="M12 15v6"/><path d="M20 16.58A5 5 0 0018 7h-1.26A8 8 0 104 15.25"/></svg>',
-  coffee: '<svg viewBox="0 0 24 24"><path d="M17 8h1a4 4 0 010 8h-1"/><path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/><path d="M6 2v3"/><path d="M10 2v3"/><path d="M14 2v3"/></svg>',
-  fire: '<svg viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.5 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/></svg>',
-  beach: '<svg viewBox="0 0 24 24"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>',
-  forest: '<svg viewBox="0 0 24 24"><path d="M12 2L7 10h10L12 2z"/><path d="M12 8L5 18h14L12 8z"/><path d="M12 18v4"/></svg>',
+  rain: `<svg ${svgAttrs}><path d="M16 13v8"/><path d="M8 13v8"/><path d="M12 15v6"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>`,
+  coffee: `<svg ${svgAttrs}><path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/><path d="M6 2v3"/><path d="M10 2v3"/><path d="M14 2v3"/></svg>`,
+  fire: `<svg ${svgAttrs}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.5 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>`,
+  beach: `<svg ${svgAttrs}><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>`,
+  forest: `<svg ${svgAttrs}><path d="M12 2 7 10h10L12 2z"/><path d="M12 8 5 18h14L12 8z"/><path d="M12 18v4"/></svg>`,
 };
 const AMBIENT_SOUNDS = [
   { id: 'rain', label: 'Rain' },
@@ -85,23 +105,24 @@ const AMBIENT_SOUNDS = [
 /* ── SVG Avatar constants ── */
 const CX = 30, CY = 30;
 const DOTS = [
-  { rx:14, ry:7,   spd:.0020, sz:2.8, ph:0,   tilt:.55,  tailLen:35, tailSpace:.018 },
-  { rx:18, ry:4.5, spd:.0014, sz:1.6, ph:2.3, tilt:-.44, tailLen:28, tailSpace:.016 },
-  { rx:8,  ry:15,  spd:.0027, sz:1.1, ph:4.2, tilt:1.30, tailLen:22, tailSpace:.014 },
+  { rx: 14, ry: 7,   spd: .0020, sz: 2.8, ph: 0,   tilt: .55,  tailLen: 35, tailSpace: .018 },
+  { rx: 18, ry: 4.5, spd: .0014, sz: 1.6, ph: 2.3, tilt: -.44, tailLen: 28, tailSpace: .016 },
+  { rx: 8,  ry: 15,  spd: .0027, sz: 1.1, ph: 4.2, tilt: 1.30, tailLen: 22, tailSpace: .014 },
 ];
-const TAIL_PAL = ['#C108AB','#D946EF','#A855F7','#7C3AED','#0EA5A0','#14B8A6','#0D9488','#2563EB','#3B82F6','#60A5FA'];
+const TAIL_PAL = ['#C108AB', '#D946EF', '#A855F7', '#7C3AED', '#0EA5A0', '#14B8A6', '#0D9488', '#2563EB', '#3B82F6', '#60A5FA'];
 
 function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
 function h2r(h: string) {
-  return { r: parseInt(h.slice(1,3),16), g: parseInt(h.slice(3,5),16), b: parseInt(h.slice(5,7),16) };
-}
-function lc(a: string, b: string, t: number) {
-  const c = h2r(a), d = h2r(b);
-  return `rgb(${Math.round(lerp(c.r,d.r,t))},${Math.round(lerp(c.g,d.g,t))},${Math.round(lerp(c.b,d.b,t))})`;
+  return { r: parseInt(h.slice(1, 3), 16), g: parseInt(h.slice(3, 5), 16), b: parseInt(h.slice(5, 7), 16) };
 }
 function sampleGrad(f: number) {
   const i = f * (TAIL_PAL.length - 1), j = Math.floor(i);
-  return lc(TAIL_PAL[j], TAIL_PAL[Math.min(j+1, TAIL_PAL.length-1)], i - j);
+  const a = h2r(TAIL_PAL[j]), b = h2r(TAIL_PAL[Math.min(j + 1, TAIL_PAL.length - 1)]);
+  return {
+    r: Math.round(lerp(a.r, b.r, i - j)),
+    g: Math.round(lerp(a.g, b.g, i - j)),
+    b: Math.round(lerp(a.b, b.b, i - j)),
+  };
 }
 
 interface DotConfig {
@@ -113,14 +134,14 @@ interface DotConfig {
 function orbPos(d: DotConfig, ang: number) {
   const ex = d.rx * Math.cos(ang), ey = d.ry * Math.sin(ang);
   const ct = Math.cos(d.tilt), st = Math.sin(d.tilt);
-  return { x: CX + ex*ct - ey*st, y: CY + ex*st + ey*ct, depth: Math.sin(ang) * Math.abs(Math.sin(d.tilt)) };
+  return { x: CX + ex * ct - ey * st, y: CY + ex * st + ey * ct, depth: Math.sin(ang) * Math.abs(Math.sin(d.tilt)) };
 }
 function orbTangent(d: DotConfig, ang: number) {
   const dex = -d.rx * Math.sin(ang), dey = d.ry * Math.cos(ang);
   const ct = Math.cos(d.tilt), st = Math.sin(d.tilt);
-  const tx = dex*ct - dey*st, ty = dex*st + dey*ct;
-  const len = Math.sqrt(tx*tx + ty*ty) || 1;
-  return { x: tx/len, y: ty/len };
+  const tx = dex * ct - dey * st, ty = dex * st + dey * ct;
+  const len = Math.sqrt(tx * tx + ty * ty) || 1;
+  return { x: tx / len, y: ty / len };
 }
 
 /* ── NEXUS Avatar Component ── */
@@ -157,8 +178,8 @@ function NexusAvatar() {
         const sizeScale = 0.4 + 0.9 * depthF;
         const mainR = d.sz * sizeScale;
         const mainOp = 0.25 + 0.75 * depthF;
-        const farCol = { r:80, g:40, b:70 };
-        const nearCol = { r:255, g:100, b:220 };
+        const farCol = { r: 80, g: 40, b: 70 };
+        const nearCol = { r: 255, g: 100, b: 220 };
         const cr = Math.round(lerp(farCol.r, nearCol.r, depthF));
         const cg = Math.round(lerp(farCol.g, nearCol.g, depthF));
         const cb = Math.round(lerp(farCol.b, nearCol.b, depthF));
@@ -176,7 +197,7 @@ function NexusAvatar() {
 
         for (let j = 0; j < d.tailLen; j++) {
           const f = j / (d.tailLen - 1);
-          const tailAng = ang - (j+1) * d.tailSpace * 8;
+          const tailAng = ang - (j + 1) * d.tailSpace * 8;
           const tp = orbPos(d, tailAng);
           const tDepthF = (tp.depth + 1) / 2;
           const dist = (j + 1) * d.tailSpace * (d.rx + d.ry) * 0.65;
@@ -184,8 +205,7 @@ function NexusAvatar() {
           const txP = mp.x + backX * dist + perpX * wave;
           const tyP = mp.y + backY * dist + perpY * wave;
           const tailSz = mainR * Math.max(0.04, 1 - f * 0.94);
-          const gradCol = sampleGrad(f);
-          const gc = h2r(gradCol);
+          const gc = sampleGrad(f);
           const depthBright = 0.5 + 0.5 * tDepthF;
           const fr = Math.round(gc.r * depthBright + 255 * (1 - depthBright) * 0.1);
           const fg = Math.round(gc.g * depthBright + 255 * (1 - depthBright) * 0.05);
@@ -198,7 +218,7 @@ function NexusAvatar() {
           el.setAttribute('cx', txP.toFixed(2));
           el.setAttribute('cy', tyP.toFixed(2));
           el.setAttribute('r', Math.max(0.05, tailSz).toFixed(3));
-          el.setAttribute('fill', `rgb(${Math.min(255,fr)},${Math.min(255,fg)},${Math.min(255,fb)})`);
+          el.setAttribute('fill', `rgb(${Math.min(255, fr)},${Math.min(255, fg)},${Math.min(255, fb)})`);
           el.setAttribute('opacity', op.toFixed(3));
         }
       });
@@ -218,6 +238,7 @@ export function NEXUSPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
+  const demoUid = useMemo(() => getDemoUid(), []);
   const assessmentProgress = useMemo(() => getAssessmentProgress(), []);
   const nextRecommendation = useMemo(() => recommendNextAssessment(), []);
 
@@ -234,7 +255,6 @@ export function NEXUSPage() {
   });
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [guestCount, setGuestCountState] = useState(0);
   const [panelOpen, setPanelOpen] = useState(true);
   const [activeSound, setActiveSound] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -265,40 +285,37 @@ export function NEXUSPage() {
   const combinedContext = [lensContext, localAssessmentContext.contextString].filter(Boolean).join('\n\n');
   const systemPrompt = useMemo(() => buildNexusSystemPrompt(combinedContext).systemPrompt, [combinedContext]);
 
-  const isGuest = !user;
-  const remaining = isGuest ? Math.max(0, GUEST_MESSAGE_LIMIT - guestCount) : Infinity;
-  const showGuestLimit = isGuest && guestCount >= GUEST_MESSAGE_LIMIT;
-
   useEffect(() => { trackNexusChatInitiation('direct_link'); }, []);
-  useEffect(() => { if (isGuest) setGuestCountState(getGuestCount()); }, [isGuest]);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading]);
 
   const send = useCallback(async (text?: string) => {
     const msgText = (text ?? input).trim();
-    if (!msgText || loading || showGuestLimit) return;
+    if (!msgText || loading) return;
     if (!firstMessageSentRef.current) {
       firstMessageSentRef.current = true;
       trackNexusFirstMessageSent({ tier: 'explorer', source: 'nexus_chat' });
     }
-    if (isGuest) {
-      const c = getGuestCount() + 1;
-      setGuestCount(c); setGuestCountState(c);
-    }
     const userMsg: Message = { role: 'user', content: msgText };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
-    if (inputRef.current) { inputRef.current.style.height = 'auto'; }
+    if (inputRef.current) inputRef.current.style.height = 'auto';
     setLoading(true);
     try {
       const fullHistory = [...messages, userMsg].map(m => ({ role: m.role, content: m.content }));
-      const reply = await sendChatMessage(msgText, fullHistory, systemPrompt);
-      setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+      const reply = await sendChatMessage(
+        msgText,
+        user?.id || demoUid,
+        fullHistory,
+        { systemPrompt, tier: 'explorer' },
+      );
+      const isErr = /having trouble connecting/i.test(reply);
+      setMessages(prev => [...prev, { role: 'assistant', content: reply, isError: isErr }]);
     } catch (e: any) {
       reportError(e, { context: 'nexus_chat_send' });
       setMessages(prev => [...prev, { role: 'assistant', content: "I'm having trouble connecting right now. Please try again in a moment.", isError: true }]);
     }
     setLoading(false);
-  }, [input, loading, showGuestLimit, isGuest, messages, systemPrompt]);
+  }, [input, loading, messages, systemPrompt, user, demoUid]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.metaKey) {
@@ -315,11 +332,13 @@ export function NEXUSPage() {
 
   const newChat = () => {
     setMessages([{ role: 'assistant', content: buildNexusFirstResponse(profile?.name) }]);
-    setInput(''); firstMessageSentRef.current = false;
-    if (inputRef.current) { inputRef.current.style.height = 'auto'; }
+    setInput('');
+    firstMessageSentRef.current = false;
+    if (inputRef.current) inputRef.current.style.height = 'auto';
+    navigate('/nexus/chat', { replace: true });
   };
 
-  const showWelcome = messages.length <= 1 && !loading;
+  const showQuickReplies = messages.length === 1 && messages[0].role === 'assistant' && !loading;
 
   /* ── Inline CSS (keyframe animations) ── */
   const styleId = 'nexus-v8-styles';
@@ -328,10 +347,9 @@ export function NEXUSPage() {
     const s = document.createElement('style');
     s.id = styleId;
     s.textContent = `
-      @keyframes nxFi{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
-      @keyframes nxTp{0%,80%,100%{opacity:.3;transform:scale(.85)}40%{opacity:1;transform:scale(1)}}
-      @keyframes nxBreatheBtn{0%,100%{transform:scale(1);opacity:.84}50%{transform:scale(1.03);opacity:1}}
-      @keyframes nxBreatheGlow{0%,100%{border-color:rgba(255,255,255,0.09);box-shadow:none}50%{border-color:rgba(255,255,255,0.07);box-shadow:0 0 18px -7px rgba(193,8,171,0.05)}}
+      @keyframes nxFi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+      @keyframes nxTp{0%,80%,100%{opacity:.35;transform:scale(.85)}40%{opacity:1;transform:scale(1)}}
+      @keyframes nxBreatheGlow{0%,100%{border-color:rgba(255,255,255,0.14)}50%{border-color:rgba(193,8,171,0.35);box-shadow:0 0 22px -8px rgba(193,8,171,0.25)}}
     `;
     document.head.appendChild(s);
     return () => { const el = document.getElementById(styleId); if (el) el.remove(); };
@@ -347,9 +365,9 @@ export function NEXUSPage() {
       }}>
         {/* Background gradients */}
         <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none',
-          background: `radial-gradient(ellipse 120% 80% at 18% 12%, rgba(193,8,171,.025) 0%, transparent 55%),
-            radial-gradient(ellipse 100% 100% at 82% 88%, rgba(14,165,160,.025) 0%, transparent 50%),
-            radial-gradient(ellipse 70% 50% at 50% 50%, rgba(37,99,235,.015) 0%, transparent 65%)`,
+          background: `radial-gradient(ellipse 120% 80% at 18% 12%, rgba(193,8,171,.03) 0%, transparent 55%),
+            radial-gradient(ellipse 100% 100% at 82% 88%, rgba(14,165,160,.03) 0%, transparent 50%),
+            radial-gradient(ellipse 70% 50% at 50% 50%, rgba(37,99,235,.02) 0%, transparent 65%)`,
         }} />
 
         {/* ── LEFT PANEL ── */}
@@ -359,194 +377,191 @@ export function NEXUSPage() {
           transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.25s', overflow: 'hidden', flexShrink: 0,
           opacity: panelOpen ? 1 : 0, pointerEvents: panelOpen ? 'auto' : 'none',
         }}>
-          <div style={{ height: 50, display: 'flex', alignItems: 'center', padding: '0 14px', borderBottom: `1px solid ${T.bdr}`, flexShrink: 0 }}>
-            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', color: T.tx3, textTransform: 'uppercase' as const }}>Recent</span>
+          {/* Brand */}
+          <div style={{ height: 54, display: 'flex', alignItems: 'center', gap: 9, padding: '0 16px', borderBottom: `1px solid ${T.bdr}`, flexShrink: 0 }}>
+            <div style={{ width: 22, height: 22, flexShrink: 0 }}><NexusAvatar /></div>
+            <span style={{ fontFamily: T.logo, fontSize: 17, fontWeight: 700, color: T.wh, letterSpacing: '0.01em' }}>
+              NEXUS<span style={{ color: T.fus }}>.</span>
+            </span>
           </div>
+
           <button onClick={newChat} style={{
-            margin: '8px 12px', padding: 7, borderRadius: T.rs, border: `1px solid ${T.bdr2}`,
-            background: 'transparent', color: T.tx2, fontSize: 12, fontWeight: 500, cursor: 'pointer',
-            textAlign: 'center' as const, fontFamily: T.font,
-          }}>+ New Chat</button>
-          <div style={{ flex: 1, overflowY: 'auto' as const, padding: 10 }}>
-            {[{ t: 'Today', p: 'How does NEXUS work?' }, { t: 'Yesterday', p: 'AI for executive search' }, { t: 'Last Week', p: 'Tell me about your services' }].map((c, i) => (
-              <div key={i} style={{ padding: '9px 11px', borderBottom: `1px solid ${T.bdr}`, cursor: 'pointer', borderRadius: T.rs, transition: 'background 0.15s' }}>
-                <div style={{ fontSize: 12, fontWeight: 500, color: T.wh2, marginBottom: 1 }}>{c.t}</div>
-                <div style={{ fontSize: 11, color: T.tx3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{c.p}</div>
+            margin: '10px 12px 6px', padding: '9px 10px', borderRadius: T.rs,
+            border: `1px solid ${T.bdr2}`, background: 'transparent', color: T.tx, fontSize: 12.5, fontWeight: 500,
+            cursor: 'pointer', textAlign: 'left' as const, fontFamily: T.font,
+            display: 'flex', alignItems: 'center', gap: 8,
+          }}>
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke={T.icon} strokeWidth="1.8" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+            New Chat
+          </button>
+
+          <div style={{ padding: '8px 16px 4px', fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', color: T.tx3, textTransform: 'uppercase' as const }}>Recent</div>
+          <div style={{ flex: 1, overflowY: 'auto' as const, padding: '4px 8px 10px' }}>
+            {['How does NEXUS work?', 'APAC leadership benchmarking', 'Board narrative prep'].map((p, i) => (
+              <div key={i} style={{ padding: '8px 10px', borderRadius: T.rs, cursor: 'pointer', color: T.tx2, fontSize: 12.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, transition: 'background 0.15s' }}
+                onMouseOver={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+                onMouseOut={e => (e.currentTarget.style.background = 'transparent')}>
+                {p}
               </div>
             ))}
           </div>
+
           {/* Ambient */}
-          <div style={{ borderTop: `1px solid ${T.bdr}`, padding: '10px 12px', flexShrink: 0 }}>
-            <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', color: T.tx3, textTransform: 'uppercase' as const, marginBottom: 8 }}>Ambient</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 5 }}>
-              {AMBIENT_SOUNDS.map(s => (
-                <div key={s.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-                  <button
-                    onClick={() => setActiveSound(activeSound === s.id ? null : s.id)}
-                    title={s.label}
-                    style={{
-                      width: 36, height: 36, borderRadius: 6, border: `1px solid ${activeSound === s.id ? 'rgba(193,8,171,0.18)' : T.bdr}`,
-                      background: activeSound === s.id ? T.fusDim : 'transparent', cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', color: activeSound === s.id ? T.fus : T.tx3,
-                      transition: 'all 0.2s', padding: 0,
-                    }}
-                    dangerouslySetInnerHTML={{ __html: AMBIENT_ICONS[s.id] }}
-                  />
-                  <span style={{ fontSize: 9, color: T.tx3 }}>{s.label}</span>
-                </div>
-              ))}
+          <div style={{ borderTop: `1px solid ${T.bdr}`, padding: '12px 14px 14px', flexShrink: 0 }}>
+            <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', color: T.tx3, textTransform: 'uppercase' as const, marginBottom: 9 }}>Ambient</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 7 }}>
+              {AMBIENT_SOUNDS.map(s => {
+                const active = activeSound === s.id;
+                return (
+                  <div key={s.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                    <button
+                      onClick={() => setActiveSound(active ? null : s.id)}
+                      title={s.label}
+                      style={{
+                        width: 38, height: 38, borderRadius: 7,
+                        border: `1px solid ${active ? 'rgba(193,8,171,0.55)' : T.bdr}`,
+                        background: active ? T.fusDim : 'rgba(255,255,255,0.03)', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: active ? '#f05ad4' : T.icon,
+                        transition: 'all 0.2s', padding: 0,
+                      }}
+                      dangerouslySetInnerHTML={{ __html: AMBIENT_ICONS[s.id] }}
+                    />
+                    <span style={{ fontSize: 9.5, color: active ? T.tx2 : T.tx3 }}>{s.label}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </aside>
 
         {/* ── MAIN ── */}
         <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, position: 'relative' }}>
-          {/* Header */}
+          {/* Slim internal header */}
           <header style={{
-            height: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            height: 54, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: '0 18px', background: 'rgba(14,14,14,0.82)', backdropFilter: 'blur(24px)',
             borderBottom: `1px solid ${T.bdr}`, zIndex: 10, flexShrink: 0,
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <button onClick={newChat} title="New Chat" style={{ width: 32, height: 32, borderRadius: T.rs, border: `1px solid ${T.bdr}`, background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.wh3, padding: 0 }}>
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 5v14M5 12h14"/></svg>
-              </button>
-              <button onClick={() => setPanelOpen(!panelOpen)} title="Toggle Panel" style={{ width: 32, height: 32, borderRadius: T.rs, border: `1px solid ${T.bdr}`, background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.wh3, padding: 0 }}>
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
-              </button>
+            <button onClick={() => setPanelOpen(!panelOpen)} title="Toggle panel" style={{ width: 32, height: 32, borderRadius: T.rs, border: `1px solid ${T.bdr}`, background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.icon, padding: 0 }}>
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2" /><line x1="9" y1="3" x2="9" y2="21" /></svg>
+            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+              {!panelOpen && <div style={{ width: 20, height: 20 }}><NexusAvatar /></div>}
+              <h1 style={{ fontFamily: T.logo, fontSize: 17, fontWeight: 700, color: T.wh, letterSpacing: '0.01em', margin: 0 }}>
+                NEXUS<span style={{ color: T.fus }}>.</span>
+              </h1>
             </div>
-            <h1 style={{ fontFamily: T.logo, fontSize: 18, fontWeight: 700, color: T.wh, letterSpacing: '0.01em', margin: 0 }}>
-              NEXUS<span style={{ color: T.fus }}>.</span>
-            </h1>
-            <div />
+            <div style={{ width: 32 }} />
           </header>
 
           {/* Messages area */}
-          <div style={{ flex: 1, overflowY: 'auto' as const, padding: '18px 14px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {/* Welcome screen */}
-            {showWelcome && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, padding: '24px 20px', gap: 8 }}>
-                <div style={{ width: 44, height: 44 }}><NexusAvatar /></div>
-                <div style={{ fontFamily: T.logo, fontSize: 24, fontWeight: 700, color: T.wh, letterSpacing: '0.02em' }}>
-                  NEXUS<span style={{ color: T.fus }}>.</span>
-                </div>
-                <div style={{ fontSize: 14, fontWeight: 400, color: T.tx2, marginTop: 2 }}>How can I help?</div>
-                {messages.length === 1 && !loading && !showGuestLimit && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 5, justifyContent: 'center', marginTop: 14, maxWidth: 380 }}>
-                    {QUICK_REPLIES.map((reply, i) => (
-                      <button key={i} onClick={() => send(reply)} style={{
-                        padding: '6px 12px', borderRadius: T.rs, border: `1px solid ${T.bdr2}`, background: 'transparent',
-                        color: T.tx2, fontSize: 12, fontWeight: 400, cursor: 'pointer', fontFamily: T.font,
-                        transition: 'all 0.25s',
-                      }}>
-                        {reply}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Messages */}
-            {!showWelcome && messages.map((msg, i) => {
-              if (i === 0 && msg.role === 'assistant' && messages.length <= 2) return null;
-              const isUser = msg.role === 'user';
-              return (
-                <div key={i} style={{
-                  display: 'flex', flexDirection: 'column',
-                  maxWidth: isUser ? 660 : 600, alignSelf: isUser ? 'flex-end' : 'flex-start',
-                  alignItems: isUser ? 'flex-end' : 'flex-start',
-                  animation: 'nxFi 0.3s ease',
-                }}>
-                  <div style={{
-                    padding: '9px 14px', fontSize: 14.5, lineHeight: 1.6, wordWrap: 'break-word' as any, whiteSpace: 'pre-wrap' as any,
-                    ...(isUser
-                      ? { background: 'rgba(255,255,255,0.90)', color: '#111', borderRadius: `${T.r}px ${T.r}px 4px ${T.r}px`, boxShadow: '0 1px 3px rgba(0,0,0,0.12)' }
-                      : { color: T.tx, paddingLeft: 0, paddingRight: 0 }
-                    ),
+          <div style={{ flex: 1, overflowY: 'auto' as const }}>
+            <div style={{ maxWidth: 760, margin: '0 auto', padding: '22px 18px 10px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {messages.map((msg, i) => {
+                const isUser = msg.role === 'user';
+                return (
+                  <div key={i} style={{
+                    display: 'flex', alignSelf: isUser ? 'flex-end' : 'flex-start',
+                    maxWidth: '88%', animation: 'nxFi 0.3s ease',
                   }}>
-                    {isUser ? msg.content : <ReactMarkdown remarkPlugins={[remarkGfm]} components={darkMd}>{msg.content}</ReactMarkdown>}
+                    <div style={{
+                      padding: '11px 16px', fontSize: 14.5, lineHeight: 1.6,
+                      wordWrap: 'break-word' as any, overflowWrap: 'anywhere' as any,
+                      ...(isUser
+                        ? {
+                            background: T.userBubble, color: T.userTx,
+                            borderRadius: `${T.r}px ${T.r}px 4px ${T.r}px`,
+                            boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+                            whiteSpace: 'pre-wrap' as any,
+                          }
+                        : {
+                            background: T.aiBubble, color: T.tx,
+                            border: `1px solid ${T.bdr}`,
+                            borderRadius: `${T.r}px ${T.r}px ${T.r}px 4px`,
+                          }),
+                      ...(msg.isError ? { borderColor: 'rgba(239,68,68,0.4)', color: '#fca5a5' } : {}),
+                    }}>
+                      {isUser
+                        ? msg.content
+                        : <ReactMarkdown remarkPlugins={[remarkGfm]} components={darkMd}>{msg.content}</ReactMarkdown>}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
 
-            {/* Loading */}
-            {loading && (
-              <div style={{ alignSelf: 'flex-start', animation: 'nxFi 0.3s ease' }}>
-                <div style={{ padding: '9px 0', color: T.tx }}>
-                  <div style={{ display: 'flex', gap: 3 }}>
+              {/* Quick replies under the greeting */}
+              {showQuickReplies && (
+                <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 8, marginTop: 2, animation: 'nxFi 0.4s ease' }}>
+                  {QUICK_REPLIES.map((reply, i) => (
+                    <button key={i} onClick={() => send(reply)} style={{
+                      padding: '8px 14px', borderRadius: T.rs, border: `1px solid ${T.bdr2}`,
+                      background: 'rgba(255,255,255,0.03)', color: T.tx, fontSize: 12.5, fontWeight: 400,
+                      cursor: 'pointer', fontFamily: T.font, transition: 'all 0.2s',
+                    }}
+                      onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(193,8,171,0.5)'; e.currentTarget.style.color = '#f05ad4'; }}
+                      onMouseOut={e => { e.currentTarget.style.borderColor = T.bdr2; e.currentTarget.style.color = T.tx; }}
+                    >
+                      {reply}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Loading */}
+              {loading && (
+                <div style={{ alignSelf: 'flex-start', animation: 'nxFi 0.3s ease', background: T.aiBubble, border: `1px solid ${T.bdr}`, borderRadius: `${T.r}px ${T.r}px ${T.r}px 4px`, padding: '13px 16px' }}>
+                  <div style={{ display: 'flex', gap: 4 }}>
                     {[0, 1, 2].map(i => (
-                      <span key={i} style={{ width: 4, height: 4, borderRadius: '50%', background: '#3a3a3a', animation: `nxTp 1.2s ease-in-out infinite ${i * 0.15}s` }} />
+                      <span key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: T.tx3, animation: `nxTp 1.2s ease-in-out infinite ${i * 0.15}s` }} />
                     ))}
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Guest limit */}
-            {showGuestLimit && (
-              <div style={{ alignSelf: 'flex-start', maxWidth: 600, padding: 24, border: `1px solid ${T.bdr2}`, borderRadius: T.r, background: T.srf, animation: 'nxFi 0.3s ease' }}>
-                <h3 style={{ fontFamily: T.logo, fontSize: 16, color: T.wh, margin: '0 0 8px', fontWeight: 700 }}>Unlock the full experience</h3>
-                <p style={{ fontFamily: T.font, fontSize: 13, color: T.tx2, margin: '0 0 16px', lineHeight: 1.6 }}>
-                  Create a profile for full NEXUS access, the 11-lens catalog, and saved conversation history.
-                </p>
-                <Link to="/signup" onClick={() => trackCTA({ location: 'nexus_chat', label: 'Create Account (guest limit CTA)', destination: '/signup' })} style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: T.rs,
-                  background: T.fus, color: '#fff', fontSize: 13, fontWeight: 500, textDecoration: 'none',
-                }}>
-                  Create profile <span>→</span>
-                </Link>
-              </div>
-            )}
-
-            <div ref={bottomRef} />
+              <div ref={bottomRef} style={{ height: 4 }} />
+            </div>
           </div>
 
           {/* Input bar */}
-          <div style={{ padding: '8px 14px 16px', background: 'rgba(14,14,14,0.82)', backdropFilter: 'blur(24px)', borderTop: `1px solid ${T.bdr}`, flexShrink: 0 }}>
-            <div style={{ maxWidth: 660, margin: '0 auto' }}>
-              {isGuest && remaining > 0 && remaining < GUEST_MESSAGE_LIMIT && (
-                <div style={{ textAlign: 'center' as const, marginBottom: 8, color: T.tx3, fontSize: 11 }}>
-                  {remaining} complimentary message{remaining === 1 ? '' : 's'} remaining
-                </div>
-              )}
+          <div style={{ padding: '8px 18px 14px', background: 'rgba(14,14,14,0.9)', backdropFilter: 'blur(24px)', borderTop: `1px solid ${T.bdr}`, flexShrink: 0 }}>
+            <div style={{ maxWidth: 760, margin: '0 auto' }}>
               <div style={{
-                display: 'flex', alignItems: 'flex-end', gap: 7, background: T.srf,
-                border: `1px solid ${T.bdr2}`, borderRadius: T.r, padding: '4px 4px 4px 14px',
-                transition: 'border-color 0.3s, box-shadow 0.3s', animation: 'nxBreatheGlow 4s ease-in-out infinite',
+                display: 'flex', alignItems: 'flex-end', gap: 8, background: T.srf,
+                border: `1px solid ${T.bdr}`, borderRadius: T.r, padding: '5px 5px 5px 16px',
+                transition: 'border-color 0.3s, box-shadow 0.3s', animation: 'nxBreatheGlow 5s ease-in-out infinite',
               }}>
                 <textarea
                   ref={inputRef}
                   value={input}
                   onChange={handleInput}
                   onKeyDown={handleKeyDown}
-                  placeholder={showGuestLimit ? 'Create a profile to continue...' : 'Message Nexus\u2026'}
-                  disabled={showGuestLimit || loading}
+                  placeholder="Message NEXUS…"
+                  disabled={loading}
                   rows={1}
                   style={{
                     flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: 14.5,
-                    lineHeight: 1.5, resize: 'none', maxHeight: 100, padding: '5px 0', fontFamily: T.font,
+                    lineHeight: 1.5, resize: 'none', maxHeight: 100, padding: '6px 0', fontFamily: T.font,
                     color: T.tx,
                   }}
                 />
                 <button
                   onClick={() => send()}
-                  disabled={loading || !input.trim() || showGuestLimit}
+                  disabled={loading || !input.trim()}
                   style={{
-                    width: 30, height: 30, borderRadius: T.rs, border: 'none',
-                    background: loading || !input.trim() || showGuestLimit ? '#222' : T.fus,
-                    cursor: loading || !input.trim() || showGuestLimit ? 'default' : 'pointer',
+                    width: 32, height: 32, borderRadius: T.rs, border: 'none',
+                    background: loading || !input.trim() ? '#262626' : T.fus,
+                    cursor: loading || !input.trim() ? 'default' : 'pointer',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                     transition: 'all 0.2s', padding: 0,
                   }}
                 >
                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/>
+                    <path d="M22 2 11 13" /><path d="M22 2 15 22 11 13 2 9 22 2Z" />
                   </svg>
                 </button>
               </div>
-              <p style={{ textAlign: 'center' as const, marginTop: 8, color: T.tx3, fontSize: 11, fontFamily: T.font }}>
+              <p style={{ textAlign: 'center' as const, marginTop: 9, color: T.tx3, fontSize: 10.5, fontFamily: T.font, margin: '8px 0 0' }}>
                 NEXUS may produce inaccurate information. Verify critical decisions.
               </p>
             </div>
