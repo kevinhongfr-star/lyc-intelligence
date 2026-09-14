@@ -13,7 +13,7 @@
  *   - LLM calls go through /api/chat → Coze (NEXUS Demo bot, full persona)
  */
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { sendChatMessage } from '@/services/coze';
+import { sendChatMessageWithSuggestions } from '@/services/coze';
 import { useAuthStore } from '@/stores/authStore';
 import { SEO } from '@/components/seo/SEO';
 import ReactMarkdown from 'react-markdown';
@@ -29,6 +29,7 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   isError?: boolean;
+  insights?: string[];
 }
 
 const DEMO_UID_KEY = 'nexus_demo_uid';
@@ -255,6 +256,7 @@ export function NEXUSPage() {
   });
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [insightsExpanded, setInsightsExpanded] = useState<Set<number>>(new Set());
   const [panelOpen, setPanelOpen] = useState(true);
   const [activeSound, setActiveSound] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -307,14 +309,19 @@ export function NEXUSPage() {
     if (inputRef.current) inputRef.current.style.height = 'auto';
     setLoading(true);
     try {
-      const reply = await sendChatMessage(
+      const result = await sendChatMessageWithSuggestions(
         msgText,
         user?.id || demoUid,
         historyForRequest,
         { systemPrompt, tier: 'explorer' },
       );
-      const isErr = /having trouble connecting/i.test(reply);
-      setMessages(prev => [...prev, { role: 'assistant', content: reply, isError: isErr }]);
+      const isErr = /having trouble connecting/i.test(result.response);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: result.response,
+        isError: isErr,
+        insights: result.insights && result.insights.length > 0 ? result.insights : undefined,
+      }]);
     } catch (e: any) {
       reportError(e, { context: 'nexus_chat_send' });
       setMessages(prev => [...prev, { role: 'assistant', content: "I'm having trouble connecting right now. Please try again in a moment.", isError: true }]);
@@ -468,32 +475,80 @@ export function NEXUSPage() {
             <div style={{ maxWidth: 760, margin: '0 auto', padding: '22px 18px 10px', display: 'flex', flexDirection: 'column', gap: 14 }}>
               {messages.map((msg, i) => {
                 const isUser = msg.role === 'user';
+                const hasInsights = !isUser && msg.insights && msg.insights.length > 0 && !msg.isError;
+                const isExpanded = insightsExpanded.has(i);
                 return (
-                  <div key={i} style={{
-                    display: 'flex', alignSelf: isUser ? 'flex-end' : 'flex-start',
-                    maxWidth: '88%', animation: 'nxFi 0.3s ease',
-                  }}>
-                    <div style={{
-                      padding: '11px 16px', fontSize: 14.5, lineHeight: 1.6,
-                      wordWrap: 'break-word' as any, overflowWrap: 'anywhere' as any,
-                      ...(isUser
-                        ? {
-                            background: T.userBubble, color: T.userTx,
-                            borderRadius: `${T.r}px ${T.r}px 4px ${T.r}px`,
-                            boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
-                            whiteSpace: 'pre-wrap' as any,
-                          }
-                        : {
-                            background: T.aiBubble, color: T.tx,
-                            border: `1px solid ${T.bdr}`,
-                            borderRadius: `${T.r}px ${T.r}px ${T.r}px 4px`,
-                          }),
-                      ...(msg.isError ? { borderColor: 'rgba(239,68,68,0.4)', color: '#fca5a5' } : {}),
-                    }}>
-                      {isUser
-                        ? msg.content
-                        : <ReactMarkdown remarkPlugins={[remarkGfm]} components={darkMd}>{msg.content}</ReactMarkdown>}
+                  <div key={i} style={{ display: 'flex', flexDirection: 'column', alignSelf: isUser ? 'flex-end' : 'flex-start', maxWidth: '88%', animation: 'nxFi 0.3s ease' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                      <div style={{
+                        padding: '11px 16px', fontSize: 14.5, lineHeight: 1.6,
+                        wordWrap: 'break-word' as any, overflowWrap: 'anywhere' as any,
+                        ...(isUser
+                          ? {
+                              background: T.userBubble, color: T.userTx,
+                              borderRadius: `${T.r}px ${T.r}px 4px ${T.r}px`,
+                              boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+                              whiteSpace: 'pre-wrap' as any,
+                            }
+                          : {
+                              background: T.aiBubble, color: T.tx,
+                              border: `1px solid ${T.bdr}`,
+                              borderRadius: `${T.r}px ${T.r}px ${T.r}px 4px`,
+                            }),
+                        ...(msg.isError ? { borderColor: 'rgba(239,68,68,0.4)', color: '#fca5a5' } : {}),
+                      }}>
+                        {isUser
+                          ? msg.content
+                          : <ReactMarkdown remarkPlugins={[remarkGfm]} components={darkMd}>{msg.content}</ReactMarkdown>}
+                      </div>
+                      {hasInsights && (
+                        <button
+                          onClick={() => {
+                            const next = new Set(insightsExpanded);
+                            if (next.has(i)) next.delete(i); else next.add(i);
+                            setInsightsExpanded(next);
+                          }}
+                          title="Toggle insights"
+                          style={{
+                            width: 28, height: 28, borderRadius: '50%',
+                            border: 'none', background: 'transparent',
+                            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: isExpanded ? T.fus : T.tx3,
+                            transition: 'color 0.2s, transform 0.2s',
+                            transform: isExpanded ? 'scale(1.1)' : 'scale(1)',
+                            flexShrink: 0, marginTop: 2,
+                          }}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M9 18h6"/>
+                            <path d="M10 22h4"/>
+                            <path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/>
+                          </svg>
+                        </button>
+                      )}
                     </div>
+                    {hasInsights && isExpanded && (
+                      <div style={{
+                        marginTop: 6, marginLeft: isUser ? 0 : 8,
+                        padding: '10px 14px',
+                        background: 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${T.bdr2}`,
+                        borderRadius: T.rs,
+                        fontSize: 12.5, lineHeight: 1.5,
+                        color: T.tx2,
+                        maxWidth: '100%',
+                        animation: 'nxFi 0.2s ease',
+                      }}>
+                        <div style={{ fontSize: 11, fontWeight: 600, color: T.tx3, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                          Insights
+                        </div>
+                        {msg.insights!.map((insight, j) => (
+                          <div key={j} style={{ marginBottom: j < msg.insights!.length - 1 ? 6 : 0 }}>
+                            • {insight}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })}
