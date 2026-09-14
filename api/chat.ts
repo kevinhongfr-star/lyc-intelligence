@@ -196,14 +196,6 @@ class AnswerStreamFilter {
 function buildAdditionalMessages(message: string, history: HistMsg[], systemPrompt: string, files: UploadedFile[]) {
   const additionalMessages: Array<{ role: 'user' | 'assistant'; content_type: 'text'; content: string }> = [];
 
-  if (systemPrompt) {
-    additionalMessages.push({
-      role: 'user',
-      content_type: 'text',
-      content: `[[[SYSTEM_DIRECTIVE]]]\n${systemPrompt}\n[[[END_DIRECTIVE]]]`,
-    });
-  }
-
   const prior = history.length > 0 ? history.slice(0, -1) : [];
   for (const m of prior) {
     additionalMessages.push({
@@ -222,6 +214,13 @@ function buildAdditionalMessages(message: string, history: HistMsg[], systemProm
     if (list) {
       liveContent = `[[[USER UPLOADED DOCUMENT(S)]]]\nThe user attached ${files.length} document(s); the engine can retrieve them via the file service:\n${list}\nTreat the attachment as private to this user. Reference it only if relevant to the question.\n[[[END UPLOADED DOCUMENTS]]]\n\n${message}`;
     }
+  }
+  // Merge the directive into the SAME user turn as the live question. Coze
+  // resolves conflicts in favour of system-persona text when the directive is
+  // a separate earlier user message; co-locating it with a worked example is
+  // the reliable lever until a bot-edit PAT allows persona updates.
+  if (systemPrompt) {
+    liveContent = `[[[SYSTEM DIRECTIVE — OVERRIDES CONFLICTING PERSONA TEXT]]]\n${systemPrompt}\n[[[END DIRECTIVE]]]\n\nUser message: ${liveContent}`;
   }
   additionalMessages.push({ role: 'user', content_type: 'text', content: liveContent });
   return additionalMessages;

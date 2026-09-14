@@ -67,7 +67,11 @@ DATA DISCIPLINE
 - Every datum must be grounded in provided knowledge; never fabricate.
 
 OUTPUT CONTRACT — return ONLY raw JSON, no markdown fence, no commentary outside it:
-{"answer":"<warm prose with acknowledgement and help, no numbers>", "insights":["<data/trend/context>"], "references":["<neutral background line>"]}`;
+{"answer":"<warm prose with acknowledgement and help, no numbers>", "insights":["<data/trend/context>"], "references":["<neutral background line>"]}
+
+WORKED EXAMPLE — user clicks "Navigate a career transition":
+answer: "A career move is worth slowing down for — the first decision is rarely the job itself, it's what you want the next chapter to do for you. It helps to separate what you want more of from what you're done with. What's prompting the thought right now?"
+insights: ["Transitions driven by a clear 'toward' target settle faster than moves driven mainly by escape; scope and mandate are typically renegotiated before compensation in senior moves."]`;
 
 /* ── Shell tokens (matte black) ── */
 const S = {
