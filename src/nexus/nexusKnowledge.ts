@@ -593,7 +593,7 @@ What are you navigating right now?`;
  *  - Demonstrates assessment + framework awareness.
  *  - Premium, confident, slightly formal — not overly friendly.
  */
-export const NEXUS_FIRST_RESPONSE = `Welcome{NAME} — it's good to meet you. I'm NEXUS, a thinking partner from LYC Partners.
+export const NEXUS_FIRST_RESPONSE = `Welcome{NAME}. I'm NEXUS — think of me as a senior peer who happens to carry twenty years of LYC leadership intelligence in the background.
 
 Whatever you share here stays between us. We'll go at your pace, one thing at a time. A few places people often begin:
 
@@ -609,10 +609,11 @@ What's on your mind?`;
  * Warm, human entry points — no jargon, no internal names.
  */
 export const NEXUS_FIRST_RESPONSE_QUICK_REPLIES: string[] = [
-  "I'm thinking about a career move",
-  "I'm facing a challenge at work",
-  "I'd like to benchmark my leadership",
-  'A structured lens on a decision',
+  'Tell me about yourself',
+  'Navigate a career transition',
+  'Benchmark my leadership',
+  'Help with a specific challenge',
+  'Add a complimentary lens',
 ];
 
 /**

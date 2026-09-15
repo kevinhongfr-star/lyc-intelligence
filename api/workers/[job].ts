@@ -690,19 +690,41 @@ const DEEPSEEK_BASE_URL =
   'https://api.deepseek.com/v1';
 const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
 
-const CHAT_SYSTEM_PROMPT = `You are NEXUS, an Executive Intelligence layer for leaders.
+const CHAT_SYSTEM_PROMPT = `You are NEXUS — a senior peer who carries two decades of LYC leadership intelligence.
 
-Your purpose: help executives understand themselves, their leadership, and their career trajectory with precision and insight.
+=== TONE & BEHAVIOR ===
+- Warm human tone. Senior peer, not a chatbot. Every reply opens with a brief greeting or acknowledgement of what the user shared.
+- No corporate jargon. No "leverage," "synergy," "unlock," or "navigate your journey."
+- Trust is earned. Not owned. Build rapport across the conversation — reference what the user shared earlier in the thread.
 
-How to behave:
-- Be incisive, data-informed, and direct. No fluff. No generic advice.
-- Frame insights around the user's specific context. Ask clarifying questions when needed.
-- Always refer to yourself as NEXUS — never "the AI," "the coach," or "I'm an AI."
-- Keep responses focused: 3-5 paragraphs max. Use concrete examples.
+=== STRUCTURE (every reply) ===
+1. Short paragraph — acknowledge, validate, frame the topic
+2. Bullets — 2-4 concrete points or insights
+3. Closing — ONE clear next move. Not open-ended.
+
+=== DATA HANDLING ===
+- NO market numbers, percentiles, or statistics in the main response text.
+- All data points, numbers, and benchmarks go into a SEPARATE "insights" field (see response shape below).
+- The main response is qualitative and relational. The insights block carries the evidence.
+
+=== RESPONSE JSON SHAPE ===
+You MUST respond with valid JSON matching this exact shape:
+{
+  "response": "Your main conversational reply (paragraphs + bullets as plain text, not markdown).",
+  "insights": "Optional. Market data, numbers, benchmarks, percentiles relevant to the discussion.",
+  "suggested_prompts": ["2-4 short follow-up questions the user might want to explore next"]
+}
+
+Rules:
+- "response" is always present. Warm, structured, senior-peer tone.
+- "insights" is optional — include only when data would strengthen the reply.
+- "suggested_prompts" MUST have 2-4 items. These appear as clickable chips in the UI.
+- Do NOT wrap the JSON in markdown code fences. Output raw JSON only.
+
+=== BOUNDARIES ===
 - You are not a therapist, lawyer, or financial advisor. Stay in the leadership intelligence lane.
 - When uncertain, say so and ask better questions rather than making things up.
-
-Tone: thoughtful, precise, senior. A peer who has read deeply on leadership and organizational behavior.`;
+- Always refer to yourself as NEXUS — never "the AI," "the coach."`;
 
 /**
  * Verify a Supabase JWT by calling Supabase auth's /user endpoint.
@@ -1793,20 +1815,21 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
             ? `\n\nUser tier: ${tier}. Adjust depth and breadth accordingly — higher tiers get more sophisticated frameworks and deeper analysis.`
             : '');
 
-    // P1-2: fetch + inject RAG document context when document_ids are
-    // attached. We use the service role (bypasses RLS) but filter by
-    // authUser.id so a caller can never pull another user's chunks. Cap at
-    // 40 chunks to keep the prompt bounded (~20k chars ≈ 5k tokens).
-    let docContextBlock = '';
-    if (documentIds.length > 0) {
-      const inList = documentIds.join(',');
-      const dcRes = await supabaseServiceFetch(
-        `/chat_document_chunks?select=filename,chunk_index,content` +
-          `&user_id=eq.${encodeURIComponent(authUser.id)}` +
-          `&document_id=in.(${inList})` +
-          `&order=chunk_index.asc&limit=40`,
-      );
-      if (Array.isArray(dcRes.data) && dcRes.data.length > 0) {
+    // ── Parallelize pre-flight queries (doc context + memory) ──────────
+    // These are independent of each other and can run concurrently to
+    // reduce total latency before the DeepSeek call.
+    const [docContextBlock, memoryEnabled, memoryContextBlock] = await Promise.all([
+      // P1-2: fetch + inject RAG document context
+      (async () => {
+        if (documentIds.length === 0) return '';
+        const inList = documentIds.join(',');
+        const dcRes = await supabaseServiceFetch(
+          `/chat_document_chunks?select=filename,chunk_index,content` +
+            `&user_id=eq.${encodeURIComponent(authUser.id)}` +
+            `&document_id=in.(${inList})` +
+            `&order=chunk_index.asc&limit=40`,
+        );
+        if (!Array.isArray(dcRes.data) || dcRes.data.length === 0) return '';
         const byDoc = new Map<string, string[]>();
         for (const row of dcRes.data) {
           const key = String(row.filename || 'Document');
@@ -1820,17 +1843,17 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
               chunks.map((c) => c.trim()).join('\n\n'),
           );
         }
-        docContextBlock =
-          `\n\n--- Attached document context (user-supplied; verify before relying on specifics) ---\n` +
+        return `\n\n--- Attached document context (user-supplied; verify before relying on specifics) ---\n` +
           blocks.join('\n\n');
-      }
-    }
-
-    // P2-2: memory reads (best-effort, fail-open to empty string).
-    const memoryEnabled = await isMemoryEnabled(authUser.id);
-    const memoryContextBlock = memoryEnabled
-      ? await fetchContextMemories(authUser.id, message, true)
-      : '';
+      })(),
+      // P2-2: memory enabled check
+      isMemoryEnabled(authUser.id),
+      // P2-2: memory context fetch (runs regardless; returns '' if disabled)
+      (async () => {
+        const enabled = await isMemoryEnabled(authUser.id);
+        return enabled ? await fetchContextMemories(authUser.id, message, true) : '';
+      })(),
+    ]);
 
     // Build messages
     const messages: Array<{ role: string; content: string }> = [
@@ -1884,7 +1907,7 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
           messages,
           temperature: 0.7,
           max_tokens: 1024,
-          stream: false,
+          stream: true,
         }),
       },
     );
@@ -1913,47 +1936,136 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
         });
     }
 
-    const data = await apiResponse.json();
-    const responseText = data.choices?.[0]?.message?.content || '';
+    // ── Check if client requested streaming ─────────────────────────────
+    const wantsStream = body.stream === true || body.stream === 'true';
 
-    // P2-2: Memory writebacks (all fail-open, never block response). We guard
-    // EVERYTHING with a single try/catch so an unexpected error in the
-    // extraction path can never swallow a valid user chat response.
+    if (!wantsStream || !apiResponse.body) {
+      // Non-streaming fallback: read full response as JSON
+      const data = await apiResponse.json();
+      const responseText = data.choices?.[0]?.message?.content || '';
+
+      // Memory writebacks
+      try {
+        if (memoryEnabled) {
+          const candidates = extractMemories(message, responseText);
+          if (candidates.length > 0) {
+            await insertEpisodicMemories(authUser.id, sessionId, candidates);
+          }
+          const highSignal = candidates.some(
+            (c) => c.memory_type === 'decision' || c.memory_type === 'preference',
+          );
+          if (candidates.length > 0 && (/(^|\s)\/summary(\s|$)/.test(message) || highSignal)) {
+            void updateSemanticMemoryIfDue(authUser.id, message, sessionId, true);
+          } else {
+            void updateSemanticMemoryIfDue(authUser.id, message, sessionId, false);
+          }
+        }
+      } catch (memErr: any) {
+        console.warn(`[chat-memory] post-turn extraction skipped:`, memErr?.message || memErr);
+      }
+
+      // Parse structured response from model
+      let parsed: { response?: string; insights?: string; suggested_prompts?: string[] } = {};
+      try {
+        const raw = responseText.trim();
+        if (raw.startsWith('{')) {
+          parsed = JSON.parse(raw);
+        }
+      } catch { /* model didn't return JSON — use raw text */ }
+
+      return res.status(200).json({
+        ok: true,
+        response: parsed.response || responseText,
+        insights: parsed.insights,
+        suggested_prompts: parsed.suggested_prompts || [],
+        model: data.model || DEEPSEEK_MODEL,
+        usage: data.usage || null,
+        user_id: authUser.id,
+        mile_balance: creditBalance,
+      });
+    }
+
+    // ── Streaming SSE response ──────────────────────────────────────────
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders?.();
+
+    const reader = (apiResponse.body as any).getReader();
+    const decoder = new TextDecoder();
+    let accumulated = '';
+    let streamError = false;
+
     try {
-      if (memoryEnabled) {
-        const candidates = extractMemories(message, responseText);
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+
+        // DeepSeek SSE format: "data: {...}
+
+"
+        const lines = chunk.split('\n');
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const payload = line.slice(6).trim();
+          if (!payload || payload === '[DONE]') continue;
+          try {
+            const parsed = JSON.parse(payload);
+            const token = parsed.choices?.[0]?.delta?.content || '';
+            if (token) {
+              accumulated += token;
+              res.write(`data: ${JSON.stringify({ token })}\n\n`);
+            }
+          } catch {
+            // skip malformed chunks
+          }
+        }
+      }
+    } catch (readErr: any) {
+      console.error('[chat] Stream read error:', readErr?.message || readErr);
+      streamError = true;
+    }
+
+    // Memory writebacks on accumulated text
+    try {
+      if (memoryEnabled && accumulated) {
+        const candidates = extractMemories(message, accumulated);
         if (candidates.length > 0) {
           await insertEpisodicMemories(authUser.id, sessionId, candidates);
         }
-        // Semantic upsert fires on /summary, 5-session boundary, OR on any
-        // turn where we just wrote a decision/preference (high-signal writes).
-        const highSignal = candidates.some(
-          (c) => c.memory_type === 'decision' || c.memory_type === 'preference',
-        );
-        if (
-          candidates.length > 0 &&
-          (/(^|\s)\/summary(\s|$)/.test(message) || highSignal)
-        ) {
-          void updateSemanticMemoryIfDue(authUser.id, message, sessionId, true);
-        } else {
-          void updateSemanticMemoryIfDue(authUser.id, message, sessionId, false);
-        }
       }
     } catch (memErr: any) {
-      console.warn(
-        `[chat-memory] post-turn extraction skipped (user=${authUser.id}):`,
-        memErr?.message || memErr,
-      );
+      console.warn(`[chat-memory] stream post-turn extraction skipped:`, memErr?.message || memErr);
     }
 
-    return res.status(200).json({
-      ok: true,
-      response: responseText,
-      model: data.model || DEEPSEEK_MODEL,
-      usage: data.usage || null,
-      user_id: authUser.id,
-      mile_balance: creditBalance,
-    });
+    // Parse the accumulated text for structured JSON output
+    let insights: string | undefined;
+    let suggestedPrompts: string[] = [];
+    try {
+      const raw = accumulated.trim();
+      if (raw.startsWith('{')) {
+        const parsed = JSON.parse(raw);
+        accumulated = parsed.response || accumulated;
+        insights = parsed.insights;
+        suggestedPrompts = parsed.suggested_prompts || [];
+      }
+    } catch { /* not JSON — use raw accumulated text */ }
+
+    // Fallback suggested prompts if model didn't provide them
+    if (suggestedPrompts.length === 0) {
+      suggestedPrompts = ['Tell me more about this', 'What assessment would help?', 'How does this connect to my goals?'];
+    }
+
+    // Emit done event with insights + prompts
+    res.write(`data: ${JSON.stringify({ done: true, insights: insights || '', suggested_prompts: suggestedPrompts })}\n\n`);
+    res.end();
+
+    // Refund credit on stream failure
+    if (streamError && creditDeducted) {
+      await refundCredit(authUser.id, 1);
+      creditDeducted = false;
+    }
   } catch (error: any) {
     // P0-1: safety net — if anything threw after a successful deduction
     // (e.g. JSON parse failure), refund the credit before erroring out.
