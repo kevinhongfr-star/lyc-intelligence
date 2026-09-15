@@ -258,6 +258,7 @@ const lightMd = {
 function ProfileOnboarding({ onComplete }: { onComplete: (profile: Record<string, string>) => void }) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [currentAnswer, setCurrentAnswer] = useState('');
   
   const questions = [
     { key: 'role', q: "What's your current role and level?" },
@@ -275,8 +276,10 @@ function ProfileOnboarding({ onComplete }: { onComplete: (profile: Record<string
   const current = questions[step];
   
   const handleNext = (value: string) => {
-    const newAnswers = { ...answers, [current.key]: value };
+    if (!value.trim()) return;
+    const newAnswers = { ...answers, [current.key]: value.trim() };
     setAnswers(newAnswers);
+    setCurrentAnswer('');
     if (step < questions.length - 1) {
       setStep(step + 1);
     } else {
@@ -312,29 +315,31 @@ function ProfileOnboarding({ onComplete }: { onComplete: (profile: Record<string
           <input
             type="text"
             autoFocus
+            value={currentAnswer}
+            onChange={e => setCurrentAnswer(e.target.value)}
             onKeyDown={e => {
-              if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                handleNext(e.currentTarget.value.trim());
+              if (e.key === 'Enter') {
+                handleNext(currentAnswer);
               }
             }}
             placeholder="Type your answer…"
             style={{
               width: '100%', padding: '14px 18px', fontSize: 15, border: `1px solid ${L.bdr}`,
               borderRadius: 14, outline: 'none', fontFamily: L.font, color: L.aiTx,
-              transition: 'border-color .15s',
+              transition: 'border-color .15s', boxSizing: 'border-box',
             }}
             onFocus={e => e.target.style.borderColor = L.userBubble}
             onBlur={e => e.target.style.borderColor = L.bdr}
           />
           <button
-            onClick={() => {
-              const input = document.querySelector('input[autofocus]') as HTMLInputElement;
-              if (input?.value.trim()) handleNext(input.value.trim());
-            }}
+            onClick={() => handleNext(currentAnswer)}
+            disabled={!currentAnswer.trim()}
             style={{
               marginTop: 16, width: '100%', padding: '13px 0', fontSize: 15, fontWeight: 600,
-              background: L.userBubble, color: '#fff', border: 'none', borderRadius: 14,
-              cursor: 'pointer', fontFamily: L.font, transition: 'opacity .15s',
+              background: currentAnswer.trim() ? L.userBubble : '#d1d1d6', color: '#fff',
+              border: 'none', borderRadius: 14,
+              cursor: currentAnswer.trim() ? 'pointer' : 'not-allowed',
+              fontFamily: L.font, transition: 'opacity .15s',
             }}
           >
             {step < questions.length - 1 ? 'Next →' : 'Start conversation →'}
@@ -343,7 +348,11 @@ function ProfileOnboarding({ onComplete }: { onComplete: (profile: Record<string
         
         {step > 0 && (
           <button
-            onClick={() => setStep(step - 1)}
+            onClick={() => {
+              setStep(step - 1);
+              const prevKey = questions[step - 1].key;
+              setCurrentAnswer(answers[prevKey] || '');
+            }}
             style={{
               marginTop: 16, background: 'transparent', border: 'none', color: '#8e8e93',
               fontSize: 13, cursor: 'pointer', fontFamily: L.font,
