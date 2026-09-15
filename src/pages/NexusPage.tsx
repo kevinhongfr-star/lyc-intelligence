@@ -670,6 +670,9 @@ function NEXUSPage() {
                       </div>
                     </div>
                     {chipsFor(msg, i)}
+                    {!isUser && msg.role === 'assistant' && !msg.streaming && !msg.isError && (
+                      <AnswerOptionsPanel onSelect={(text) => send(text)} />
+                    )}
                   </div>
                 );
               })}
@@ -794,6 +797,55 @@ function FoldCard({ kind, title, items }: { kind: 'insight' | 'reference'; title
           {it}
         </div>
       ))}
+    </div>
+  );
+}
+
+function AnswerOptionsPanel({ onSelect }: { onSelect: (text: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const options = [
+    "Tell me more about that",
+    "What should I consider first?",
+    "Can you give me an example?",
+    "What's the biggest risk here?",
+    "Others / None of the above"
+  ];
+  
+  return (
+    <div style={{ marginTop: 6, animation: 'nxFi 0.3s ease' }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px',
+          borderRadius: 14, border: `1px solid ${L.chipBorder}`, background: '#fff',
+          color: L.aiTx2, fontSize: 11.5, fontWeight: 500, cursor: 'pointer',
+          fontFamily: L.font, transition: 'all .15s',
+        }}
+      >
+        <span>Suggested responses</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform .2s' }}>
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      {open && (
+        <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 6, animation: 'nxFi 0.25s ease' }}>
+          {options.map((opt, k) => (
+            <button
+              key={k}
+              onClick={() => { onSelect(opt); setOpen(false); }}
+              style={{
+                padding: '8px 13px', borderRadius: 14, border: `1px solid ${L.chipBorder}`,
+                background: '#fff', color: L.chipText, fontSize: 12.5, fontWeight: 500,
+                cursor: 'pointer', fontFamily: L.font, textAlign: 'left', transition: 'all .15s',
+              }}
+              onMouseOver={e => { e.currentTarget.style.background = '#f0f7ff'; e.currentTarget.style.borderColor = L.userBubble; }}
+              onMouseOut={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = L.chipBorder; }}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
