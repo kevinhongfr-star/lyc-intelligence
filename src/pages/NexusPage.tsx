@@ -87,13 +87,13 @@ WORKED EXAMPLE — user says "I'm thinking about a career move":
 answer: "A career move is worth slowing down for — the first decision is rarely the job itself, it's what you want the next chapter to do for you. It helps to separate what you want more of from what you're done with. What's prompting the thought right now?"
 insights: ["Transitions driven by a clear 'toward' target settle faster than moves driven mainly by escape; scope and mandate are typically renegotiated before compensation in senior moves."]`;
 
-/* ── Shell tokens (matte black) ── */
+/* ── Shell tokens (warmer gray) ── */
 const S = {
-  shellBg: '#0a0a0b',
-  panelBg: '#0d0d0e',
-  headerBg: 'rgba(10,10,11,0.86)',
-  line: 'rgba(255,255,255,0.08)',
-  lineSoft: 'rgba(255,255,255,0.05)',
+  shellBg: '#1a1a1c',
+  panelBg: '#222224',
+  headerBg: 'rgba(26,26,28,0.86)',
+  line: 'rgba(255,255,255,0.10)',
+  lineSoft: 'rgba(255,255,255,0.06)',
   icon: '#c7c7cc',
   iconDim: '#8e8e93',
   wh: '#ffffff',
@@ -183,13 +183,6 @@ function NexusAvatar({ size = 22 }: { size?: number }) {
     if (!svg) return;
     const dots: DotConfig[] = DOTS.map(d => ({ ...d }));
     dots.forEach(d => {
-      d.tailEls = [];
-      for (let j = 0; j < d.tailLen; j++) {
-        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        c.setAttribute('r', '0.4');
-        svg.appendChild(c);
-        d.tailEls.push(c);
-      }
       const m = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       m.setAttribute('r', String(d.sz));
       svg.appendChild(m);
@@ -200,7 +193,6 @@ function NexusAvatar({ size = 22 }: { size?: number }) {
       dots.forEach(d => {
         const ang = d.ph + t * d.spd;
         const mp = orbPos(d, ang);
-        const tan = orbTangent(d, ang);
         const depthF = (mp.depth + 1) / 2;
         const sizeScale = 0.4 + 0.9 * depthF;
         const mainR = d.sz * sizeScale;
@@ -216,19 +208,6 @@ function NexusAvatar({ size = 22 }: { size?: number }) {
           d.mainEl.setAttribute('r', mainR.toFixed(2));
           d.mainEl.setAttribute('fill', `rgb(${cr},${cg},${cb})`);
           d.mainEl.setAttribute('opacity', mainOp.toFixed(3));
-        }
-        const backX = -tan.x, backY = -tan.y;
-        const perpX = -tan.y, perpY = tan.x;
-        for (let j = 0; j < d.tailLen; j++) {
-          const el = d.tailEls![j];
-          const trail = (j + 1) * d.tailSpace;
-          const wobble = Math.sin(t * 0.003 + j * 0.5 + d.ph) * 0.35;
-          const fade = 1 - j / d.tailLen;
-          el.setAttribute('cx', (mp.x + backX * trail * 60 + perpX * wobble * 2).toFixed(2));
-          el.setAttribute('cy', (mp.y + backY * trail * 60 + perpY * wobble * 2).toFixed(2));
-          const col = sampleGrad(1 - fade);
-          el.setAttribute('fill', `rgb(${col.r},${col.g},${col.b})`);
-          el.setAttribute('opacity', (fade * 0.5).toFixed(3));
         }
       });
       rafRef.current = requestAnimationFrame(animate);
@@ -629,11 +608,6 @@ function NEXUSPage() {
                 return (
                   <div key={i} style={{ display: 'flex', flexDirection: 'column', alignSelf: isUser ? 'flex-end' : 'flex-start', maxWidth: '86%', animation: 'nxFi .3s ease' }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, flexDirection: isUser ? 'row-reverse' : 'row' }}>
-                      {!isUser && (
-                        <div style={{ width: 22, height: 22, marginTop: 8, flexShrink: 0, borderRadius: '50%', background: '#fff', border: `1px solid ${L.bdr}`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                          <NexusAvatar size={18} />
-                        </div>
-                      )}
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUser ? 'flex-end' : 'flex-start' }}>
                         {/* attachments */}
                         {msg.attachments && msg.attachments.length > 0 && (
@@ -721,7 +695,7 @@ function NEXUSPage() {
               )}
               <div style={{
                 display: 'flex', alignItems: 'flex-end', gap: 7, background: '#fff',
-                border: `1px solid ${L.bdr}`, borderRadius: 22, padding: '5px 6px 5px 8px',
+                border: `1px solid ${L.bdr}`, borderRadius: 26, padding: '5px 6px 5px 8px',
                 boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
               }}>
                 <input ref={fileRef} type="file" accept=".pdf,.doc,.docx,.txt,.md,.csv,.xls,.xlsx,.pptx" style={{ display: 'none' }} onChange={e => onFilesPicked(e.target.files)} />
