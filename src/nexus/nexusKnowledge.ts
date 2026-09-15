@@ -593,7 +593,7 @@ What are you navigating right now?`;
  *  - Demonstrates assessment + framework awareness.
  *  - Premium, confident, slightly formal — not overly friendly.
  */
-export const NEXUS_FIRST_RESPONSE = `Welcome{NAME}. I'm NEXUS, your executive intelligence partner — built on two decades of LYC executive search methodology.
+export const NEXUS_FIRST_RESPONSE = `Welcome{NAME}. I'm NEXUS — think of me as a senior peer who happens to carry twenty years of LYC leadership intelligence in the background.
 
 I can help you with:
 - Navigate a career transition or cross-border move
@@ -608,6 +608,7 @@ Where would you like to start?`;
  * Specific, framework-aware options — not open-ended.
  */
 export const NEXUS_FIRST_RESPONSE_QUICK_REPLIES: string[] = [
+  'Tell me about yourself',
   'Navigate a career transition',
   'Benchmark my leadership',
   'Help with a specific challenge',
