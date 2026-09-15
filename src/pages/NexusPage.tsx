@@ -824,4 +824,5 @@ function FoldCard({ kind, title, items }: { kind: 'insight' | 'reference'; title
   );
 }
 
+export { NEXUSPage };
 export default NEXUSPage;
