@@ -255,10 +255,114 @@ const lightMd = {
   li: ({ children }: any) => <li style={{ color: L.aiTx, fontFamily: L.font, fontSize: 14.5, lineHeight: 1.6, marginBottom: 4 }}>{children}</li>,
 };
 
+function ProfileOnboarding({ onComplete }: { onComplete: (profile: Record<string, string>) => void }) {
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  
+  const questions = [
+    { key: 'role', q: "What's your current role and level?" },
+    { key: 'industry', q: "What industry are you in?" },
+    { key: 'company_size', q: "How large is your organization?" },
+    { key: 'team_size', q: "How many people report to you (directly or indirectly)?" },
+    { key: 'location', q: "Where are you based, and do you work across borders?" },
+    { key: 'challenge', q: "What's the biggest challenge you're facing right now?" },
+    { key: 'goal', q: "What are you trying to achieve in the next 6-12 months?" },
+    { key: 'expectation', q: "What brought you to NEXUS today?" },
+    { key: 'experience', q: "Have you worked with an executive coach or advisor before?" },
+    { key: 'preference', q: "What's your preferred communication style? (Direct and structured / Exploratory and conversational)" }
+  ];
+  
+  const current = questions[step];
+  
+  const handleNext = (value: string) => {
+    const newAnswers = { ...answers, [current.key]: value };
+    setAnswers(newAnswers);
+    if (step < questions.length - 1) {
+      setStep(step + 1);
+    } else {
+      onComplete(newAnswers);
+    }
+  };
+  
+  return (
+    <div style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      height: '100dvh', width: '100vw', background: S.shellBg, padding: 20,
+    }}>
+      <div style={{ maxWidth: 560, width: '100%' }}>
+        <div style={{ marginBottom: 32, textAlign: 'center' }}>
+          <h1 style={{ fontSize: 28, fontWeight: 600, color: '#fff', marginBottom: 8, fontFamily: L.logo }}>
+            Welcome to NEXUS
+          </h1>
+          <p style={{ fontSize: 14, color: '#8e8e93', lineHeight: 1.5 }}>
+            A few quick questions to help me understand your context
+          </p>
+          <div style={{ marginTop: 16, fontSize: 12, color: '#6e6e73' }}>
+            {step + 1} of {questions.length}
+          </div>
+        </div>
+        
+        <div style={{
+          background: '#fff', borderRadius: 20, padding: 32,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+        }}>
+          <h2 style={{ fontSize: 18, fontWeight: 600, color: L.aiTx, marginBottom: 24, lineHeight: 1.4 }}>
+            {current.q}
+          </h2>
+          <input
+            type="text"
+            autoFocus
+            onKeyDown={e => {
+              if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                handleNext(e.currentTarget.value.trim());
+              }
+            }}
+            placeholder="Type your answer…"
+            style={{
+              width: '100%', padding: '14px 18px', fontSize: 15, border: `1px solid ${L.bdr}`,
+              borderRadius: 14, outline: 'none', fontFamily: L.font, color: L.aiTx,
+              transition: 'border-color .15s',
+            }}
+            onFocus={e => e.target.style.borderColor = L.userBubble}
+            onBlur={e => e.target.style.borderColor = L.bdr}
+          />
+          <button
+            onClick={() => {
+              const input = document.querySelector('input[autofocus]') as HTMLInputElement;
+              if (input?.value.trim()) handleNext(input.value.trim());
+            }}
+            style={{
+              marginTop: 16, width: '100%', padding: '13px 0', fontSize: 15, fontWeight: 600,
+              background: L.userBubble, color: '#fff', border: 'none', borderRadius: 14,
+              cursor: 'pointer', fontFamily: L.font, transition: 'opacity .15s',
+            }}
+          >
+            {step < questions.length - 1 ? 'Next →' : 'Start conversation →'}
+          </button>
+        </div>
+        
+        {step > 0 && (
+          <button
+            onClick={() => setStep(step - 1)}
+            style={{
+              marginTop: 16, background: 'transparent', border: 'none', color: '#8e8e93',
+              fontSize: 13, cursor: 'pointer', fontFamily: L.font,
+            }}
+          >
+            ← Back
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function NEXUSPage() {
   const { user, profile } = useAuthStore();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [profileComplete, setProfileComplete] = useState(false);
+  const [profileContext, setProfileContext] = useState<Record<string, string> | null>(null);
 
   const demoUid = useMemo(() => getDemoUid(), []);
   const assessmentProgress = useMemo(() => getAssessmentProgress(), []);
@@ -497,6 +601,9 @@ function NEXUSPage() {
   return (
     <>
       <SEO title="NEXUS. — Executive Thinking Partner" description="NEXUS is the executive thinking partner by LYC Partners." />
+      {!profileComplete ? (
+        <ProfileOnboarding onComplete={(p) => { setProfileContext(p); setProfileComplete(true); }} />
+      ) : (
       <div style={{
         display: 'flex', height: '100dvh', width: '100vw', overflow: 'hidden',
         background: S.shellBg, fontFamily: L.font, fontSize: 15, lineHeight: 1.5,
@@ -750,6 +857,7 @@ function NEXUSPage() {
           </div>
         </main>
       </div>
+      )}
     </>
   );
 }
