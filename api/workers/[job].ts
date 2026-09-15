@@ -1857,7 +1857,8 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
 
     // Build messages
     const messages: Array<{ role: string; content: string }> = [
-      { role: 'system', content: sysPrompt + docContextBlock + memoryContextBlock },
+      { role: 'system', content: sysPrompt + docContextBlock + memoryContextBlock + '\n\nRespond concisely. First token must appear within 1 second. Keep answers short and direct.' }
+
     ];
 
     // Add recent history (last 10 turns)
@@ -1905,8 +1906,8 @@ async function handleChat(req: VercelRequest, res: VercelResponse) {
         body: JSON.stringify({
           model: DEEPSEEK_MODEL,
           messages,
-          temperature: 0.7,
-          max_tokens: 1024,
+          temperature: 0.5,
+          max_tokens: 512,
           stream: true,
         }),
       },

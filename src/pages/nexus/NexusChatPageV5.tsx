@@ -19,6 +19,7 @@ import {
 import { ASSESSMENT_CATALOG } from '@/assessments/catalog';
 import { getAvailablePersonas } from '@/config/nexusPersonas';
 import { reportError } from '@/analytics/errorMonitor';
+import { NexusProfileGate, getSavedProfile, type NexusUserProfile } from './NexusProfileGate';
 import {
   trackCTA,
   trackNexusChatInitiation,
@@ -28,11 +29,11 @@ import {
 // ─── iOS-inspired theme tokens ───────────────────────────────────────────────
 const IOS = {
   bg: '#F5F5F7',          // iOS off-white
-  panel: '#1C1C1E',       // matte black
-  divider: '#2C2C2E',     // iOS system gray
-  dividerLight: '#3A3A3C',
+  panel: '#3A3632',       // warm charcoal
+  divider: '#4A4640',     // warm gray divider
+  dividerLight: '#5A5650',
   textDark: '#1D1D1F',    // on light bg
-  textLight: '#FFFFFF',   // on dark bg
+  textLight: '#F2EFEA',   // warm off-white on charcoal
   bubbleBot: '#FFFFFF',
   bubbleUser: '#E8E8ED',
   shadow: '0 1px 3px rgba(0,0,0,0.08)',
@@ -138,45 +139,12 @@ function NexusAvatar({ size = 36 }: { size?: number }) {
         justifyContent: 'center',
         flexShrink: 0,
         border: `2px solid rgba(255,255,255,0.15)`,
-        boxShadow: '0 0 0 3px rgba(0,180,160,0.15)',
+        // no outer ring
         position: 'relative',
       }}
     >
       <span style={{ color: '#fff', fontSize: size * 0.4, fontWeight: 700, fontFamily: V1.monoFont }}>
         N
-      </span>
-      {/* Pulse ring */}
-      <span
-        style={{
-          position: 'absolute',
-          inset: -3,
-          borderRadius: '50%',
-          border: `1.5px solid ${V1.teal400}`,
-          opacity: 0.4,
-          animation: 'nexus-avatar-pulse 2.5s ease-in-out infinite',
-        }}
-      />
-    </div>
-  );
-}
-
-function UserAvatar({ size = 36 }: { size?: number }) {
-  return (
-    <div
-      style={{
-        width: size,
-        height: size,
-        borderRadius: '50%',
-        background: `linear-gradient(135deg, #3A3A3C, #1C1C1E)`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0,
-        border: '2px solid rgba(255,255,255,0.1)',
-      }}
-    >
-      <span style={{ color: '#fff', fontSize: size * 0.4, fontWeight: 600, fontFamily: V1.bodyFont }}>
-        U
       </span>
     </div>
   );
@@ -197,7 +165,7 @@ function HeaderOrbitAvatar() {
           justifyContent: 'center',
           top: 3,
           left: 3,
-          animation: 'nexus-orbit 8s linear infinite',
+          // orbit removed — static avatar
         }}
       >
         <span style={{ color: '#fff', fontSize: 9, fontWeight: 700, fontFamily: V1.monoFont }}>N</span>
@@ -347,51 +315,123 @@ function UserMessageBlock({ msg }: { msg: UserMessage }) {
   );
 }
 
-function OptionChipsBlock({
+const FALLBACK_OPTIONS = [
+  'Tell me more about this',
+  'What should I do next?',
+  'Give me a specific example',
+  'How does this compare to best practices?',
+  'Others / None of the above',
+];
+
+function RollingOptionsPanel({
   chips,
   onSelect,
 }: {
   chips: OptionChips;
   onSelect: (text: string) => void;
 }) {
+  const [expanded, setExpanded] = useState(false);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+
+  // Ensure exactly 5 options, 5th always "Others / None of the above"
+  const options = useMemo(() => {
+    const base = chips.options.length > 0 ? chips.options : FALLBACK_OPTIONS;
+    const first4 = base.slice(0, 4);
+    while (first4.length < 4) first4.push(FALLBACK_OPTIONS[first4.length]);
+    return [...first4, 'Others / None of the above'];
+  }, [chips.options]);
+
+  const handleSelect = (opt: string) => {
+    setExpanded(false);
+    onSelect(opt);
+  };
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 6 }}
+      initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, delay: 0.1 }}
-      style={{
-        marginTop: 12,
-        marginLeft: 44,
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: 8,
-      }}
+      transition={{ duration: 0.2, delay: 0.15 }}
+      style={{ marginTop: 8, marginLeft: 44 }}
     >
-      {chips.options.map((opt, i) => (
-        <button
-          key={i}
-          onClick={() => onSelect(opt)}
-          onMouseEnter={() => setHoveredIdx(i)}
-          onMouseLeave={() => setHoveredIdx(null)}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            padding: '7px 13px',
-            border: `1px solid ${hoveredIdx === i ? V1.teal600 : '#D1D1D6'}`,
-            background: hoveredIdx === i ? '#F0FAF8' : '#FFFFFF',
-            borderRadius: 20,
-            cursor: 'pointer',
-            fontFamily: V1.bodyFont,
-            fontSize: 13,
-            color: hoveredIdx === i ? V1.teal700 : V1.ink700,
-            lineHeight: V1.leadingBody,
-            transition: 'all 0.15s ease',
-          }}
-        >
-          {opt}
-        </button>
-      ))}
+      {/* Collapsed: ↓ pill */}
+      <AnimatePresence>
+        {!expanded && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            onClick={() => setExpanded(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              padding: '5px 12px',
+              border: '1px solid #E5E5EA',
+              background: '#FFFFFF',
+              borderRadius: 14,
+              cursor: 'pointer',
+              fontFamily: V1.bodyFont,
+              fontSize: 12,
+              color: V1.ink500,
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = V1.teal400; e.currentTarget.style.color = V1.teal700; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E5EA'; e.currentTarget.style.color = V1.ink500; }}
+          >
+            <span style={{ fontSize: 10 }}>↓</span>
+            <span>Options</span>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Expanded: vertical panel */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ opacity: 0, height: 0, marginTop: 0 }}
+            animate={{ opacity: 1, height: 'auto', marginTop: 0 }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            style={{
+              overflow: 'hidden',
+              background: '#FFFFFF',
+              borderRadius: 12,
+              border: '1px solid #E5E5EA',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+            }}
+          >
+            {options.map((opt, i) => (
+              <motion.button
+                key={i}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.15, delay: i * 0.04 }}
+                onClick={() => handleSelect(opt)}
+                onMouseEnter={() => setHoveredIdx(i)}
+                onMouseLeave={() => setHoveredIdx(null)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  width: '100%',
+                  padding: '10px 14px',
+                  border: 'none',
+                  borderBottom: i < options.length - 1 ? '1px solid #F0F0F2' : 'none',
+                  background: hoveredIdx === i ? '#F0FAF8' : 'transparent',
+                  cursor: 'pointer',
+                  fontFamily: V1.bodyFont,
+                  fontSize: 13,
+                  color: hoveredIdx === i ? V1.teal700 : V1.ink700,
+                  lineHeight: V1.leadingBody,
+                  textAlign: 'left',
+                  transition: 'background 0.12s ease',
+                }}
+              >
+                {opt}
+              </motion.button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
@@ -820,6 +860,8 @@ function fileToBase64(file: File): Promise<string> {
 
 // ─── Main component ──────────────────────────────────────────────────────────
 export function NexusChatPageV5(): React.ReactElement {
+  const [userProfile, setUserProfile] = useState<NexusUserProfile | null>(() => getSavedProfile());
+  const [showProfileForm, setShowProfileForm] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<MessageRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -890,7 +932,11 @@ export function NexusChatPageV5(): React.ReactElement {
   // Initialize thread
   useEffect(() => {
     trackNexusChatInitiation('direct_link');
-    const base = buildNexusFirstResponse(profile?.name);
+    // Build personalized greeting from profile
+    const profileContext = userProfile
+      ? `Welcome, ${userProfile.name}. I've noted you're a ${userProfile.role} in ${userProfile.industry || 'your field'} at ${userProfile.location || 'your location'}. ${userProfile.challenge ? `Let's focus on ${userProfile.challenge.slice(0, 120)}` : "How can I help you today?"}`
+      : '';
+    const base = profileContext || buildNexusFirstResponse(profile?.name);
     const assessmentProgress = getAssessmentProgress();
     let greeting = base;
     if (assessmentProgress.completed > 0) {
@@ -908,7 +954,7 @@ export function NexusChatPageV5(): React.ReactElement {
       { type: 'chips', id: 'quick-replies', options: NEXUS_FIRST_RESPONSE_QUICK_REPLIES },
     ]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile?.name]);
+  }, [profile?.name, userProfile]);
 
   // Auto-scroll
   useEffect(() => {
@@ -1008,14 +1054,12 @@ export function NexusChatPageV5(): React.ReactElement {
         );
       });
 
-      // Append suggested prompts as chips after every bot reply
+      // Append rolling options panel after every bot reply (always 5 options)
       const prompts = resultResponse?.suggested_prompts || [];
-      if (prompts.length > 0) {
-        setMessages((prev) => [
-          ...prev,
-          { type: 'chips', id: `chips-${botId}`, options: prompts },
-        ]);
-      }
+      setMessages((prev) => [
+        ...prev,
+        { type: 'chips', id: `chips-${botId}`, options: prompts },
+      ]);
 
       setStreamingBotId(null);
       streamingRef.current = '';
@@ -1057,6 +1101,18 @@ export function NexusChatPageV5(): React.ReactElement {
   const handleDocumentUploaded = (documentId: string) => {
     setPendingDocIds((prev) => [...prev, documentId]);
   };
+
+  // Profile gate: show form if no profile saved or user clicked Profile button
+  if (!userProfile || showProfileForm) {
+    return (
+      <NexusProfileGate
+        onComplete={(p) => {
+          setUserProfile(p);
+          setShowProfileForm(false);
+        }}
+      />
+    );
+  }
 
   return (
     <div style={{ display: 'flex', gap: 0, minHeight: 'calc(100vh - 0px)' }}>
@@ -1116,6 +1172,13 @@ export function NexusChatPageV5(): React.ReactElement {
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              onClick={() => setShowProfileForm(true)}
+              style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: V1.monoFont, fontSize: '0.65rem', letterSpacing: V1.trackingMono, textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', lineHeight: V1.leadingLabel }}
+            >
+              Profile
+            </button>
+            <span style={{ color: IOS.dividerLight, fontFamily: V1.bodyFont }}>•</span>
             <button style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: V1.monoFont, fontSize: '0.65rem', letterSpacing: V1.trackingMono, textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', lineHeight: V1.leadingLabel }}>
               Export
             </button>
@@ -1147,7 +1210,7 @@ export function NexusChatPageV5(): React.ReactElement {
                   case 'user':
                     return <UserMessageBlock key={row.id} msg={row} />;
                   case 'chips':
-                    return <OptionChipsBlock key={row.id} chips={row} onSelect={handleChipSelect} />;
+                    return <RollingOptionsPanel key={row.id} chips={row} onSelect={handleChipSelect} />;
                   case 'system':
                     return <SystemCardBlock key={row.id} card={row} />;
                   case 'milestone':
@@ -1186,8 +1249,8 @@ export function NexusChatPageV5(): React.ReactElement {
                 style={{
                   width: '100%',
                   boxSizing: 'border-box',
-                  border: `1px solid #D1D1D6`,
-                  borderRadius: 12,
+                  border: '1px solid rgba(0,0,0,0.04)',
+                  borderRadius: 22,
                   padding: '11px 14px',
                   fontFamily: V1.bodyFont,
                   fontSize: 15,
@@ -1200,8 +1263,8 @@ export function NexusChatPageV5(): React.ReactElement {
                   background: IOS.bg,
                   transition: `border-color ${V1.durFast}ms ${V1.ease}`,
                 }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = V1.teal600)}
-                onBlur={(e) => (e.currentTarget.style.borderColor = '#D1D1D6')}
+                onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(0,180,160,0.2)')}
+                onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(0,0,0,0.04)')}
               />
               <div style={{ marginTop: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <FileUploadButton
@@ -1263,14 +1326,7 @@ export function NexusChatPageV5(): React.ReactElement {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
         }
-        @keyframes nexus-avatar-pulse {
-          0%, 100% { transform: scale(1); opacity: 0.4; }
-          50% { transform: scale(1.12); opacity: 0.1; }
-        }
-        @keyframes nexus-orbit {
-          0% { transform: rotate(0deg) translateX(2px) rotate(0deg); }
-          100% { transform: rotate(360deg) translateX(2px) rotate(-360deg); }
-        }
+        /* pulse & orbit animations removed — no tails */
       `}</style>
     </div>
   );
