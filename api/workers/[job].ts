@@ -371,6 +371,10 @@ const TEMPLATE_REGISTRY: Record<string, { defaultSubject: string; defaultPrehead
     defaultSubject: 'Your NEXUS conversation summary',
     defaultPreheader: 'Here\'s what we covered.',
   },
+  monthly_summary: {
+    defaultSubject: 'Your monthly LYC Partners summary',
+    defaultPreheader: 'See what you accomplished this month.',
+  },
 };
 
 async function handleTemplateRender(
@@ -636,6 +640,7 @@ function emailKindFromJob(kind: string): string | null {
   if (kind === 'email:upgrade_confirmation') return 'upgrade_confirmation';
   if (kind === 'email:nexus_conversation_summary')
     return 'nexus_conversation_summary';
+  if (kind === 'email:monthly_summary') return 'monthly_summary';
   return null;
 }
 

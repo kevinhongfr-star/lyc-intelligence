@@ -44,6 +44,7 @@ export const AI_JOB_KINDS = [
   'email:share_result',
   'email:assessment_complete',
   'email:weekly_digest',
+  'email:monthly_summary',
   'email:export_pdf_complete',
 ] as const;
 export type AiJobKind = (typeof AI_JOB_KINDS)[number];
@@ -123,6 +124,29 @@ export interface ExportPdfCompletePayload {
   user_tier: TierKey;
   download_url: string;
   filename: string;
+}
+
+export interface MonthlySummaryEmailPayload {
+  recipient_name: string;
+  recipient_email: string;
+  user_tier: TierKey;
+  month_label: string;
+  summary_counts: {
+    assessments_completed: number;
+    nexus_sessions: number;
+    shares_sent: number;
+    insights_generated: number;
+  };
+  trend: {
+    highest_single_score: number | null;
+    assessments_per_diagnostic: Record<string, number>;
+    three_month_comparison?: Array<{
+      month: string;
+      assessments_completed: number;
+      avg_score: number | null;
+    }>;
+  };
+  account_url: string;
 }
 
 /* ── Enqueue helper (SQL adapter contract) ────────────────────────── */
